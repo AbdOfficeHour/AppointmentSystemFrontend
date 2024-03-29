@@ -1,0 +1,6 @@
+AbdAppointmentSystem/node_modules
+/.idea
+/AbdAppointmentSystem/.vscode
+.idea/AppointmentSystemFrontend.iml
+.idea/modules.xml
+.idea/vcs.xml
