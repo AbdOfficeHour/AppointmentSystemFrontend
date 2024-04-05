@@ -25,7 +25,7 @@ function onSubmit(){
     console.log(res)
     if(res.data.code === 0){
       localStorage.setItem('token', res.data.data.token)
-      router.push('/index')
+      router.push('/index/officehour')
     }else{
       alert(res.data.message)
     }
