@@ -7,7 +7,7 @@
   let select_value= ref('') // 被选中的对象
 
   watch(props, (newVal, oldVal) => { // 侦听PickerList数据变化
-    console.log('侦听器发现父组件传递的信息发生变化，开始更新')
+    console.log('Picker侦听器发现父组件传递的信息发生变化，开始更新')
     newVal = newVal.PickerList
     options.value = []
     for (let i = 0; i < newVal.length; i++) {
@@ -16,7 +16,7 @@
         label: newVal[i]
       })
     }
-    console.log("侦听器发现父组件传递的信息发生变化，并更新完成，更新options为：", options)
+    console.log("Picker侦听器发现父组件传递的信息发生变化，并更新完成，更新options为：", options)
   })
 
   function pickerChange() {

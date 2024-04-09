@@ -33,6 +33,15 @@ let OfficeHourTableFormat = {
         }
         return teacherList
     },
+    officehour_timetable_format(timeTable, getSelection) {
+        let timeTableFormat = []
+        for (let i = 0 ; i < timeTable.length; i++) {
+            if (timeTable[i].name === getSelection) {
+                timeTableFormat = timeTable[i].time
+            }
+        }
+        return timeTableFormat
+    }
 
 }
 
