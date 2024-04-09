@@ -7,11 +7,9 @@
   import {OfficeHourTableFormat} from "@/script/index/format.js";
 
   const props = defineProps(['timeSlots', "getSelection"]);
-
   const totalMinutes = 12 * 60 * 60 * 1000; // 12小时对应的毫秒数
-
-  const getSelection = ref(null); // 选择器选中的选项
-  const timeSlots = ref([]); // 用于渲染的时间表信息
+  let getSelection = ref(null); // 选择器选中的选项
+  let timeSlots = ref([]); // 用于渲染的时间表信息
 
   watch(props, (newVal, oldVal) => {
     console.log('OfficeHourTimeTable侦听器发现父组件传递的信息发生变化，' +

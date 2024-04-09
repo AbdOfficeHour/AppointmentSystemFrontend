@@ -3,7 +3,7 @@
 
   const props = defineProps(['PickerList']) // 父组件传递的数据
   const emits = defineEmits(['picker-change']) // 父组件监听的事件
-  const options = ref([]) // 选择器内选项
+  let options = ref([]) // 选择器内选项
   let select_value= ref('') // 被选中的对象
 
   watch(props, (newVal, oldVal) => { // 侦听PickerList数据变化
