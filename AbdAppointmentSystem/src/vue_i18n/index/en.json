@@ -1,5 +1,13 @@
 {
   "introduction_available": "Available time",
   "introduction_unavailable": "Unavailable time",
-  "select_teacher_hint": "Select the teacher"
+  "select_teacher_hint": "Select the teacher",
+  "select_teacher_DNE_hint": "Please select the teacher to view the schedule",
+  "select_teacher_no_officehour": "Have no OfficeHour activity for the time being",
+  "go_appointment": "Make an appointment",
+  "ban_time_button": "Disable a time period",
+  "ban_date": "Date",
+  "ban_time": "Time Period",
+  "ban_time_upload": "Upload",
+  "ban_time_cancel": "Cancel"
 }

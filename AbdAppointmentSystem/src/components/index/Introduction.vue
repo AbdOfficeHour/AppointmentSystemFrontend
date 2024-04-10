@@ -1,8 +1,10 @@
 <script setup>
+
 </script>
 
 <template>
   <div class="legend">
+    <!-- 图例组件 -->
     <div class="legend-item">
       <span class="legend-color" style="background-color: blue;"></span>
       <span class="legend-text">{{ $t("index.introduction_available")}}</span>

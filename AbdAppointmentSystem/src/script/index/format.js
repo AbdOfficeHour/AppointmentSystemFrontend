@@ -1,5 +1,6 @@
 let UserInfoFormat = {
     credit_format(credits) {
+        // 从用户信息中提取出权限表
         console.log("从用户信息中提取出权限表")
         let authorityTable = {
             "OfficeHour:appointment": null,
@@ -15,7 +16,7 @@ let UserInfoFormat = {
             "classroom:approve": null,
         }
         for (let key in authorityTable) {
-            authorityTable[key] = credits.includes(key)
+            authorityTable[key] = credits.includes(key) // 结果为布尔值
         }
         return authorityTable
     },
@@ -23,6 +24,7 @@ let UserInfoFormat = {
 
 let OfficeHourTableFormat = {
     teacher_list_format(officeHourTime) {
+        // 从后端返回的OfficeHour时间表中提取出教师列表信息
         let teacherList = []
         console.log("从时间表中提取出教师列表信息")
         for (let i = 0; i < officeHourTime.length; i++) {
@@ -33,7 +35,9 @@ let OfficeHourTableFormat = {
         }
         return teacherList
     },
+
     officehour_timetable_format(timeTable, getSelection) {
+        // 从后端返回的完整时间表中提取出被选中教师的时间表
         let timeTableFormat = []
         console.log("从时间表中提取出被选中教师的时间表")
         for (let i = 0 ; i < timeTable.length; i++) {

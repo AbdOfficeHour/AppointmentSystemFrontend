@@ -2,9 +2,11 @@
   import Introduction from "@/components/index/Introduction.vue";
   import Picker from "@/components/index/Picker.vue";
   import TimeTable from "@/components/index/OfficeHourTimeTable.vue";
+  import BanSelector from "@/components/index/BanSelector.vue";
   import {UserInfoFormat, OfficeHourTableFormat} from "@/script/index/format.js";
-  import {onMounted, reactive, ref} from "vue";
+  import {onMounted, ref} from "vue";
   import axios from "axios";
+  import router from "@/router/index.js";
 
   let username = ref(null) // 用户名
   let userID = ref(null) // 用户ID
@@ -16,6 +18,7 @@
   let teacherList = ref([]) // 具有OfficeHour活动的教师列表
   let authorityTable = ref({}) // 权限表
   let getSelection = ref(null) // 被用户选中的教师 或 教师账号本人
+  let banTime = ref(false) // 是否渲染禁用时间表单
 
   onMounted(function () {
     // 生命周期函数——组件开始挂载时调用
@@ -75,6 +78,24 @@
     // 接收到Picker子组件传递的选中的教师信息
     getSelection.value = selection
   }
+
+  function navigateToAppointment(){
+    console.log('准备跳转到预约页面');
+    router.push({
+      name: 'Appointment',
+    })
+  }
+
+  function banOnOff(){
+    console.log('展开/关闭禁用时间段表单');
+    banTime.value = !banTime.value
+  }
+
+  function banOff(){
+    console.log('收起禁用时间段表单');
+    banTime.value = false
+  }
+
 </script>
 
 <template>
@@ -83,10 +104,41 @@
       <Introduction></Introduction>
     </div>
     <div v-if="authorityTable['OfficeHour:timeTable:all']" class="picker">
-      <Picker :PickerList="teacherList" @picker-change="pickerChange"></Picker>
+      <Picker :PickerList="teacherList"
+              @picker-change="pickerChange">
+      </Picker>
     </div>
     <div class="table">
-      <TimeTable :time-slots="timeTable" :get-selection="getSelection"></TimeTable>
+      <div v-if="authorityTable['OfficeHour:appointment']">
+        <TimeTable :time-slots="timeTable"
+                   :get-selection="getSelection"
+                   :is-navigate=true>
+        </TimeTable>
+      </div>
+      <div v-if="authorityTable['OfficeHour:approve']">
+        <TimeTable :time-slots="timeTable"
+                   :get-selection="getSelection"
+                   :is-navigate=false>
+        </TimeTable>
+      </div>
+    </div>
+    <div v-if="authorityTable['OfficeHour:appointment']" class="goAppointment">
+      <el-button type="primary"
+                 @click="navigateToAppointment">
+        {{ $t("index.go_appointment")}}
+      </el-button>
+    </div>
+    <div v-if="authorityTable['OfficeHour:approve']" class="banButton">
+      <el-button type="primary"
+                 @click="banOnOff">
+        {{ $t("index.ban_time_button")}}
+      </el-button>
+    </div>
+    <div v-if="banTime" class="banTable">
+      <BanSelector @ban-time-cancel="banOff"
+                   :time-table="timeTable"
+                   :get-selection="getSelection">
+      </BanSelector>
     </div>
   </div>
 </template>
@@ -98,7 +150,7 @@
     width: 100%;
   }
 
-  .introduction, .picker, .table {
+  .introduction, .picker, .table, .goAppointment, .banButton, .banTable{
     flex-grow: 1;
     margin-top: 20px;
   }
