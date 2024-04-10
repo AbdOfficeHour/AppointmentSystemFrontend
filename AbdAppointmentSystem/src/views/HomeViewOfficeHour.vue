@@ -3,7 +3,7 @@
   import Picker from "@/components/index/Picker.vue";
   import TimeTable from "@/components/index/OfficeHourTimeTable.vue";
   import BanSelector from "@/components/index/BanSelector.vue";
-  import {UserInfoFormat, OfficeHourTableFormat} from "@/script/index/format.js";
+  import {UserInfoFormat, OfficeHourTableFormat} from "@/utils/index/format.js";
   import {onMounted, ref} from "vue";
   import axios from "axios";
   import router from "@/router/index.js";

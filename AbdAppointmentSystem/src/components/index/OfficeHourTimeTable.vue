@@ -6,7 +6,7 @@
   // 为方便后续变更，采用从DOM树开始定义与变更的方式
 
   import {ref, onMounted, watch} from 'vue';
-  import {OfficeHourTableFormat} from "@/script/index/format.js";
+  import {OfficeHourTableFormat} from "@/utils/index/format.js";
   import router from "@/router/index.js";
   import {useI18n} from "vue-i18n";
 
