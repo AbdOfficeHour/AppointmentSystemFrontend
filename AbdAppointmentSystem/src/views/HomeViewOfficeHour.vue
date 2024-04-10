@@ -19,7 +19,8 @@
 
   onMounted(function () {
     // 生命周期函数——组件开始挂载时调用
-    console.log("HomeView OfficeHour开始挂载")
+    console.log("HomeViewOfficeHour开始挂载")
+
     // 从后端获取用户信息和权限信息
     console.log("获取用户信息和权限信息")
     axios({
@@ -36,12 +37,12 @@
         username.value = res.data.data.username
         userID.value = res.data.data.userID
         email.value = res.data.data.email
-
+        // 若为审批者，则默认选中自己，因为只能查看自己的时间表
         if (authorityTable.value['OfficeHour:approve']) {
           getSelection = username.value
         }
-
-      }else{
+      }
+      else{
         console.log("请求失败，获取用户信息和权限信息失败")
         console.log(res.data.message)
       }
@@ -61,7 +62,8 @@
         console.log("教师列表信息提取成功")
         timeTable.value = res.data.data.timeTable
         console.log("时间表信息提取成功")
-      }else{
+      }
+      else{
         console.log("请求失败，获取OfficeHour时间表信息失败")
         console.log(res.data.message)
       }

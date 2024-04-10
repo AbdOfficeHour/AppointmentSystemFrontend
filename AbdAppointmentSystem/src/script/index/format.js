@@ -35,6 +35,7 @@ let OfficeHourTableFormat = {
     },
     officehour_timetable_format(timeTable, getSelection) {
         let timeTableFormat = []
+        console.log("从时间表中提取出被选中教师的时间表")
         for (let i = 0 ; i < timeTable.length; i++) {
             if (timeTable[i].name === getSelection) {
                 timeTableFormat = timeTable[i].time

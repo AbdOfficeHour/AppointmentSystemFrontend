@@ -5,10 +5,11 @@
 <script setup>
   import {ref, onMounted, watch} from 'vue';
   import {OfficeHourTableFormat} from "@/script/index/format.js";
+  import router from "@/router/index.js";
 
   const props = defineProps(['timeSlots', "getSelection"]);
   const totalMinutes = 12 * 60 * 60 * 1000; // 12小时对应的毫秒数
-  let getSelection = ref(null); // 选择器选中的选项
+  let getSelection = ref(null); // 选择器选中的选项（父组件传递的内容）
   let timeSlots = ref([]); // 用于渲染的时间表信息
 
   watch(props, (newVal, oldVal) => {
@@ -22,6 +23,16 @@
     console.log('时间表数据信息更新完成');
     renderTimeline();
   });
+
+  function navigateToAppointment(date, teacher) {
+    router.push({
+      name: 'Appointment',
+      query: {
+        date: date,
+        selectTeacher: teacher
+      }
+    })
+  }
 
   onMounted(() => {
     console.log('mounted');
@@ -47,7 +58,17 @@
     timeSlots.value.forEach(slot => {
       const timeline = document.createElement('div');
       timeline.classList.add('timeline');
-      appTable.appendChild(timeline); // 时间轴元素，存储time-labels和time-bar
+      appTable.appendChild(timeline); // 时间轴元素，存储time-labels、time-bar、teacher-label、date_label
+
+      const teacherLabel = document.createElement('div');
+      teacherLabel.classList.add('teacher-label');
+      teacherLabel.textContent = getSelection.value;
+      timeline.appendChild(teacherLabel);
+
+      const dateLabel = document.createElement('div');
+      dateLabel.classList.add('date-label');
+      dateLabel.textContent = slot.date;
+      timeline.appendChild(dateLabel);
 
       const timeLabels = document.createElement('div');
       timeLabels.classList.add('time-labels');
@@ -56,6 +77,11 @@
       const timeBar = document.createElement('div');
       timeBar.classList.add('time-bar');
       timeline.appendChild(timeBar);
+
+      timeline.addEventListener('click', () => {
+        console.log("检测到点击，准备执行跳转操作")
+        navigateToAppointment(slot.date, getSelection.value)
+      })
 
       for (let i = 8; i < 20; i++) {
         const timeLabel = document.createElement('div');
