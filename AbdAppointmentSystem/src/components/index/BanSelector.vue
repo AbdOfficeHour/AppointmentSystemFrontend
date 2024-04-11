@@ -1,6 +1,6 @@
 <script setup>
-import {onMounted, ref, watch} from "vue";
-import {OfficeHourTableFormat} from "@/utils/index/format.js";
+  import {onMounted, ref, watch} from "vue";
+  import {OfficeHourTableFormat} from "@/utils/index/format.js";
 
   const props = defineProps(['timeTable', 'getSelection'])
   const emits = defineEmits(['banTimeCancel']) // 父组件监听的事件

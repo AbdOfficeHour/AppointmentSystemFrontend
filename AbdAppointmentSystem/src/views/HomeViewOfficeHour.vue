@@ -21,7 +21,11 @@
   let banTime = ref(false) // 是否渲染禁用时间表单
 
   onMounted(function () {
-    // 生命周期函数——组件开始挂载时调用
+    /**
+     * HomeViewOfficeHour组件挂载时执行
+     * 向后端请求数据，获取用户信息、权限信息、OfficeHour时间表信息
+     */
+
     console.log("HomeViewOfficeHour开始挂载")
 
     // 从后端获取用户信息和权限信息
@@ -33,20 +37,22 @@
       console.log(res)
       if(res.data.code === 0){
         console.log("获取用户信息和权限信息成功")
-        role.value = res.data.data.userAuthority.role
-        credits.value = res.data.data.userAuthority.credit
+        role.value = res.data.data.userAuthority.role // 用户角色
+        credits.value = res.data.data.userAuthority.credit // 用户权限
+        console.log("提取用户权限表")
         authorityTable.value = UserInfoFormat.credit_format(credits.value) // 格式化权限信息
-        console.log("权限表提取成功")
-        username.value = res.data.data.username
-        userID.value = res.data.data.userID
-        email.value = res.data.data.email
+        console.log("用户权限表提取成功")
+        username.value = res.data.data.username // 用户姓名
+        userID.value = res.data.data.userID // 用户学号（学生） 或 Unknown（教师）
+        email.value = res.data.data.email // 用户邮箱
+
         // 若为审批者，则默认选中自己，因为只能查看自己的时间表
         if (authorityTable.value['OfficeHour:approve']) {
           getSelection = username.value
         }
       }
       else{
-        console.log("请求失败，获取用户信息和权限信息失败")
+        console.warn("请求失败，获取用户信息和权限信息失败")
         console.log(res.data.message)
       }
     })
@@ -60,14 +66,16 @@
       console.log(res)
       if(res.data.code === 0){
         console.log("获取OfficeHour时间表信息成功")
-        officeHourTime.value = res.data.data.officeHourTime
+        officeHourTime.value = res.data.data.officeHourTime // 后端返回的时间表信息
+        console.log("提取教师列表信息")
         teacherList.value = OfficeHourTableFormat.teacher_list_format(officeHourTime.value) // 格式化教师列表信息
         console.log("教师列表信息提取成功")
+        console.log("提取时间表信息")
         timeTable.value = res.data.data.timeTable
         console.log("时间表信息提取成功")
       }
       else{
-        console.log("请求失败，获取OfficeHour时间表信息失败")
+        console.warn("请求失败，获取OfficeHour时间表信息失败")
         console.log(res.data.message)
       }
     })
