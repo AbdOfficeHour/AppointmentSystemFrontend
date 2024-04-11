@@ -31,6 +31,7 @@ import {OfficeHourTableFormat} from "@/utils/index/format.js";
     // 当信息填写不完整时
     if (selectDate.value === null || startTime.value === null || endTime.value === null) {
       console.warn("日期或时间未选择")
+      alert("警告：暂时未选择需要禁用的日期或时间")
       return;
     }
 
@@ -65,15 +66,24 @@ import {OfficeHourTableFormat} from "@/utils/index/format.js";
               (end.getTime() > busyStart.getTime() && end.getTime() <= busyEnd.getTime()) ||
               (start.getTime() <= busyStart.getTime() && end.getTime() >= busyEnd.getTime())) {
             console.warn("禁用时间段和繁忙时间段重叠")
+            alert("警告：禁用时间段和繁忙时间段重叠，请处理学生预约事件后重试")
             return;
           }
         }
       }
     }
 
-    // 时间段合理性校验通过，上传表单
-    console.log("时间段合理性校验通过，上传禁用时间表单")
-    emits('banTimeCancel')
+    // 时间段合理性校验通过，可以上传表单
+    let comfirm_result = confirm("确认要禁用这个时间段？")
+    if (comfirm_result){
+      console.log("时间段合理性校验通过，上传禁用时间表单")
+      confirm("禁用时间段成功")
+      emits('banTimeCancel')
+    }
+    else {
+      console.log("取消上传禁用时间表单")
+      emits('banTimeCancel')
+    }
   }
 
   function banTimeCancel() {
