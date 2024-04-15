@@ -82,12 +82,19 @@
   })
 
   function pickerChange(selection){
-    console.log("HomeViewOfficeHour组件接收到Picker组件传递的选中的教师信息：", selection)
+    /**
+     * HomeViewOfficeHour组件接收Picker组件传递的选中的教师信息
+     * @param selection: 选中的教师信息
+     */
+    console.log("HomeViewOfficeHour组件接收到Picker子组件传递的选中的教师信息：", selection)
     // 接收到Picker子组件传递的选中的教师信息
     getSelection.value = selection
   }
 
   function navigateToAppointment(){
+    /**
+     * 跳转到预约页面，不带参跳转
+     */
     console.log('准备跳转到预约页面');
     router.push({
       name: 'Appointment',
@@ -95,11 +102,17 @@
   }
 
   function banOnOff(){
+    /**
+     * 展开/关闭禁用时间段表单，触发时变更当前展开状态
+     */
     console.log('展开/关闭禁用时间段表单');
     banTime.value = !banTime.value
   }
 
   function banOff(){
+    /**
+     * 收起禁用时间段表单，触发时收起表单
+     */
     console.log('收起禁用时间段表单');
     banTime.value = false
   }
@@ -107,6 +120,7 @@
 </script>
 
 <template>
+  <!-- HomeViewOfficeHour组件，OfficeHour首页渲染 -->
   <div class="page-container">
     <div class="introduction">
       <Introduction></Introduction>

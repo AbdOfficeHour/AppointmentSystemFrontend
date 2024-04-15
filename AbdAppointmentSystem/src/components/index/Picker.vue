@@ -3,10 +3,14 @@
 
   const props = defineProps(['PickerList']) // 父组件传递的数据
   const emits = defineEmits(['picker-change']) // 父组件监听的事件
-  let options = ref([]) // 选择器内选项
+  let options = ref([]) // 用于渲染的选择器内选项列表
   let select_value= ref(null) // 被选中的对象
 
   watch(props, (newVal, oldVal) => { // 侦听PickerList数据变化
+    /**
+     * 侦听父组件传递的props数据发生变化
+     * 更新options列表
+     */
     console.log('Picker组件侦听器发现父组件传递的信息发生变化，开始更新')
     newVal = newVal.PickerList
     options.value = []
@@ -16,11 +20,14 @@
         label: newVal[i]
       })
     }
-    console.log("Picker组件侦听器发现父组件传递的信息发生变化，并更新完成，更新options为：", options)
+    console.log("Picker组件侦听器发现父组件传递的信息发生变化，并更新完成")
   })
 
   function pickerChange() {
-    console.log("Picker组件选择器发生变化，选中的对象为", select_value.value)
+    /**
+     * Picker组件选择器发生变化，选中的对象为select_value.value
+     */
+    console.log("Picker子组件选择器发生变化，选中的对象为", select_value.value)
     emits('picker-change', select_value.value)
   }
 </script>
