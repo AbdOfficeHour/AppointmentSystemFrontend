@@ -36,7 +36,7 @@ function onSubmit(){
 
 <template>
   <p>login</p>
-  <el-from :model="form" label-width="auto" style="max-width: 600px">
+  <el-form :model="form" label-width="auto" style="max-width: 600px">
     <el-form-item label="用户名">
       <el-input v-model="form.userID"></el-input>
     </el-form-item>
@@ -44,7 +44,7 @@ function onSubmit(){
       <el-input v-model="form.password"></el-input>
     </el-form-item>
     <el-button type="primary" @click="onSubmit">Create</el-button>
-  </el-from>
+  </el-form>
 </template>
 
 <style scoped>
