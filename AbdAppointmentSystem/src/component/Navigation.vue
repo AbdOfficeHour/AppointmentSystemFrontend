@@ -194,6 +194,7 @@ const changeLanguage = () => {
 <style scoped>
 .nav{
   background-color: #31b0e6;
+  width: 100%;
 }
 
 .nav a{
