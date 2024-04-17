@@ -1,12 +1,15 @@
 <script setup>
-import {computed, onBeforeMount, reactive, ref} from "vue";
+import {computed, onBeforeMount, reactive, ref,nextTick} from "vue";
 import {useI18n} from "vue-i18n";
 import axios from "axios";
 
 const {t,locale} = useI18n()
 
-const officeHourNav = ref("none")
-const classRoomNav = ref("none")
+const active = ref("")
+const officeHourLi = ref()
+const classroomLi = ref()
+const officeHourUl = ref()
+const classroomUl = ref()
 const userInfo = reactive({
   username:t("other.unLogin"),
   email:"",
@@ -49,7 +52,7 @@ const nav_list_officeHour = computed(()=>{
     }
   })
   return [
-      ...menu.reverse(),
+    ...menu.reverse(),
     {
       name:t("other./user"),
       path:"/User"
@@ -92,7 +95,7 @@ const nav_list_classroom = computed(()=>{
   })
 
   return [
-      ...menu.reverse(),
+    ...menu.reverse(),
     {
       name:t("other./user"),
       path:"/User"
@@ -103,6 +106,7 @@ const nav_list_classroom = computed(()=>{
     }
   ]
 })
+
 
 
 onBeforeMount(()=>{
@@ -130,24 +134,61 @@ const changeLanguage = () => {
     locale.value = "zh"
   }
 }
+const mouseLeave = async (event)=>{
+  console.log(event)
+  const officehourli = officeHourLi.value.getBoundingClientRect()
+  const classroomli = classroomLi.value.getBoundingClientRect()
+  const officehourul = officeHourUl.value?officeHourUl.value.getBoundingClientRect():null
+  const classroomul = classroomUl.value?classroomUl.value.getBoundingClientRect():null
+
+  await nextTick()
+
+  if(event.clientX>officehourli.left
+      &&event.clientX<=officehourli.right
+      &&event.clientY>officehourli.top
+      &&event.clientY<=officehourli.bottom)
+    return
+
+  if(event.clientX>classroomli.left
+      &&event.clientX<classroomli.right
+      &&event.clientY>classroomli.top
+      &&event.clientY<=classroomli.bottom)
+    return;
+
+  if(officehourul)
+  if(event.clientX>officehourul.left
+      &&event.clientX<officehourul.right
+      &&event.clientY>officehourul.top
+      &&event.clientY<officehourul.bottom)
+    return;
+
+  if(classroomul)
+  if(event.clientX>classroomul.left
+      &&event.clientX<classroomul.right
+      &&event.clientY>classroomul.top
+      &&event.clientY<classroomul.bottom)
+    return;
+
+  active.value = ''
+}
 
 </script>
 
 <template>
   <nav class="nav">
     <ul class="nav-one">
-      <li>
+      <li ref="officeHourLi">
         <a
-            @mouseover="()=>{officeHourNav = 'flex'}"
-            @mouseout="()=>{officeHourNav = 'none'}"
+            @mouseover="()=>{active = 'officehour'}"
+            @mouseleave="mouseLeave"
         >
           {{$t("other.officeHour")}}
         </a>
       </li>
-      <li>
+      <li ref="classroomLi">
         <a
-            @mouseover="()=>{classRoomNav = 'flex'}"
-            @mouseout="()=>{classRoomNav = 'none'}"
+            @mouseover="()=>{active = 'classroom'}"
+            @mouseleave="mouseLeave"
         >
           {{$t("other.classAppointment")}}
         </a>
@@ -178,22 +219,23 @@ const changeLanguage = () => {
       </li>
     </ul>
   <!--二级导航部分 -->
-    <ul id="officeHour" class="nav-one nav-two">
-      <li v-for="item in nav_list_officeHour">
-        <router-link :to="item.path">{{item.name}}</router-link>
-      </li>
-    </ul>
-    <ul id="classroom" class="nav-one nav-two">
-      <li v-for="item in nav_list_classroom">
-        <router-link :to="item.path">{{item.name}}</router-link>
-      </li>
-    </ul>
+    <transition mode="out-in">
+      <ul v-if="active === 'officehour'" class="nav-one nav-two" ref="officeHourUl" @mouseleave="mouseLeave">
+        <li v-for="item in nav_list_officeHour">
+          <router-link :to="item.path">{{item.name}}</router-link>
+        </li>
+      </ul>
+      <ul v-else-if="active === 'classroom'" class="nav-one nav-two" ref="classroomUl" @mouseleave="mouseLeave">
+        <li v-for="item in nav_list_classroom">
+          <router-link :to="item.path">{{item.name}}</router-link>
+        </li>
+      </ul>
+    </transition>
   </nav>
 </template>
 
 <style scoped>
 .nav{
-  background-color: #31b0e6;
   width: 100%;
 }
 
@@ -211,6 +253,7 @@ const changeLanguage = () => {
 一级导航栏样式
 */
 .nav-one {
+  background-color: #319be6;
   margin: 0;
   padding: 0;
   list-style-type: none;
@@ -238,36 +281,31 @@ const changeLanguage = () => {
   margin-right: 8px;
 }
 
+
 /**
 二级导航栏样式
  */
 
 .nav-two{
-  background-color: #3195e6;
-}
-
-#officeHour{
-  display: v-bind(officeHourNav);
-}
-
-#officeHour:hover{
-  display: flex;
-}
-
-#classroom{
-  display: v-bind(classRoomNav);
-}
-
-#classroom:hover{
+  background-color: #39ace4;
   display: flex;
 }
 
 .el-row a{
   color: black;
 }
-
 .el-row a:hover{
   background-color: white;
+}
+/**
+过渡动画
+ */
+.v-enter-active, .v-leave-active{
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from, .v-leave-to{
+  opacity: 0;
 }
 
 </style>
