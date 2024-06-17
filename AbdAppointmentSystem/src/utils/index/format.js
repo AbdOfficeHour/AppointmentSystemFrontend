@@ -1,22 +1,45 @@
-let TimeFormat = {
-    formatTimestamp(timestamp, if_date = false) {
-        const date = new Date(timestamp);
-        const year = date.getFullYear();
-        const month = ('0' + (date.getMonth() + 1)).slice(-2);
-        const day = ('0' + date.getDate()).slice(-2);
-        const hours = ('0' + date.getHours()).slice(-2);
-        const minutes = ('0' + date.getMinutes()).slice(-2);
-        const seconds = ('0' + date.getSeconds()).slice(-2);
-        if (if_date) {
-            return `${year}-${month}-${day}`;
-        }
-        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+let PickerFormat = {
+    /**
+     * 负责对选择器相关数据执行格式化操作
+     */
+    teacher_list_format(teacherList) {
+        /**
+         * 从后端返回的完整教师列表中，筛选出教师分类选择器需要的数据
+         */
+        console.log("从教师列表中筛选出教师分类选择器需要的数据")
+        let teacherListFormat = null
+        teacherListFormat = teacherList.map(item => {
+            return {
+                title: item.classification,
+                options: item.teachers ? item.teachers.map(teacher => teacher.teacherName) : ['no teachers available']
+            }
+        })
+        return teacherListFormat
+    },
+    all_teacher_info(teacherList) {
+        /**
+         * 从教师列表中筛选出所有有OfficeHour的教师数据，并创建从id到name的映射表，用于向后端请求时间表数据
+         */
+        console.log("从教师列表中筛选出所有有OfficeHour的教师数据，并创建id-name的map")
+        let allTeacherFormat = null
+        allTeacherFormat = teacherList.reduce((acc, item) => {
+            if (item.teachers) {
+                acc.push(...item.teachers)
+            }
+            return acc
+        }, [])
+        return allTeacherFormat
     }
 }
 
 let UserInfoFormat = {
+    /**
+     * 负责对用户信息相关数据执行格式化操作
+     */
     credit_format(credits) {
-        // 从用户信息中提取出权限表
+        /**
+         * 从用户信息中提取出权限表
+         */
         console.log("从用户信息中提取出权限表")
         let authorityTable = {
             "OfficeHour:appointment": null,
@@ -39,21 +62,13 @@ let UserInfoFormat = {
 }
 
 let OfficeHourTableFormat = {
-    teacher_list_format(officeHourTime) {
-        // 从后端返回的OfficeHour时间表中提取出教师列表信息
-        let teacherList = []
-        console.log("从时间表中提取出教师列表信息")
-        for (let i = 0; i < officeHourTime.length; i++) {
-            let teacher = officeHourTime[i].name
-            if (teacherList.indexOf(teacher) === -1) { // 教师是否已经存在于数组中，不存在则添加
-                teacherList.push(teacher)
-            }
-        }
-        return teacherList
-    },
-
-    officehour_timetable_format(timeTable, getSelection) {
-        // 从后端返回的完整时间表中提取出被选中教师的时间表
+    /**
+     * 负责对OfficeHour时间表信息相关数据执行格式化操作
+     */
+    office_hour_timetable_format(timeTable, getSelection) {
+        /**
+         * 从后端返回的完整时间表中提取出被选中教师的时间表
+         */
         let timeTableTeacher = []
         console.log("从时间表中提取出被选中教师的时间表")
         for (let i = 0 ; i < timeTable.length; i++) {
@@ -78,11 +93,30 @@ let OfficeHourTableFormat = {
         })
         return timeTableFormat
     }
+}
 
+let TimeFormat = {
+    /**
+     * 负责对时间格式相关数据执行格式化操作
+     */
+    formatTimestamp(timestamp, if_date = false) {
+        const date = new Date(timestamp);
+        const year = date.getFullYear();
+        const month = ('0' + (date.getMonth() + 1)).slice(-2);
+        const day = ('0' + date.getDate()).slice(-2);
+        const hours = ('0' + date.getHours()).slice(-2);
+        const minutes = ('0' + date.getMinutes()).slice(-2);
+        const seconds = ('0' + date.getSeconds()).slice(-2);
+        if (if_date) {
+            return `${year}-${month}-${day}`;
+        }
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    }
 }
 
 export{
     UserInfoFormat,
     OfficeHourTableFormat,
-    TimeFormat
+    TimeFormat,
+    PickerFormat
 }
