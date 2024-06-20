@@ -19,7 +19,7 @@ const localSelectors = reactive(JSON.parse(JSON.stringify(props.selectors)));
 const currentSelection = ref(new Array(localSelectors.length).fill(null));  // 六个选择器内，被选中的选项
 const selectedTeacher = ref(null);  // 被选中的教师
 
-onMounted(function () {
+onMounted(function (){
   /**
    * 组件初始化
    */
