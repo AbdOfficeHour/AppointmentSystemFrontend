@@ -8,13 +8,17 @@ const props = defineProps({
 });
 
 // 向父组件传递的事件
-const emit = defineEmits(['update:selectedClassroom']);
+const emit = defineEmits(
+    ['update:selectedClassroom']
+);
+
+const selectedClassroom = ref(null);
 
 onMounted(function () {
   /**
    * 组件初始化
    */
-  console.log("PickerClassroom组件开始挂载");
+  console.log("PickerClassroom组件开始挂载")
 });
 
 const handleChange = (item) => {
@@ -22,6 +26,8 @@ const handleChange = (item) => {
    * 选择器选项发生变化时触发
    * 向父组件传递选中教师变更信息
    */
+  selectedClassroom.value = item;
+  console.log(item)
   emit('update:selectedClassroom', item);
 };
 </script>
@@ -32,7 +38,7 @@ const handleChange = (item) => {
         v-for="item in props.selectors"
         :key="item.classroomId"
         @click="handleChange(item)"
-        class="selector-button"
+        :class="['selector-button', { 'selected': selectedClassroom && selectedClassroom.classroomId === item.classroomId }]"
     >
       {{ item.classroom }}
     </button>
@@ -55,5 +61,10 @@ const handleChange = (item) => {
 
 .selector-button:hover {
   background-color: #e0e0e0;
+}
+
+.selector-button.selected {
+  background-color: #007BFF;
+  color: white;
 }
 </style>

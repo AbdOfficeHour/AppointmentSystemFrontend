@@ -1,3 +1,5 @@
+import {all} from "axios";
+
 let PickerFormat = {
     /**
      * 负责对选择器相关数据执行格式化操作
@@ -37,6 +39,20 @@ let PickerFormat = {
         return allTeacherFormat
     },
 
+    get_id_by_teacher_name(teacherName, allTeacherInfo) {
+        /**
+         * 从教师用户选中的教师中，通过教师姓名获取教师ID，以向后端查询教师的时间表
+         *
+         */
+        let teacherId = null
+        allTeacherInfo.forEach(teacher =>{
+            if (teacher.teacherName == teacherName) {
+                teacherId = teacher.teacherId
+            }
+        })
+        return teacherId
+    },
+
     all_classroom_info(classroomList) {
         /**
          * 从教师列表中筛选出所有Classroom数据，并创建从id到name的映射表，用于向后端请求时间表数据
@@ -44,7 +60,7 @@ let PickerFormat = {
          * {classroomId: '1', classroom: '102'}
          * {classroomId: '2', classroom: '104'}
          * {classroomId: '3', classroom: '106'}
-         * {classroomId: '4', classroom: '202'}
+         * {classroomId: '4', classroom: '202B'}
          * ]
          */
         console.log("从教室列表中筛选出所有有Classroom的数据，并创建id-name的map")
@@ -56,6 +72,25 @@ let PickerFormat = {
             return acc
         }, [])
         return allClassroomFormat
+    },
+
+    allow_classroom_info(authorityTable, allClassroomInfo) {
+        /**
+         * 从所有教室的信息中，筛选出用户权限可以预约的教室
+         * [
+         * {classroomId: '1', classroom: '102'}
+         * {classroomId: '2', classroom: '104'}
+         * {classroomId: '3', classroom: '106'}
+         * ]
+         */
+        console.log("从教室列表中筛选出用户可以预约的Classroom的数据，并创建id-name的map")
+        let allowClassroomFormat = []
+        allClassroomInfo.forEach(classroom => {
+            if (authorityTable[`classroom:appointment:${classroom.classroom}`]) {
+                allowClassroomFormat.push(classroom);
+            }
+        })
+        return allowClassroomFormat
     }
 }
 
@@ -77,6 +112,7 @@ let UserInfoFormat = {
             "classroom:appointment:104": null,
             "classroom:appointment:106": null,
             "classroom:appointment:202B": null,
+            "classroom:appointment:102": null,
             "classroom:check:all": null,
             "classroom:timeTable:all": null,
             "classroom:approve": null,

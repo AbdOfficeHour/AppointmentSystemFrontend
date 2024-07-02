@@ -5,6 +5,7 @@ import {UserInfoFormat, PickerFormat} from "@/utils/index/format.js";
 import {onMounted, ref, nextTick} from "vue";
 import axios from "axios";
 import router from "@/router/index.js";
+import PickerClassroom from "@/components/index/PickerClassroom.vue";
 
 // 用户基本信息
 let username = ref(null) // 用户名
@@ -22,12 +23,15 @@ let teacherList = ref([]) // 后端返回的教师列表
 let pickerTeacherListFormat = ref([]) // 格式化后的教师选择器列表
 let allTeacherInfo = ref(null) // 所有有OfficeHour活动的教师的id - name映射信息表
 let getOfficeHourSelection = ref(null) // 被用户选中的教师 或 教师账号本人
+let getOfficeHourSelectionId = ref(null) // 被用户选中的教师 或 教师账号本人 对应的id，用于向动态路由请求时间表数据
 let isBanTimeShow = ref(false) // 是否渲染禁用时间表单
 
 //classroom的基本变量
 let classroomList = ref([]) // 后端返回的教室列表
 let allClassroomInfo = ref(null) // 所有教室的id - name映射信息表
 let getClassroomSelection = ref(null) // 被用户选中的教室
+let getClassroomSelectionId = ref(null) // 被用户选中的教室
+let allowClassroomInfo = ref(null) // 用户权限允许的教室的id - name映射信息表
 
 onMounted( function(){
   /**
@@ -97,7 +101,8 @@ onMounted( function(){
       console.log("教室列表信息提取成功")
       allClassroomInfo.value = PickerFormat.all_classroom_info(classroomList.value) // 格式化教师列表信息，用于id - name映射表
       console.log("教室列表信息格式化成功")
-      console.log(allClassroomInfo)
+      allowClassroomInfo.value = PickerFormat.allow_classroom_info(authorityTable.value, allClassroomInfo.value)
+      console.log("可预约教室列表信息格式化成功")
     }
     else {
       console.warn("请求失败，获取教师选择器内选项信息失败")
@@ -124,10 +129,23 @@ const handleSelectedTeacher = (teacher) => {
   console.log("父组件收到选中教师变更，并保存变更")
   if (teacher === "no teachers available") {
     getOfficeHourSelection.value = null  // 若选中no teachers available，getOfficeHourSelection置为空
+    getOfficeHourSelectionId.value = null
   }
   else {
     getOfficeHourSelection.value = teacher
+    getOfficeHourSelectionId.value = PickerFormat.get_id_by_teacher_name(teacher, allTeacherInfo.value)
+    console.log(getOfficeHourSelectionId.value)
   }
+};
+
+const handleSelectedClassroom = (classroom) => {
+  /**
+   * 当接收到来自PickerClassroom组件传递的选中教师发生变更时触发
+   * 保存用户的变更，用于后续向后端请求时间表数据进行渲染
+   */
+  console.log("父组件收到选中教室变更，并保存变更")
+  getClassroomSelectionId.value = classroom.classroomId
+  getClassroomSelection.value = classroom.classroom
 };
 </script>
 
@@ -139,7 +157,7 @@ const handleSelectedTeacher = (teacher) => {
     </div>
     <div class="picker-layer">
       <div v-if="isTabRoom" class="picker-room">
-        
+        <PickerClassroom :selectors="allowClassroomInfo" @update:selectedClassroom="handleSelectedClassroom"/>
       </div>
       <div v-else class="picker-tutor-container">
         <div v-if="authorityTable['OfficeHour:timeTable:all']" class="picker-tutor">
