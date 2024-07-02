@@ -132,9 +132,24 @@ const handleSelectedTeacher = (teacher) => {
     getOfficeHourSelectionId.value = null
   }
   else {
+    // 暂存子组件传来的选择
     getOfficeHourSelection.value = teacher
     getOfficeHourSelectionId.value = PickerFormat.get_id_by_teacher_name(teacher, allTeacherInfo.value)
-    console.log(getOfficeHourSelectionId.value)
+
+    // 通过选中的教师的ID向后端动态路由请求数据
+    console.log("向后端请求 教师 时间表数据")
+    axios({
+      method:"get",
+      url:`/User/TableInfo/officehour/${getOfficeHourSelectionId.value}`
+    }).then(res =>{
+      if (res.data.code === 0){
+         console.log(res)
+      }
+      else {
+        console.warn("请求失败，获取 教师 时间表内信息失败")
+        console.log(res.data.message)
+      }
+    })
   }
 };
 
@@ -144,8 +159,24 @@ const handleSelectedClassroom = (classroom) => {
    * 保存用户的变更，用于后续向后端请求时间表数据进行渲染
    */
   console.log("父组件收到选中教室变更，并保存变更")
+  // 暂存子组件传来的选择
   getClassroomSelectionId.value = classroom.classroomId
   getClassroomSelection.value = classroom.classroom
+
+  // 通过选中的教室的ID向后端动态路由请求数据
+  console.log("向后端请求 教室 时间表数据")
+  axios({
+    method:"get",
+    url:`/User/TableInfo/classroom/${getClassroomSelectionId.value}`
+  }).then(res =>{
+    if (res.data.code === 0){
+      console.log(res)
+    }
+    else {
+      console.warn("请求失败，获取 教室 时间表内信息失败")
+      console.log(res.data.message)
+    }
+  })
 };
 </script>
 
