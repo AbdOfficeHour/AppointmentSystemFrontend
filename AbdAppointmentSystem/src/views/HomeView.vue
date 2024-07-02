@@ -97,6 +97,7 @@ onMounted( function(){
       console.log("教室列表信息提取成功")
       allClassroomInfo.value = PickerFormat.all_classroom_info(classroomList.value) // 格式化教师列表信息，用于id - name映射表
       console.log("教室列表信息格式化成功")
+      console.log(allClassroomInfo)
     }
     else {
       console.warn("请求失败，获取教师选择器内选项信息失败")
@@ -138,7 +139,7 @@ const handleSelectedTeacher = (teacher) => {
     </div>
     <div class="picker-layer">
       <div v-if="isTabRoom" class="picker-room">
-
+        
       </div>
       <div v-else class="picker-tutor-container">
         <div v-if="authorityTable['OfficeHour:timeTable:all']" class="picker-tutor">

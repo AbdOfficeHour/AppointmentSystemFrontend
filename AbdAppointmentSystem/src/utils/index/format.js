@@ -41,8 +41,10 @@ let PickerFormat = {
         /**
          * 从教师列表中筛选出所有Classroom数据，并创建从id到name的映射表，用于向后端请求时间表数据
          * [
-         * {classroomId: 1, classroom: 102},
-         * {classroomId: 2, classroom: 104}
+         * {classroomId: '1', classroom: '102'}
+         * {classroomId: '2', classroom: '104'}
+         * {classroomId: '3', classroom: '106'}
+         * {classroomId: '4', classroom: '202'}
          * ]
          */
         console.log("从教室列表中筛选出所有有Classroom的数据，并创建id-name的map")
