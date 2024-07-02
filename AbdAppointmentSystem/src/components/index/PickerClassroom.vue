@@ -1,5 +1,5 @@
 <script setup>
-import {ref, reactive, onMounted} from 'vue';
+import {ref, onMounted} from 'vue';
 import { defineProps, defineEmits } from 'vue';
 
 // 接收父组件传递的props
