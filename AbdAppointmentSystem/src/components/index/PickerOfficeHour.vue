@@ -33,6 +33,7 @@ const handleChange = (event, index) => {
    */
   const selectedValue = event.target.value; // 暂存被选中的数据
   selectedTeacher.value = selectedValue;
+  console.log(selectedTeacher.value)
 
   // 触发父组件事件，传递selectedTeacher
   emit('update:selectedTeacher', selectedTeacher.value)
@@ -51,6 +52,7 @@ const handleChange = (event, index) => {
 watch(() => props.selectors, (newSelectors) => {
   Object.assign(localSelectors, JSON.parse(JSON.stringify(newSelectors)));
 }, { deep: true });
+
 </script>
 
 <template>

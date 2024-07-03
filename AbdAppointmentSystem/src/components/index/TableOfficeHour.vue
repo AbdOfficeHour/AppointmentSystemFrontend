@@ -1,7 +1,3 @@
-<template>
-
-</template>
-
 <script setup>
 // 为方便后续变更，采用从DOM树开始定义与变更的方式
 
@@ -18,36 +14,98 @@ let timeSlots = ref([]); // 用于渲染的时间表信息（指定教师的时�
 
 watch(props, (newVal, oldVal) => {
   // 监听父组件传入参数变更
-  let backendDataTemp = newVal.backendData;
-  let timeTableTemp = backendDataTemp.timeTable
+  if (newVal.backendData === null) {
+    renderNoTable()
+  }
+  else {
+    let backendDataTemp = newVal.backendData;
+    let timeTableTemp = backendDataTemp.timeTable
 
-  // 格式化传入数据为渲染用数据
-  timeSlots.value = OfficeHourTableFormat.officehour_timetable_format(timeTableTemp);
-  renderTimeline(); // 执行时间表渲染，修改DOM树
+    // 格式化传入数据为渲染用数据
+    timeSlots.value = OfficeHourTableFormat.officehour_timetable_format(timeTableTemp);
+    renderTimeline(); // 执行时间表渲染，修改DOM树
+  }
 });
 
 onMounted(() => {
+  /**
+   * 组件初始化，依据父组件传入的数据决定渲染逻辑
+   */
   console.log('TableOfficeHour组件开始挂载');
-  renderTimeline(); // 执行时间表渲染，修改DOM树
+  if (props.backendData === null){
+    renderNoTable(); // 父组件传入空数据，代表不具备可渲染数据，修改DOM树为空时间表提示
+  }
+  else{
+    renderTimeline(); // 父组件传入时间表数据，执行时间表渲染，修改DOM树为时间表结构
+  }
 });
 
-function renderTimeline() {
-  // 查找DOM元素，用于执行挂载
+function queryElements() {
+  /**
+   * 在DOM树中查询到时间表对应的标签
+   * 查询到后返回此标签
+   */
   const appContainer = document.querySelector('#app .app-container');
   if (!appContainer) {
     console.error('没有在#app中找到.page-container元素');
-    return;
+    return ;
   }
 
-  const appTable = appContainer.querySelector('.table-layer');
+  const appTableLayer = appContainer.querySelector('.table-layer');
+  if (!appTableLayer) {
+    console.error('没有在.page-container中找到.table-layer元素');
+    return ;
+  }
+
+  const appTable = appTableLayer.querySelector('.table-tutor');
   if (!appTable) {
-    console.error('没有在.page-container中找到.table元素');
-    return;
+    console.error('没有在.table-layer中找到.table-tutor元素')
   }
+  return appTable
+}
 
+function clearTimeTable() {
+  /**
+   * 在DOM树中清空先前的时间表 或 空时间表提示 以重新渲染
+   */
   // 清除现有时间表
   const timelines = document.querySelectorAll('.timeline');
+  const emptyPrompt = document.querySelectorAll('.empty-prompt');
   timelines.forEach(timeline => timeline.remove()); // 移除所有时间轴标签
+  emptyPrompt.forEach(emptyPrompt => emptyPrompt.remove())
+}
+
+function renderNoTable() {
+  /**
+   * 当父组件传入的数据为空，表示不具备合适的数据以渲染时间表，渲染空时间表提示
+   */
+  // 查找DOM元素，用于执行挂载
+  let appTable = queryElements();
+  // 清除现有时间表
+  clearTimeTable();
+
+  // 渲染为空情况下的提示
+  const emptyPrompt = document.createElement('div');
+  emptyPrompt.classList.add('empty-prompt')
+  emptyPrompt.textContent = '当前暂无可查看时间表';
+  emptyPrompt.style.textAlign = 'center';
+  emptyPrompt.style.color = 'gray';
+  emptyPrompt.style.marginTop = '20px';
+  emptyPrompt.style.fontSize = '18px';
+
+  // 将提示挂载到appTable下
+  appTable.appendChild(emptyPrompt);
+}
+
+function renderTimeline() {
+  /**
+   * 当父组件传入的数据可以用于渲染时间表，将传入数据转换为时间表
+   */
+
+  // 查找DOM元素，用于执行挂载
+  let appTable = queryElements();
+  // 清除现有时间表
+  let timelines = clearTimeTable();
 
   // 渲染时间表
   timeSlots.value.forEach(slot => {
@@ -115,12 +173,14 @@ function renderTimeline() {
       availableElement.style.left = `${((start - new Date(start.getFullYear(), start.getMonth(), start.getDate(), 8)) / totalMinutes) * 100}%`;
       availableTimeElement.appendChild(availableElement);
     });
-
     appTable.appendChild(timeline); // 挂载至 #app .page-container .table-layer下
   });
-
 }
 </script>
+
+<template>
+
+</template>
 
 <style>
 body {

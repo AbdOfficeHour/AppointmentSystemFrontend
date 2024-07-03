@@ -39,13 +39,34 @@ let allowClassroomInfo = ref(null) // 用户权限允许的教室的id - name映
 
 // Classroom的基本变量 - Table Layer
 let classroomTimeTableOrigin = ref(null) // 后端返回的教室时间表数据直接存储于此变量
-classroomTimeTableOrigin.value = null // 数据项初始化为null，供子组件判定时间表是否为空来条件渲染
+classroomTimeTableOrigin.value = null // 数据项初始化为null，供子组件判定时间表是否为空
+
+function OfficeHourTeacherWithNoSelector(){
+  /**
+   * 当不具有OfficeHour:timeTable:all权限（通常为教师）的用户进入OfficeHour平台时触发，向后端请求自己的时间表数据
+   */
+  axios({
+    method:"get",
+    url:`/User/TableInfo/officehour/${userID.value}`
+  }).then(res =>{
+    if (res.data.code === 0){
+      officeHourTimeTableOrigin.value = res.data.data
+    }
+    else {
+      console.warn("请求失败，获取 教师 时间表内信息失败")
+      console.log(res.data.message)
+    }
+  })
+}
 
 onMounted( function(){
   /**
    * HomeView组件挂载时执行
    * 向后端请求数据，获取用户信息、权限信息、选择器内信息
    */
+
+  console.log("HomeView组件开始挂载")
+
   // 从后端获取用户信息和权限信息
   axios({
     method: 'get',
@@ -58,7 +79,10 @@ onMounted( function(){
       username.value = res.data.data.username // 用户姓名
       userID.value = res.data.data.userID // 用户学号/工号
       email.value = res.data.data.email // 用户邮箱
-
+      if (authorityTable.value['OfficeHour:timeTable:all'] === false){
+        // 当不具有OfficeHour:timeTable:all权限（通常为教师）的用户进入OfficeHour平台时触发，向后端请求自己的时间表数据
+        OfficeHourTeacherWithNoSelector();
+      }
       // 数据获取结束后执行操作，以确定DOM的更新完成
       nextTick(() => {
         handleTabChange('tutor') // 默认设置为tutor界面
@@ -119,7 +143,7 @@ const handleSelectedTeacher = (teacher) => {
   if (teacher === "no teachers available") {
     getOfficeHourSelection.value = null  // 若选中no teachers available，getOfficeHourSelection置为空
     getOfficeHourSelectionId.value = null
-    officeHourTimeTableOrigin.value = null // 数据项恢复为为null，供子组件判定时间表是否为空
+    officeHourTimeTableOrigin.value = null // 没有向后端请求新数据，故置为空。子组件识别到后展示无时间表时的界面
   }
   else {
     // 暂存子组件传来的选择
@@ -165,10 +189,10 @@ const handleSelectedClassroom = (classroom) => {
     }
   })
 };
+
 </script>
 
 <template>
-  <!-- HomeView组件，负责首页的渲染 -->
   <div class="app-container">
     <div class="tab-selector">
       <TabSelector @update:selectedTab="handleTabChange"></TabSelector>
@@ -177,15 +201,19 @@ const handleSelectedClassroom = (classroom) => {
       <div v-if="isTabRoom" class="picker-room">
         <PickerClassroom :selectors="allowClassroomInfo" @update:selectedClassroom="handleSelectedClassroom"/>
       </div>
-      <div v-else class="picker-tutor-container">
-        <div v-if="authorityTable['OfficeHour:timeTable:all']" class="picker-tutor">
+      <div v-else class="picker-tutor">
+        <div v-if="authorityTable['OfficeHour:timeTable:all']" class="picker-tutor-stu">
           <PickerOfficeHour :selectors="pickerTeacherListFormat" @update:selectedTeacher="handleSelectedTeacher" />
         </div>
       </div>
     </div>
     <div class="table-layer">
-      <TableOfficeHour :backend-data="officeHourTimeTableOrigin">
-      </TableOfficeHour>
+      <div v-if="isTabRoom" class="table-room">
+
+      </div>
+      <div v-else class="table-tutor">
+        <TableOfficeHour :backend-data="officeHourTimeTableOrigin" />
+      </div>
     </div>
   </div>
 </template>
