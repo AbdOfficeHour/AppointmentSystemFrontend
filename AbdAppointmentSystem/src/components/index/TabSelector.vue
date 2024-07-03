@@ -1,6 +1,7 @@
 <script setup>
 import {ref, defineEmits, onMounted} from 'vue';
 
+// 组件全局变量定义
 const selectedTab = ref('tutor'); // 被选中的预约平台，初始化为教师预约平台
 
 // 向父组件传递的事件

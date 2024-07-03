@@ -1,12 +1,15 @@
 <script setup>
+import { ElButton } from 'element-plus';  // 引入Element-Plus按钮组件
+import { ref, onMounted, nextTick } from 'vue';
+import axios from 'axios';
+import router from '@/router';
 import TabSelector from "@/components/index/TabSelector.vue";
 import PickerOfficeHour from "@/components/index/PickerOfficeHour.vue";
-import {UserInfoFormat, PickerFormat} from "@/utils/index/format.js";
-import {onMounted, ref, nextTick} from "vue";
-import axios from "axios";
-import router from "@/router/index.js";
 import PickerClassroom from "@/components/index/PickerClassroom.vue";
 import TableComponent from "@/components/index/TableComponent.vue";
+import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
+import { UserInfoFormat, PickerFormat } from "@/utils/index/format.js";
+
 
 // 用户基本信息
 let username = ref(null) // 用户名
@@ -18,7 +21,7 @@ let authorityTable = ref({}) // 经过格式化后的权限表
 
 // 全局基本变量
 let isTabRoom = ref(false); // 用户在tab内选择的平台，教师预约或教室预约
-// let lastTab = ref('tutor') // 记录上一次tab选择器的状态，由于初始为tutor，故初始为tutor
+let isDialogVisible = ref(false); // 禁用时段弹框是否可见
 
 // OfficeHour的基本变量 - Picker Layer
 let teacherList = ref([]) // 后端返回的教师列表
@@ -189,24 +192,6 @@ const handleTabChange = (tab) => {
    * 当接收到来自TabSelector组件传递的用户选择的平台变更时触发
    * 保存用户的变更并保存至isTabRoom变量，用于条件渲染
    */
-  // if (lastTab.value !== tab){
-  //   isTabRoom.value = (tab === 'room')
-  //   lastTab.value = tab
-  //
-  //   // 获取新的数据并更新表格内容
-  //   if (isTabRoom.value){
-  //     if (authorityTable.value['OfficeHour:timeTable:all']){
-  //       getOfficeHourSelection.value = null
-  //       getOfficeHourSelectionId.value = null
-  //       console.log('change tutor to room')
-  //     }
-  //   }
-  //   else{
-  //     getClassroomSelection.value = null
-  //     getClassroomSelectionId.value = null
-  //     console.log('change room to tutor')
-  //   }
-  // }
   isTabRoom.value = (tab === 'room')
   if(!isTabRoom.value){ // 教师预约tutor平台
     if (!authorityTable.value['OfficeHour:timeTable:all']){ // 教师
@@ -260,6 +245,47 @@ const handleSelectedClassroom = (classroom) => {
   getClassroomTableInfo()
 };
 
+const navigateToAppointment = () => {
+  /**
+   * 当用户点击预约按钮时触发
+   * 根据用户当前所在平台和选择的教师/教室跳转至对应的预约页面
+   */
+  if (isTabRoom.value){
+    router.push({
+      name: 'ClassroomAppointment' // 跳转至教室预约页面，未来替换为实际组件名
+    })
+  }
+  else{
+    router.push({
+      name: 'OfficeHourAppointment' // 跳转至教室预约页面，未来替换为实际组件名
+    })
+  }
+};
+
+const banTimeShow = () => {
+  /**
+   * 当用户点击禁用时段按钮时触发
+   * 弹出禁用时段弹框表单
+   */
+  isDialogVisible.value = true
+};
+
+const handleDisableTimeSlotSubmit = (form) => {
+  /**
+   * 当用户点击禁用时段弹框表单的提交按钮时触发
+   * 向后端发送禁用时段的请求
+   */
+  isDialogVisible.value = false
+};
+
+const handleDisableTimeSlotClose = () => {
+  /**
+   * 当用户点击禁用时段弹框表单的关闭按钮时触发
+   * 关闭窗口
+   */
+  isDialogVisible.value = false
+};
+
 </script >
 
 <template>
@@ -285,9 +311,30 @@ const handleSelectedClassroom = (classroom) => {
         <TableComponent :backend-data="officeHourTimeTableOrigin" is-room="false"/>
       </div>
     </div>
+    <div class="button-layer">
+      <div v-if="authorityTable['OfficeHour:appointment']" class="appointment-button">
+        <ElButton type="primary" round @click="navigateToAppointment">发起预约 Appointment</ElButton>
+      </div>
+      <div v-if="authorityTable['OfficeHour:approve']" class="ban-button">
+        <div v-if="!isTabRoom">
+          <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>
+        </div>
+      </div>
+    </div>
+    <div class="ban-layer">
+      <DisableTimeSlot
+          :isDialogVisible="isDialogVisible"
+          @submit="handleDisableTimeSlotSubmit"
+          @close="handleDisableTimeSlotClose">
+      </DisableTimeSlot>
+    </div>
   </div>
 </template>
 
 <style scoped>
-
+.button-layer {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
 </style>

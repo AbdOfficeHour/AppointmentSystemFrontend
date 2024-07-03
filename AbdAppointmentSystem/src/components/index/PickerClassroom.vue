@@ -2,6 +2,9 @@
 import {ref, onMounted} from 'vue';
 import { defineProps, defineEmits } from 'vue';
 
+// 组件内全局变量定义
+const selectedClassroom = ref(null);
+
 // 接收父组件传递的props
 const props = defineProps({
   selectors: Array
@@ -11,8 +14,6 @@ const props = defineProps({
 const emit = defineEmits(
     ['update:selectedClassroom']
 );
-
-const selectedClassroom = ref(null);
 
 onMounted(function () {
   /**

@@ -2,6 +2,13 @@
 import {ref, watch, reactive, onMounted} from 'vue';
 import { defineProps, defineEmits } from 'vue';
 
+// 组件内全局变量定义 - 本地状态，避免浅拷贝
+const localSelectors = reactive(JSON.parse(JSON.stringify(props.selectors)));  // 本地状态，深拷贝props避免直接修改props
+
+// 组件内全局变量定义 - 选择器状态变量
+const currentSelection = ref(new Array(localSelectors.length).fill(null));  // 六个选择器内，被选中的选项
+const selectedTeacher = ref(null);  // 被选中的教师
+
 // 接收父组件传递的props
 const props = defineProps({
   selectors: Array
@@ -11,13 +18,6 @@ const props = defineProps({
 const emit = defineEmits(
     ['update:selectedTeacher']
 )
-
-// 本地状态，深拷贝props避免直接修改props
-const localSelectors = reactive(JSON.parse(JSON.stringify(props.selectors)));
-
-// 选择器状态变量
-const currentSelection = ref(new Array(localSelectors.length).fill(null));  // 六个选择器内，被选中的选项
-const selectedTeacher = ref(null);  // 被选中的教师
 
 onMounted(function (){
   /**

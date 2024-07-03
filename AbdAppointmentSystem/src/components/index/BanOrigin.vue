@@ -1,6 +1,6 @@
 <script setup>
   import {onMounted, ref, watch} from "vue";
-  import {OfficeHourTableFormat} from "@/utils/index/format.js";
+  import {TableFormat} from "@/utils/index/format.js";
 
   const props = defineProps(['timeTable', 'getSelection'])
   const emits = defineEmits(['banTimeCancel']) // 父组件监听的事件
@@ -13,7 +13,7 @@
   onMounted(() => {
     console.log("BanSelector组件挂载完成")
     getSelection = props.getSelection
-    timeSlots.value = OfficeHourTableFormat.officehour_timetable_format(props.timeTable, getSelection)
+    timeSlots.value = TableFormat.timetable_format(props.timeTable, getSelection)
   })
 
   watch(props, (newVal, oldVal) => {
