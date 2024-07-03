@@ -32,6 +32,7 @@ onMounted(() => {
    * 组件初始化，依据父组件传入的数据决定渲染逻辑
    */
   console.log('TableOfficeHour组件开始挂载');
+  clearTimeTable();
   if (props.backendData === null){
     renderNoTable(); // 父组件传入空数据，代表不具备可渲染数据，修改DOM树为空时间表提示
   }

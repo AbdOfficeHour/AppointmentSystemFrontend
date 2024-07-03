@@ -27,7 +27,6 @@ const handleChange = (item) => {
    * 向父组件传递选中教师变更信息
    */
   selectedClassroom.value = item;
-  console.log(item)
   emit('update:selectedClassroom', item);
 };
 </script>
