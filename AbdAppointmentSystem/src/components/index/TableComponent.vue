@@ -6,7 +6,9 @@ import {TableFormat} from "@/utils/index/format.js";
 
 // 接收父组件传递的props
 const props = defineProps(
-    ['backendData']
+  [
+      "backendData",
+  ]
 );
 
 const totalMinutes = 12 * 60 * 60 * 1000; // 12小时对应的毫秒数（8：00-20：00）
@@ -20,7 +22,6 @@ watch(props, (newVal, oldVal) => {
   else {
     let backendDataTemp = newVal.backendData;
     let timeTableTemp = backendDataTemp.timeTable;
-
     // 格式化传入数据为渲染用数据
     timeSlots.value = TableFormat.timetable_format(timeTableTemp);
     renderTimeline(); // 执行时间表渲染，修改DOM树

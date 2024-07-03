@@ -18,7 +18,7 @@ let authorityTable = ref({}) // 经过格式化后的权限表
 
 // 全局基本变量
 let isTabRoom = ref(false); // 用户在tab内选择的平台，教师预约或教室预约
-let lastTab = ref('tutor') // 记录上一次tab选择器的状态，由于初始为tutor，故初始为tutor
+// let lastTab = ref('tutor') // 记录上一次tab选择器的状态，由于初始为tutor，故初始为tutor
 
 // OfficeHour的基本变量 - Picker Layer
 let teacherList = ref([]) // 后端返回的教师列表
@@ -42,7 +42,7 @@ let allowClassroomInfo = ref(null) // 用户权限允许的教室的id - name映
 let classroomTimeTableOrigin = ref(null) // 后端返回的教室时间表数据直接存储于此变量
 classroomTimeTableOrigin.value = null // 数据项初始化为null，供子组件判定时间表是否为空
 
-function OfficeHourTeacherWithNoSelector(){
+function getTeacherTableInfoWithNoSelector(){
   /**
    * 当不具有OfficeHour:timeTable:all权限（通常为教师）的用户进入OfficeHour平台时触发，向后端请求自己的时间表数据
    */
@@ -78,7 +78,7 @@ function getUserInfo() {
       email.value = res.data.data.email // 用户邮箱
       if (authorityTable.value['OfficeHour:timeTable:all'] === false){
         // 当不具有OfficeHour:timeTable:all权限（通常为教师）的用户进入OfficeHour平台时触发，向后端请求自己的时间表数据
-        OfficeHourTeacherWithNoSelector();
+        getTeacherTableInfoWithNoSelector();
       }
       // 数据获取结束后执行操作，以确定DOM的更新完成
       nextTick(() => {
@@ -189,27 +189,42 @@ const handleTabChange = (tab) => {
    * 当接收到来自TabSelector组件传递的用户选择的平台变更时触发
    * 保存用户的变更并保存至isTabRoom变量，用于条件渲染
    */
-    if (lastTab.value !== tab){
-      isTabRoom.value = (tab === 'room')
-      lastTab.value = tab
-
-      // 获取新的数据并更新表格内容
-      if (isTabRoom.value){
-        if (authorityTable.value['OfficeHour:timeTable:all']){
-          getOfficeHourSelection.value = null
-          getOfficeHourSelectionId.value = null
-          console.log('change tutor to room')
-        }
-        else{
-          OfficeHourTeacherWithNoSelector()
-        }
-      }
-      else{
-        getClassroomSelection.value = null
-        getClassroomSelectionId.value = null
-        console.log('change room to tutor')
-      }
+  // if (lastTab.value !== tab){
+  //   isTabRoom.value = (tab === 'room')
+  //   lastTab.value = tab
+  //
+  //   // 获取新的数据并更新表格内容
+  //   if (isTabRoom.value){
+  //     if (authorityTable.value['OfficeHour:timeTable:all']){
+  //       getOfficeHourSelection.value = null
+  //       getOfficeHourSelectionId.value = null
+  //       console.log('change tutor to room')
+  //     }
+  //   }
+  //   else{
+  //     getClassroomSelection.value = null
+  //     getClassroomSelectionId.value = null
+  //     console.log('change room to tutor')
+  //   }
+  // }
+  isTabRoom.value = (tab === 'room')
+  if(!isTabRoom.value){ // 教师预约tutor平台
+    if (!authorityTable.value['OfficeHour:timeTable:all']){ // 教师
+      getTeacherTableInfoWithNoSelector();
+      // 重新获取后端数据以刷新，触发子组件的观测props的观测器watch
     }
+    else{ // 学生
+      getOfficeHourSelectionId.value = null
+      getOfficeHourSelection.value = null
+      officeHourTimeTableOrigin.value = null
+      // 选项和时间表信息置为空
+    }
+  }
+  else{ // 教室预约room平台
+    getClassroomSelectionId.value = null
+    getClassroomSelection.value = null
+    classroomTimeTableOrigin.value = null
+  }
 };
 
 const handleSelectedTeacher = (teacher) => {
@@ -264,10 +279,10 @@ const handleSelectedClassroom = (classroom) => {
     </div>
     <div class="table-layer">
       <div v-if="isTabRoom" class="table-component">
-        <TableComponent :backend-data="classroomTimeTableOrigin" />
+        <TableComponent :backend-data="classroomTimeTableOrigin" :is-room="true"/>
       </div>
       <div v-else class="table-component">
-        <TableComponent :backend-data="officeHourTimeTableOrigin" />
+        <TableComponent :backend-data="officeHourTimeTableOrigin" is-room="false"/>
       </div>
     </div>
   </div>
