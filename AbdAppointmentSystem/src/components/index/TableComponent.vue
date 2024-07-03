@@ -2,7 +2,7 @@
 // 为方便后续变更，采用从DOM树开始定义与变更的方式
 
 import {ref, onMounted, watch} from 'vue';
-import {OfficeHourTableFormat} from "@/utils/index/format.js";
+import {TableFormat} from "@/utils/index/format.js";
 
 // 接收父组件传递的props
 const props = defineProps(
@@ -10,7 +10,7 @@ const props = defineProps(
 );
 
 const totalMinutes = 12 * 60 * 60 * 1000; // 12小时对应的毫秒数（8：00-20：00）
-let timeSlots = ref([]); // 用于渲染的时间表信息（指定教师的时间表）
+let timeSlots = ref([]); // 用于渲染的时间表信息
 
 watch(props, (newVal, oldVal) => {
   // 监听父组件传入参数变更
@@ -19,10 +19,10 @@ watch(props, (newVal, oldVal) => {
   }
   else {
     let backendDataTemp = newVal.backendData;
-    let timeTableTemp = backendDataTemp.timeTable
+    let timeTableTemp = backendDataTemp.timeTable;
 
     // 格式化传入数据为渲染用数据
-    timeSlots.value = OfficeHourTableFormat.officehour_timetable_format(timeTableTemp);
+    timeSlots.value = TableFormat.timetable_format(timeTableTemp);
     renderTimeline(); // 执行时间表渲染，修改DOM树
   }
 });
@@ -31,7 +31,7 @@ onMounted(() => {
   /**
    * 组件初始化，依据父组件传入的数据决定渲染逻辑
    */
-  console.log('TableOfficeHour组件开始挂载');
+  console.log('TableComponent组件开始挂载');
   clearTimeTable();
   if (props.backendData === null){
     renderNoTable(); // 父组件传入空数据，代表不具备可渲染数据，修改DOM树为空时间表提示
@@ -58,9 +58,9 @@ function queryElements() {
     return ;
   }
 
-  const appTable = appTableLayer.querySelector('.table-tutor');
+  const appTable = appTableLayer.querySelector('.table-component');
   if (!appTable) {
-    console.error('没有在.table-layer中找到.table-tutor元素')
+    console.error('没有在.table-layer中找到.table-component元素')
   }
   return appTable
 }

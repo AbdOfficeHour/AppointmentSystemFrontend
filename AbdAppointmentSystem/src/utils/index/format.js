@@ -1,5 +1,3 @@
-import {all} from "axios";
-
 let PickerFormat = {
     /**
      * 负责对选择器相关数据执行格式化操作
@@ -133,11 +131,11 @@ let TimeFormat = {
     }
 };
 
-let OfficeHourTableFormat = {
+let TableFormat = {
     /**
      * 负责对OfficeHour时间表信息相关数据执行格式化操作
      */
-    officehour_timetable_format(timeTableTeacher) {
+    timetable_format(timeTableTeacher) {
         // 从后端返回的时间表，格式化为前端渲染所需的数据结构
         let timeTableFormat = timeTableTeacher.map(entry => {
             let transformedBusy = entry.busy.map(timeSlot => ({
@@ -160,7 +158,7 @@ let OfficeHourTableFormat = {
 
 export{
     UserInfoFormat,
-    OfficeHourTableFormat,
+    TableFormat,
     TimeFormat,
-    PickerFormat
+    PickerFormat,
 }

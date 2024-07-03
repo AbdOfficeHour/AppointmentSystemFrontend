@@ -6,7 +6,7 @@ import {onMounted, ref, nextTick} from "vue";
 import axios from "axios";
 import router from "@/router/index.js";
 import PickerClassroom from "@/components/index/PickerClassroom.vue";
-import TableOfficeHour from "@/components/index/TableOfficeHour.vue";
+import TableComponent from "@/components/index/TableComponent.vue";
 
 // 用户基本信息
 let username = ref(null) // 用户名
@@ -18,6 +18,7 @@ let authorityTable = ref({}) // 经过格式化后的权限表
 
 // 全局基本变量
 let isTabRoom = ref(false); // 用户在tab内选择的平台，教师预约或教室预约
+let lastTab = ref('tutor') // 记录上一次tab选择器的状态，由于初始为tutor，故初始为tutor
 
 // OfficeHour的基本变量 - Picker Layer
 let teacherList = ref([]) // 后端返回的教师列表
@@ -50,6 +51,7 @@ function OfficeHourTeacherWithNoSelector(){
     url:`/User/TableInfo/officehour/${userID.value}`
   }).then(res =>{
     if (res.data.code === 0){
+      console.log(res)
       officeHourTimeTableOrigin.value = res.data.data
     }
     else {
@@ -59,15 +61,10 @@ function OfficeHourTeacherWithNoSelector(){
   })
 }
 
-onMounted( function(){
+function getUserInfo() {
   /**
-   * HomeView组件挂载时执行
-   * 向后端请求数据，获取用户信息、权限信息、选择器内信息
+   * 从后端获取用户信息和权限信息
    */
-
-  console.log("HomeView组件开始挂载")
-
-  // 从后端获取用户信息和权限信息
   axios({
     method: 'get',
     url: '/User/info',
@@ -93,8 +90,12 @@ onMounted( function(){
       console.log(res.data.message)
     }
   })
+}
 
-  // 从后端获取OfficeHour选择器内信息
+function getOfficeHourPickerInfo() {
+  /**
+   * 从后端获取OfficeHour选择器内信息
+   */
   axios({
     method:'get',
     url:'/User/picker/officehour',
@@ -109,8 +110,12 @@ onMounted( function(){
       console.log(res.data.message)
     }
   })
+}
 
-  // 从后端获取Classroom选择器信息
+function getClassroomPickerInfo(){
+  /**
+   * 从后端获取Classroom选择器信息
+   */
   axios({
     method:'get',
     url:'/User/picker/classroom',
@@ -125,6 +130,58 @@ onMounted( function(){
       console.log(res.data.message)
     }
   })
+}
+
+function getOfficeHourTableInfo() {
+  /**
+   * 通过选中的教师的ID向后端动态路由请求数据
+   */
+  axios({
+    method:"get",
+    url:`/User/TableInfo/officehour/${getOfficeHourSelectionId.value}`
+  }).then(res =>{
+    if (res.data.code === 0){
+      console.log(res)
+      officeHourTimeTableOrigin.value = res.data.data
+    }
+    else {
+      console.warn("请求失败，获取 教师 时间表内信息失败")
+      console.log(res.data.message)
+    }
+  })
+}
+
+function getClassroomTableInfo(){
+  /**
+   * 通过选中的教室的ID向后端动态路由请求数据
+   */
+  axios({
+    method:"get",
+    url:`/User/TableInfo/classroom/${getClassroomSelectionId.value}`
+  }).then(res =>{
+    if (res.data.code === 0){
+      console.log(res)
+      classroomTimeTableOrigin.value = res.data.data
+    }
+    else {
+      console.warn("请求失败，获取 教室 时间表内信息失败")
+      console.log(res.data.message)
+    }
+  })
+}
+
+onMounted( function(){
+  /**
+   * HomeView组件挂载时执行
+   * 向后端请求数据，获取用户信息、权限信息、选择器内信息
+   */
+  console.log("HomeView组件开始挂载")
+  // 从后端获取用户信息和权限信息
+  getUserInfo()
+  // 从后端获取OfficeHour选择器内信息
+  getOfficeHourPickerInfo()
+  // 从后端获取Classroom选择器信息
+  getClassroomPickerInfo()
 })
 
 const handleTabChange = (tab) => {
@@ -132,7 +189,27 @@ const handleTabChange = (tab) => {
    * 当接收到来自TabSelector组件传递的用户选择的平台变更时触发
    * 保存用户的变更并保存至isTabRoom变量，用于条件渲染
    */
-  isTabRoom.value = (tab === "room")
+    if (lastTab.value !== tab){
+      isTabRoom.value = (tab === 'room')
+      lastTab.value = tab
+
+      // 获取新的数据并更新表格内容
+      if (isTabRoom.value){
+        if (authorityTable.value['OfficeHour:timeTable:all']){
+          getOfficeHourSelection.value = null
+          getOfficeHourSelectionId.value = null
+          console.log('change tutor to room')
+        }
+        else{
+          OfficeHourTeacherWithNoSelector()
+        }
+      }
+      else{
+        getClassroomSelection.value = null
+        getClassroomSelectionId.value = null
+        console.log('change room to tutor')
+      }
+    }
 };
 
 const handleSelectedTeacher = (teacher) => {
@@ -151,18 +228,7 @@ const handleSelectedTeacher = (teacher) => {
     getOfficeHourSelectionId.value = PickerFormat.get_id_by_teacher_name(teacher, allTeacherInfo.value)
 
     // 通过选中的教师的ID向后端动态路由请求数据
-    axios({
-      method:"get",
-      url:`/User/TableInfo/officehour/${getOfficeHourSelectionId.value}`
-    }).then(res =>{
-      if (res.data.code === 0){
-        officeHourTimeTableOrigin.value = res.data.data
-      }
-      else {
-        console.warn("请求失败，获取 教师 时间表内信息失败")
-        console.log(res.data.message)
-      }
-    })
+    getOfficeHourTableInfo()
   }
 };
 
@@ -176,21 +242,10 @@ const handleSelectedClassroom = (classroom) => {
   getClassroomSelection.value = classroom.classroom
 
   // 通过选中的教室的ID向后端动态路由请求数据
-  axios({
-    method:"get",
-    url:`/User/TableInfo/classroom/${getClassroomSelectionId.value}`
-  }).then(res =>{
-    if (res.data.code === 0){
-      console.log(res)
-    }
-    else {
-      console.warn("请求失败，获取 教室 时间表内信息失败")
-      console.log(res.data.message)
-    }
-  })
+  getClassroomTableInfo()
 };
 
-</script>
+</script >
 
 <template>
   <div class="app-container">
@@ -208,11 +263,11 @@ const handleSelectedClassroom = (classroom) => {
       </div>
     </div>
     <div class="table-layer">
-      <div v-if="isTabRoom" class="table-room">
-
+      <div v-if="isTabRoom" class="table-component">
+        <TableComponent :backend-data="classroomTimeTableOrigin" />
       </div>
-      <div v-else class="table-tutor">
-        <TableOfficeHour :backend-data="officeHourTimeTableOrigin" />
+      <div v-else class="table-component">
+        <TableComponent :backend-data="officeHourTimeTableOrigin" />
       </div>
     </div>
   </div>
