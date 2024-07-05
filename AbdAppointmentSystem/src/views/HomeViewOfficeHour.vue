@@ -6,8 +6,8 @@ import router from '@/router';
 import PickerOfficeHour from "@/components/index/PickerOfficeHour.vue";
 import TableComponent from "@/components/index/TableComponent.vue";
 import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
+import FunctionalOfficeHour from "@/components/index/FunctionalOfficeHour.vue";
 import { UserInfoFormat, PickerFormat } from "@/utils/index/format.js";
-import FunctionalComponent from "@/components/index/FunctionalComponent.vue";
 
 // 用户基本信息
 let username = ref(null) // 用户名
@@ -18,7 +18,7 @@ let credits = ref([]) // 后端返回的用户权限
 let authorityTable = ref({}) // 经过格式化后的权限表
 
 // 全局基本变量
-let isDialogVisible = ref(false); // 禁用时段弹框是否可见
+// None
 
 // OfficeHour的基本变量 - Picker Layer
 let teacherList = ref([]) // 后端返回的教师列表
@@ -40,7 +40,6 @@ function getTeacherTableInfoWithNoSelector(){
     url:`/User/TableInfo/officehour/${userID.value}`
   }).then(res =>{
     if (res.data.code === 0){
-      console.log(res)
       officeHourTimeTableOrigin.value = res.data.data
     }
     else {
@@ -85,7 +84,6 @@ function getOfficeHourPickerInfo() {
     method:'get',
     url:'/User/picker/officehour',
   }).then(res =>{
-    console.log(res)
     if(res.data.code === 0){
       teacherList.value = res.data.data.pickerList // 后端返回的教师列表信息
       pickerTeacherListFormat.value = PickerFormat.teacher_list_format(teacherList.value) // 格式化教师列表信息，用于选择器
@@ -149,49 +147,12 @@ const handleSelectedTeacher = (teacher) => {
   }
 };
 
-const navigateToAppointment = () => {
-  /**
-   * 当用户点击预约按钮时触发
-   * 根据用户当前所在平台和选择的教师/教室跳转至对应的预约页面
-   */
-  router.push({
-    name: 'Appointment', // 跳转至预约列表页面
-    query: {
-      if_appointment: true
-    }
-  })
-};
-
-const banTimeShow = () => {
-  /**
-   * 当用户点击禁用时段按钮时触发
-   * 弹出禁用时段弹框表单
-   */
-  isDialogVisible.value = true
-};
-
-const handleDisableTimeSlotSubmit = (form) => {
-  /**
-   * 当用户点击禁用时段弹框表单的提交按钮时触发
-   * 向后端发送禁用时段的请求
-   */
-  isDialogVisible.value = false
-};
-
-const handleDisableTimeSlotClose = () => {
-  /**
-   * 当用户点击禁用时段弹框表单的关闭按钮时触发
-   * 关闭窗口
-   */
-  isDialogVisible.value = false
-};
-
 </script >
 
 <template>
   <div class="app-container">
     <div class="functional-layer">
-      <FunctionalComponent />
+      <FunctionalOfficeHour :authority-table="authorityTable" :backend-data="officeHourTimeTableOrigin"/>
     </div>
     <div class="picker-layer">
       <div v-if="authorityTable['OfficeHour:timeTable:all']" class="picker-tutor-stu">
@@ -203,45 +164,32 @@ const handleDisableTimeSlotClose = () => {
         <TableComponent :backend-data="officeHourTimeTableOrigin" is-room="false"/>
       </div>
     </div>
-    <div class="button-layer">
-      <div v-if="authorityTable['OfficeHour:appointment']" class="appointment-button">
-        <ElButton type="primary" round @click="navigateToAppointment">发起预约 Appointment</ElButton>
-      </div>
-      <div v-if="authorityTable['OfficeHour:approve']" class="ban-button">
-        <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>
-        <ElButton type="primary" round @click="navigateToAppointment">查看我的预约 Appointment</ElButton>
-      </div>
-    </div>
-    <div class="ban-layer">
-      <DisableTimeSlot
-          :isDialogVisible="isDialogVisible"
-          :backend-data="officeHourTimeTableOrigin"
-          @submit="handleDisableTimeSlotSubmit"
-          @close="handleDisableTimeSlotClose">
-      </DisableTimeSlot>
-    </div>
   </div>
 </template>
 
 <style scoped>
-.button-layer {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
 .table-component {
   display: flex;
   height: 100%;
-  padding-top: 20px;
 }
+
 .app-container{
   height: 100vh;
-  background-color: #F0F5FF;
+  background-color: #F7FAFF;
 }
+
 .table-layer {
   height: 60vh;
 }
+
 .functional-layer {
-  padding: 10px;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.picker-layer {
+  margin-left: 10px;
+  margin-right: 10px;
 }
 </style>

@@ -45,8 +45,7 @@ watch(props, (newVal, oldVal) => {
   /**
    * 监听父组件传入参数变更
    */
-  console.log('禁用时间段组件侦听器发现父组件传递的信息发生变化，' +
-      '并开始更新');
+  console.log(newVal.backendData)
   if (newVal.backendData === null) {
     isBackendDataNone = true
   }
@@ -55,8 +54,6 @@ watch(props, (newVal, oldVal) => {
     let timeTableTemp = newVal.backendData.timeTable
     timeSlots.value = TableFormat.timetable_format(timeTableTemp)
   }
-  console.log('禁用时间段组件侦听器发现父组件传递的信息发生变化，' +
-      '并更新完成');
 })
 
 function banTimeInfoCheck() {

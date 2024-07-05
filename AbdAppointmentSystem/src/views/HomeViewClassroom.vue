@@ -5,7 +5,7 @@ import axios from 'axios';
 import router from '@/router';
 import PickerClassroom from "@/components/index/PickerClassroom.vue";
 import TableComponent from "@/components/index/TableComponent.vue";
-import FunctionalComponent from "@/components/index/FunctionalComponent.vue";
+import FunctionalClassroom from "@/components/index/FunctionalClassroom.vue";
 import { UserInfoFormat, PickerFormat } from "@/utils/index/format.js";
 
 
@@ -135,7 +135,7 @@ const navigateToAppointment = () => {
 <template>
   <div class="app-container">
     <div class="functional-layer">
-      <FunctionalComponent />
+      <FunctionalClassroom />
     </div>
     <div class="picker-layer">
       <PickerClassroom :selectors="allowClassroomInfo" @update:selectedClassroom="handleSelectedClassroom"/>
@@ -145,31 +145,31 @@ const navigateToAppointment = () => {
         <TableComponent :backend-data="classroomTimeTableOrigin" :is-room="true"/>
       </div>
     </div>
-    <div class="button-layer">
-      <ElButton type="primary" round @click="navigateToAppointment">发起预约 Appointment</ElButton>
-    </div>
   </div>
 </template>
 
 <style scoped>
-.button-layer {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
 .table-component{
   display: flex;
   height: 100%;
-  margin-top: 20px;
 }
 .app-container{
   height: 100vh;
   background-color: #F7FAFF;
 }
+
 .table-layer{
   height: 60vh;
 }
+
+.picker-layer {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
 .functional-layer {
-  padding: 10px;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 </style>
