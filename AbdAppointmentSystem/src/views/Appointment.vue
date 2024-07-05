@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <p>index</p>
+  <div>OfficeHourAppointment</div>
 </template>
 
 <style scoped>

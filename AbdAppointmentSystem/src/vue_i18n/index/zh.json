@@ -1,4 +1,13 @@
 {
   "introduction_available": "可预约时间段",
-  "introduction_unavailable": "不可预约时间段"
+  "introduction_unavailable": "不可预约时间段",
+  "select_teacher_hint": "请选择要预约的教师",
+  "select_teacher_DNE_hint": "请选择教师，以展示时间表",
+  "select_teacher_no_officehour": "暂时没有OfficeHour活动",
+  "go_appointment": "进行预约",
+  "ban_time_button": "禁用某个时间段",
+  "ban_date": "需禁用时间段的日期",
+  "ban_time": "需禁用的时间段",
+  "ban_time_upload": "提交",
+  "ban_time_cancel": "取消"
 }
