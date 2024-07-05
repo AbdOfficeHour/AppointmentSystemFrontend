@@ -18,7 +18,7 @@ onMounted(() => {
 
 <template>
   <div class="tab-selector">
-    <TabSelector @update:selectedTab="handleTabChange" :selected-tab="selectedTab"></TabSelector>
+    <TabSelector />
   </div>
   <RouterView />
 </template>

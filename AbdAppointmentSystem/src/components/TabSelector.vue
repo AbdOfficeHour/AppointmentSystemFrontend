@@ -28,7 +28,7 @@ const selectTab = (tab) => {
     <RouterLink to="/index/officehour" class="tab" :class="{ active: selectedTab === 'tutor' }" @click="selectTab('tutor')">
       教师预约 Tutor
     </RouterLink>
-    <RouterLink to="/list" class="tab" :class="{ active: selectedTab === 'appointment' }" @click="selectTab('appointment')">
+    <RouterLink to="/list?if_appointment=false" class="tab" :class="{ active: selectedTab === 'appointment' }" @click="selectTab('appointment')">
       我的预约 MyAppointment
     </RouterLink>
   </div>
