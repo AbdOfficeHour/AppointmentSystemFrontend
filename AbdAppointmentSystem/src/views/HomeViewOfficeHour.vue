@@ -7,6 +7,7 @@ import PickerOfficeHour from "@/components/index/PickerOfficeHour.vue";
 import TableComponent from "@/components/index/TableComponent.vue";
 import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
 import { UserInfoFormat, PickerFormat } from "@/utils/index/format.js";
+import FunctionalComponent from "@/components/index/FunctionalComponent.vue";
 
 // 用户基本信息
 let username = ref(null) // 用户名
@@ -189,6 +190,9 @@ const handleDisableTimeSlotClose = () => {
 
 <template>
   <div class="app-container">
+    <div class="functional-layer">
+      <FunctionalComponent />
+    </div>
     <div class="picker-layer">
       <div v-if="authorityTable['OfficeHour:timeTable:all']" class="picker-tutor-stu">
         <PickerOfficeHour :selectors="pickerTeacherListFormat" @update:selectedTeacher="handleSelectedTeacher" />
@@ -225,16 +229,19 @@ const handleDisableTimeSlotClose = () => {
   justify-content: center;
   margin-top: 20px;
 }
-.table-component{
+.table-component {
   display: flex;
   height: 100%;
   padding-top: 20px;
 }
 .app-container{
   height: 100vh;
-  background-color: #F7FAFF;
+  background-color: #F0F5FF;
 }
-.table-layer{
+.table-layer {
   height: 60vh;
+}
+.functional-layer {
+  padding: 10px;
 }
 </style>

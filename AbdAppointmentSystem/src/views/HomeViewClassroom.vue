@@ -5,6 +5,7 @@ import axios from 'axios';
 import router from '@/router';
 import PickerClassroom from "@/components/index/PickerClassroom.vue";
 import TableComponent from "@/components/index/TableComponent.vue";
+import FunctionalComponent from "@/components/index/FunctionalComponent.vue";
 import { UserInfoFormat, PickerFormat } from "@/utils/index/format.js";
 
 
@@ -133,6 +134,9 @@ const navigateToAppointment = () => {
 
 <template>
   <div class="app-container">
+    <div class="functional-layer">
+      <FunctionalComponent />
+    </div>
     <div class="picker-layer">
       <PickerClassroom :selectors="allowClassroomInfo" @update:selectedClassroom="handleSelectedClassroom"/>
     </div>
@@ -164,5 +168,8 @@ const navigateToAppointment = () => {
 }
 .table-layer{
   height: 60vh;
+}
+.functional-layer {
+  padding: 10px;
 }
 </style>
