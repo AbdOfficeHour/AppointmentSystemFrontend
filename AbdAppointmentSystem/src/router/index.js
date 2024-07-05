@@ -1,30 +1,30 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from "@/views/HomeView.vue";
-import OfficeHourAppointment from "@/views/OfficeHourAppointment.vue";
-import ClassroomAppointment from "@/views/ClassroomAppointment.vue";
+import HomeViewOfficeHour from "@/views/HomeViewOfficeHour.vue";
+import HomeViewClassroom from "@/views/HomeViewClassroom.vue";
+import Appointment from "@/views/Appointment.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomeView
+      name: 'HomeViewClassroomWithNone',
+      component: HomeViewClassroom
     },
     {
-      path: '/index',
-      name: 'home_other',
-      component: HomeView
+      path: '/index/classroom',
+      name: 'HomeViewClassroom',
+      component: HomeViewClassroom
     },
     {
-      path: '/list/officehour',
-      name: 'OfficeHourAppointment',
-      component: OfficeHourAppointment // 替换成预约列表界面实际组件名称
+      path: '/index/officehour',
+      name: 'HomeViewOfficeHour',
+      component: HomeViewOfficeHour
     },
     {
-      path: '/list/classroom',
-      name: 'ClassroomAppointment',
-      component: ClassroomAppointment // 替换成预约列表界面实际组件名称
+      path: '/list',
+      name: 'Appointment',
+      component:Appointment // 替换成预约列表界面实际组件名称
     }
   ]
 })

@@ -73,9 +73,11 @@ function clearTimeTable() {
    */
   // 清除现有时间表
   const timelines = document.querySelectorAll('.timeline');
+  const timeLabels = document.querySelectorAll('.time-label');
   const emptyPrompt = document.querySelectorAll('.empty-prompt');
   timelines.forEach(timeline => timeline.remove()); // 移除所有时间轴标签
   emptyPrompt.forEach(emptyPrompt => emptyPrompt.remove())
+  timeLabels.forEach(timeLabel => timeLabel.remove()); // 移除所有时间标签
 }
 
 function renderNoTable() {
@@ -110,35 +112,39 @@ function renderTimeline() {
   // 清除现有时间表
   let timelines = clearTimeTable();
 
+  const timeLabels = document.createElement('div');
+  timeLabels.classList.add('time-labels');
+  appTable.appendChild(timeLabels); // 时间标签（8 - 20）
+
+  for (let i = 8; i < 20; i++) {
+    const timeLabel = document.createElement('div');
+    timeLabel.classList.add('time-label');
+    timeLabel.textContent = `${i}`;
+    timeLabels.appendChild(timeLabel);
+  } // 渲染timeLabel标签，为timeLabels的子标签
+
+
   // 渲染时间表
   timeSlots.value.forEach(slot => {
     const timeline = document.createElement('div');
     timeline.classList.add('timeline');
     appTable.appendChild(timeline); // 时间轴标签，子标签有time-labels、time-bar、teacher-label、date_label
 
-    const teacherLabel = document.createElement('div');
-    teacherLabel.classList.add('teacher-label');
-    timeline.appendChild(teacherLabel); // 教师标签
-
     const dateLabel = document.createElement('div');
     dateLabel.classList.add('date-label');
     dateLabel.textContent = slot.date;
     timeline.appendChild(dateLabel); // 日期标签
 
-    const timeLabels = document.createElement('div');
-    timeLabels.classList.add('time-labels');
-    timeline.appendChild(timeLabels); // 时间标签（8 - 20）
-
     const timeBar = document.createElement('div');
     timeBar.classList.add('time-bar');
     timeline.appendChild(timeBar); // 时间条标签
 
-    for (let i = 8; i < 20; i++) {
-      const timeLabel = document.createElement('div');
-      timeLabel.classList.add('time-label');
-      timeLabel.textContent = `${i}`;
-      timeLabels.appendChild(timeLabel);
-    } // 渲染timeLabel标签，为timeLabels的子标签
+    // for (let i = 8; i < 20; i++) {
+    //   const timeLabel = document.createElement('div');
+    //   timeLabel.classList.add('time-label');
+    //   timeLabel.textContent = `${i}`;
+    //   timeLabels.appendChild(timeLabel);
+    // } // 渲染timeLabel标签，为timeLabels的子标签
 
     const busyTimeElement = document.createElement("div");
     busyTimeElement.classList.add("busy-time");
@@ -157,8 +163,8 @@ function renderTimeline() {
       const duration = end - start;
       const busyElement = document.createElement("div");
       busyElement.classList.add("busy-time-slot");
-      busyElement.style.width = `${(duration / totalMinutes) * 100}%`;
-      busyElement.style.left = `${((start - new Date(start.getFullYear(), start.getMonth(), start.getDate(), 8)) / totalMinutes) * 100}%`;
+      busyElement.style.height = `${(duration / totalMinutes) * 100}%`;
+      busyElement.style.top = `${((start - new Date(start.getFullYear(), start.getMonth(), start.getDate(), 8)) / totalMinutes) * 100}%`;
       busyTimeElement.appendChild(busyElement);
     });
 
@@ -172,8 +178,8 @@ function renderTimeline() {
       const duration = end - start;
       const availableElement = document.createElement("div");
       availableElement.classList.add("available-time-slot");
-      availableElement.style.width = `${(duration / totalMinutes) * 100}%`;
-      availableElement.style.left = `${((start - new Date(start.getFullYear(), start.getMonth(), start.getDate(), 8)) / totalMinutes) * 100}%`;
+      availableElement.style.height = `${(duration / totalMinutes) * 100}%`;
+      availableElement.style.top = `${((start - new Date(start.getFullYear(), start.getMonth(), start.getDate(), 8)) / totalMinutes) * 100}%`;
       availableTimeElement.appendChild(availableElement);
     });
     appTable.appendChild(timeline); // 挂载至 #app .page-container .table-layer下
@@ -192,20 +198,22 @@ body {
 .timeline {
   width: 100%;
   position: relative;
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid;
 }
 .time-labels {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  padding-top: 10px;
+  padding-top: 30px;
 }
 .time-label {
   flex: 1;
   text-align: left;
 }
 .time-bar {
-  width: 100%;
-  height: 50px;
+  height: 100%;
   background-color: #f0f0f0;
   position: relative;
 }
@@ -224,7 +232,16 @@ body {
 .available-time-slot {
   background-color: deepskyblue;
   position: absolute;
-  height: 100%;
+  width: 100%;
   z-index: 1;
+}
+
+.time-labels {
+  margin-right: 10px;
+}
+
+.date-label {
+  height: 30px;
+  border-bottom-style: solid;
 }
 </style>

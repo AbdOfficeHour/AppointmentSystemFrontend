@@ -1,8 +1,13 @@
 <script setup>
-import {ref, defineEmits, onMounted} from 'vue';
+import {ref, defineEmits, onMounted, defineProps} from 'vue';
+
+// 接收父组件传递的props
+const props = defineProps({
+  selectedTab: String
+});
 
 // 组件全局变量定义
-const selectedTab = ref('tutor'); // 被选中的预约平台，初始化为教师预约平台
+const selectedTab = ref(props.selectedTab); // 被选中的预约平台，初始化为父组件传递的selectedTab
 
 // 向父组件传递的事件
 const emit = defineEmits(
@@ -33,7 +38,10 @@ const selectTab = (tab) => {
       教室预约 Room
     </div>
     <div :class="['tab', { active: selectedTab === 'tutor' }]" @click="selectTab('tutor')">
-      Tutor 教师预约
+      教师预约 Tutor
+    </div>
+    <div :class="['tab', { active: selectedTab === 'appointment' }]" @click="selectTab('appointment')">
+      我的预约 MyAppointment
     </div>
   </div>
 </template>
