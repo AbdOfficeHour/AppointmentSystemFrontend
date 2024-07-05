@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineEmits, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { RouterLink } from 'vue-router';
 
 // 组件全局变量定义
