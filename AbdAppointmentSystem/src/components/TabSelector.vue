@@ -1,13 +1,13 @@
 <script setup>
 import {ref, defineEmits, onMounted, defineProps} from 'vue';
 
-// 接收父组件传递的props
-const props = defineProps({
-  selectedTab: String
-});
+// // 接收父组件传递的props
+// const props = defineProps({
+//   selectedTab: String
+// });
 
 // 组件全局变量定义
-const selectedTab = ref(props.selectedTab); // 被选中的预约平台，初始化为父组件传递的selectedTab
+const selectedTab = ref('room'); // 被选中的预约平台，初始化为父组件传递的selectedTab
 
 // 向父组件传递的事件
 const emit = defineEmits(

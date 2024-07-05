@@ -131,36 +131,36 @@ onMounted( function(){
   getOfficeHourPickerInfo()
 })
 
-const handleTabChange = (tab) => {
-  /**
-   * 当接收到来自TabSelector组件传递的用户选择的平台变更时触发
-   */
-  if(tab === 'tutor'){ // 教师预约tutor平台
-    if (!authorityTable.value['OfficeHour:timeTable:all']){ // 教师
-      getTeacherTableInfoWithNoSelector();
-      // 重新获取后端数据以刷新，触发子组件的观测props的观测器watch
-    }
-    else{ // 学生
-      getOfficeHourSelectionId.value = null
-      getOfficeHourSelection.value = null
-      officeHourTimeTableOrigin.value = null
-      // 选项和时间表信息置为空
-    }
-  }
-  else if (tab === 'room') { // 教室预约room平台
-    router.push({
-      name: 'HomeViewClassroom' // 跳转至教室预约页面
-    })
-  }
-  else if (tab === 'appointment') {
-    router.push({
-      name: 'Appointment', // 跳转至我的预约页面
-      query: {
-        if_appointment: false
-      }
-    })
-  }
-};
+// const handleTabChange = (tab) => {
+//   /**
+//    * 当接收到来自TabSelector组件传递的用户选择的平台变更时触发
+//    */
+//   if(tab === 'tutor'){ // 教师预约tutor平台
+//     if (!authorityTable.value['OfficeHour:timeTable:all']){ // 教师
+//       getTeacherTableInfoWithNoSelector();
+//       // 重新获取后端数据以刷新，触发子组件的观测props的观测器watch
+//     }
+//     else{ // 学生
+//       getOfficeHourSelectionId.value = null
+//       getOfficeHourSelection.value = null
+//       officeHourTimeTableOrigin.value = null
+//       // 选项和时间表信息置为空
+//     }
+//   }
+//   else if (tab === 'room') { // 教室预约room平台
+//     router.push({
+//       name: 'HomeViewClassroom' // 跳转至教室预约页面
+//     })
+//   }
+//   else if (tab === 'appointment') {
+//     router.push({
+//       name: 'Appointment', // 跳转至我的预约页面
+//       query: {
+//         if_appointment: false
+//       }
+//     })
+//   }
+// };
 
 const handleSelectedTeacher = (teacher) => {
   /**
@@ -223,9 +223,9 @@ const handleDisableTimeSlotClose = () => {
 
 <template>
   <div class="app-container">
-    <div class="tab-selector">
-      <TabSelector @update:selectedTab="handleTabChange" :selected-tab="selectedTab"></TabSelector>
-    </div>
+<!--    <div class="tab-selector">-->
+<!--      <TabSelector @update:selectedTab="handleTabChange" :selected-tab="selectedTab"></TabSelector>-->
+<!--    </div>-->
     <div class="picker-layer">
       <div v-if="authorityTable['OfficeHour:timeTable:all']" class="picker-tutor-stu">
         <PickerOfficeHour :selectors="pickerTeacherListFormat" @update:selectedTeacher="handleSelectedTeacher" />

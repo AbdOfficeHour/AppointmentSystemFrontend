@@ -69,6 +69,8 @@ watch(() => props.selectors, (newSelectors) => {
 .selectors-container {
   display: flex;
   justify-content: space-between;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .selector {

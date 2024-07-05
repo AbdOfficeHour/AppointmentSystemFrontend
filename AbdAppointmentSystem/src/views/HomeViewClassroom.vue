@@ -105,31 +105,31 @@ onMounted( function(){
   getClassroomPickerInfo()
 })
 
-const handleTabChange = (tab) => {
-  /**
-   * 当接收到来自TabSelector组件传递的用户选择的平台变更时触发
-   */
-  if(tab === 'tutor'){ // 教师预约tutor平台
-    router.push({
-      name: 'HomeViewOfficeHour' // 跳转至教师预约页面
-    })
-  }
-  else if (tab === 'room') { // 教室预约room平台
-
-    getClassroomSelectionId.value = null
-    getClassroomSelection.value = null
-    classroomTimeTableOrigin.value = null
-    // 选项和时间表信息置为空
-  }
-  else if (tab === 'appointment') {
-    router.push({
-      name: 'Appointment', // 跳转至我的预约页面
-      query: {
-        if_appointment: false
-      }
-    })
-  }
-};
+// const handleTabChange = (tab) => {
+//   /**
+//    * 当接收到来自TabSelector组件传递的用户选择的平台变更时触发
+//    */
+//   if(tab === 'tutor'){ // 教师预约tutor平台
+//     router.push({
+//       name: 'HomeViewOfficeHour' // 跳转至教师预约页面
+//     })
+//   }
+//   else if (tab === 'room') { // 教室预约room平台
+//
+//     getClassroomSelectionId.value = null
+//     getClassroomSelection.value = null
+//     classroomTimeTableOrigin.value = null
+//     // 选项和时间表信息置为空
+//   }
+//   else if (tab === 'appointment') {
+//     router.push({
+//       name: 'Appointment', // 跳转至我的预约页面
+//       query: {
+//         if_appointment: false
+//       }
+//     })
+//   }
+// };
 
 const handleSelectedClassroom = (classroom) => {
   /**
@@ -160,9 +160,9 @@ const navigateToAppointment = () => {
 
 <template>
   <div class="app-container">
-    <div class="tab-selector">
-      <TabSelector @update:selectedTab="handleTabChange" :selected-tab="selectedTab"></TabSelector>
-    </div>
+<!--    <div class="tab-selector">-->
+<!--      <TabSelector @update:selectedTab="handleTabChange" :selected-tab="selectedTab"></TabSelector>-->
+<!--    </div>-->
     <div class="picker-layer">
       <PickerClassroom :selectors="allowClassroomInfo" @update:selectedClassroom="handleSelectedClassroom"/>
     </div>

@@ -49,6 +49,8 @@ const handleChange = (item) => {
 .selectors-container {
   display: flex;
   justify-content: space-around;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .selector-button {
