@@ -244,4 +244,12 @@ body {
   height: 30px;
   border-bottom-style: solid;
 }
+
+.empty-prompt {
+  text-align: center;
+  color: gray;
+  margin-top: 20px;
+  font-size: 18px;
+  width: 100%;
+}
 </style>

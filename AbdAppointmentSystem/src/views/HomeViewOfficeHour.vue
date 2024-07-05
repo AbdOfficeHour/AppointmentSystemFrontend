@@ -1,9 +1,8 @@
 <script setup>
 import { ElButton } from 'element-plus';
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import router from '@/router';
-import TabSelector from "@/components/TabSelector.vue";
 import PickerOfficeHour from "@/components/index/PickerOfficeHour.vue";
 import TableComponent from "@/components/index/TableComponent.vue";
 import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
@@ -131,37 +130,6 @@ onMounted( function(){
   getOfficeHourPickerInfo()
 })
 
-// const handleTabChange = (tab) => {
-//   /**
-//    * 当接收到来自TabSelector组件传递的用户选择的平台变更时触发
-//    */
-//   if(tab === 'tutor'){ // 教师预约tutor平台
-//     if (!authorityTable.value['OfficeHour:timeTable:all']){ // 教师
-//       getTeacherTableInfoWithNoSelector();
-//       // 重新获取后端数据以刷新，触发子组件的观测props的观测器watch
-//     }
-//     else{ // 学生
-//       getOfficeHourSelectionId.value = null
-//       getOfficeHourSelection.value = null
-//       officeHourTimeTableOrigin.value = null
-//       // 选项和时间表信息置为空
-//     }
-//   }
-//   else if (tab === 'room') { // 教室预约room平台
-//     router.push({
-//       name: 'HomeViewClassroom' // 跳转至教室预约页面
-//     })
-//   }
-//   else if (tab === 'appointment') {
-//     router.push({
-//       name: 'Appointment', // 跳转至我的预约页面
-//       query: {
-//         if_appointment: false
-//       }
-//     })
-//   }
-// };
-
 const handleSelectedTeacher = (teacher) => {
   /**
    * 当接收到来自PickerOfficeHour组件传递的选中教师发生变更时触发
@@ -223,9 +191,6 @@ const handleDisableTimeSlotClose = () => {
 
 <template>
   <div class="app-container">
-<!--    <div class="tab-selector">-->
-<!--      <TabSelector @update:selectedTab="handleTabChange" :selected-tab="selectedTab"></TabSelector>-->
-<!--    </div>-->
     <div class="picker-layer">
       <div v-if="authorityTable['OfficeHour:timeTable:all']" class="picker-tutor-stu">
         <PickerOfficeHour :selectors="pickerTeacherListFormat" @update:selectedTeacher="handleSelectedTeacher" />
@@ -265,6 +230,7 @@ const handleDisableTimeSlotClose = () => {
 .table-component{
   display: flex;
   height: 100%;
+  margin-top: 20px;
 }
 .app-container{
   height: 100vh;
