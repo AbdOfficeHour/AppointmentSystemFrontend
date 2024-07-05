@@ -1,51 +1,38 @@
 <script setup>
-import {ref, defineEmits, onMounted, defineProps} from 'vue';
-
-// // 接收父组件传递的props
-// const props = defineProps({
-//   selectedTab: String
-// });
+import { ref, defineEmits, onMounted } from 'vue';
+import { RouterLink } from 'vue-router';
 
 // 组件全局变量定义
-const selectedTab = ref('room'); // 被选中的预约平台，初始化为父组件传递的selectedTab
-
-// 向父组件传递的事件
-const emit = defineEmits(
-    ['update:selectedTab']
-);
+const selectedTab = ref('room'); // 被选中的预约平台，默认为教室预约平台
 
 onMounted(function () {
   /**
    * 组件初始化
    */
   console.log("TabSelector组件开始挂载")
-})
+});
 
 const selectTab = (tab) => {
   /**
    * 选择器发生变更时触发的函数，@click点击触发
    */
-  console.log("子组件顶栏Tab选择器发生变更")
   selectedTab.value = tab;
-  emit('update:selectedTab', tab); // 触发父组件事件，传递selectedTab
 };
 </script>
 
-
 <template>
   <div class="tab-selector">
-    <div :class="['tab', { active: selectedTab === 'room' }]" @click="selectTab('room')">
+    <RouterLink to="/index/classroom" class="tab" :class="{ active: selectedTab === 'room' }" @click="selectTab('room')">
       教室预约 Room
-    </div>
-    <div :class="['tab', { active: selectedTab === 'tutor' }]" @click="selectTab('tutor')">
+    </RouterLink>
+    <RouterLink to="/index/officehour" class="tab" :class="{ active: selectedTab === 'tutor' }" @click="selectTab('tutor')">
       教师预约 Tutor
-    </div>
-    <div :class="['tab', { active: selectedTab === 'appointment' }]" @click="selectTab('appointment')">
+    </RouterLink>
+    <RouterLink to="/list" class="tab" :class="{ active: selectedTab === 'appointment' }" @click="selectTab('appointment')">
       我的预约 MyAppointment
-    </div>
+    </RouterLink>
   </div>
 </template>
-
 
 <style scoped>
 .tab-selector {
