@@ -34,39 +34,50 @@ const handleChange = (item) => {
 
 <template>
   <div class="selectors-container">
-    <button
-        v-for="item in props.selectors"
+    <span
+        v-for="(item, index) in props.selectors"
         :key="item.classroomId"
         @click="handleChange(item)"
-        :class="['selector-button', { 'selected': selectedClassroom && selectedClassroom.classroomId === item.classroomId }]"
+        :class="['selector-item', { 'selected': selectedClassroom && selectedClassroom.classroomId === item.classroomId }]"
     >
-      {{ item.classroom }}
-    </button>
+      {{ item.classroom }} <span v-if="index < props.selectors.length - 1">/</span>
+    </span>
   </div>
 </template>
 
 <style scoped>
 .selectors-container {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  align-items: center;
   padding-top: 10px;
   padding-bottom: 10px;
 }
 
-.selector-button {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  padding: 10px 20px;
+.selector-item {
+  font-size: 24px;  /* 字号 */
+  font-weight: 700; /* 字重 */
+  color: #666;      /* 默认字体颜色 */
   cursor: pointer;
-  transition: background-color 0.3s;
+  margin: 0 5px;    /* 每个选项之间的间距 */
+  padding-bottom: 0px; /* 下划线与文字之间的间距 */
+  position: relative; /* 相对定位用于下划线 */
 }
 
-.selector-button:hover {
-  background-color: #e0e0e0;
+.selector-item.selected {
+  color: #10239E; /* 选中项的颜色 */
 }
 
-.selector-button.selected {
-  background-color: #007BFF;
-  color: white;
+.selector-item.selected::after {
+  content: '';
+  display: block;
+  height: 2px;  /* 下划线的高度 */
+  background-color: #10239E;  /* 下划线的颜色 */
+  width: 100%;
+  position: absolute;
+  bottom: -2px;  /* 下划线的位置，调整为距离文字更远 */
+  left: 0;
 }
+
+
 </style>

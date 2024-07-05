@@ -228,7 +228,7 @@ const handleDisableTimeSlotClose = () => {
 .table-component{
   display: flex;
   height: 100%;
-  margin-top: 20px;
+  padding-top: 20px;
 }
 .app-container{
   height: 100vh;

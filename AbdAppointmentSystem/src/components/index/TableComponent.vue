@@ -119,7 +119,7 @@ function renderTimeline() {
   for (let i = 8; i < 20; i++) {
     const timeLabel = document.createElement('div');
     timeLabel.classList.add('time-label');
-    timeLabel.textContent = `${i}`;
+    timeLabel.textContent = `${i}:00`;
     timeLabels.appendChild(timeLabel);
   } // 渲染timeLabel标签，为timeLabels的子标签
 
@@ -229,13 +229,13 @@ body {
   z-index: 1;
 }
 .busy-time-slot {
-  background-color: #FFFFFF;
+  background-color: #f2f2f2; /*淡灰色*/
   position: absolute;
   width: 100%;
   z-index: 1;
 }
 .available-time-slot {
-  background-color: #F0F5FF;
+  background-color: #F0F5FF; /*淡白色*/
   position: absolute;
   width: 100%;
   z-index: 1;
