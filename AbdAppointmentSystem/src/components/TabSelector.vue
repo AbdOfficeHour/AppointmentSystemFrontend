@@ -48,12 +48,19 @@ const selectTab = (tab) => {
   background-color: #f0f0f0;
   color: grey;
   transition: background-color 0.3s, color 0.3s;
+  font-size: 25px;
+  font-weight: 700;
 }
 .tab.active {
-  background-color: #e0f0ff;
-  color: #0044cc;
+  background-color: #E3ECFF;
+  color: #10239E;
+  font-size: 25px;
+  font-weight: 700;
 }
 .tab:not(.active):hover {
-  background-color: #e0e0e0;
+  background-color: #101010;
+  color: #E3ECFF;
+  font-size: 25px;
+  font-weight: 700;
 }
 </style>

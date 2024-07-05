@@ -17,7 +17,7 @@ let credits = ref([]) // 后端返回的用户权限
 let authorityTable = ref({}) // 经过格式化后的权限表
 
 // 全局基本变量
-let selectedTab = ref('room'); // 当前被选中的平台
+// None
 
 // Classroom的基本变量 - Picker Layer
 let classroomList = ref([]) // 后端返回的教室列表
@@ -160,6 +160,7 @@ const navigateToAppointment = () => {
 }
 .app-container{
   height: 100vh;
+  background-color: #F7FAFF;
 }
 .table-layer{
   height: 60vh;

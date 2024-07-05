@@ -73,7 +73,7 @@ function clearTimeTable() {
    */
   // 清除现有时间表
   const timelines = document.querySelectorAll('.timeline');
-  const timeLabels = document.querySelectorAll('.time-label');
+  const timeLabels = document.querySelectorAll('.time-labels');
   const emptyPrompt = document.querySelectorAll('.empty-prompt');
   timelines.forEach(timeline => timeline.remove()); // 移除所有时间轴标签
   emptyPrompt.forEach(emptyPrompt => emptyPrompt.remove())
@@ -139,13 +139,6 @@ function renderTimeline() {
     timeBar.classList.add('time-bar');
     timeline.appendChild(timeBar); // 时间条标签
 
-    // for (let i = 8; i < 20; i++) {
-    //   const timeLabel = document.createElement('div');
-    //   timeLabel.classList.add('time-label');
-    //   timeLabel.textContent = `${i}`;
-    //   timeLabels.appendChild(timeLabel);
-    // } // 渲染timeLabel标签，为timeLabels的子标签
-
     const busyTimeElement = document.createElement("div");
     busyTimeElement.classList.add("busy-time");
     timeBar.appendChild(busyTimeElement); // 忙碌时间标签
@@ -165,6 +158,11 @@ function renderTimeline() {
       busyElement.classList.add("busy-time-slot");
       busyElement.style.height = `${(duration / totalMinutes) * 100}%`;
       busyElement.style.top = `${((start - new Date(start.getFullYear(), start.getMonth(), start.getDate(), 8)) / totalMinutes) * 100}%`;
+
+      // 添加开始和结束时间的文字
+      const timeText = document.createElement("span");
+      timeText.classList.add("time-text");
+      timeText.textContent = `${slot.start} - ${slot.end}`;
       busyTimeElement.appendChild(busyElement);
     });
 
@@ -181,7 +179,14 @@ function renderTimeline() {
       availableElement.style.height = `${(duration / totalMinutes) * 100}%`;
       availableElement.style.top = `${((start - new Date(start.getFullYear(), start.getMonth(), start.getDate(), 8)) / totalMinutes) * 100}%`;
       availableTimeElement.appendChild(availableElement);
+
+      // 添加开始和结束时间的文字
+      const timeText = document.createElement("span");
+      timeText.classList.add("time-text");
+      timeText.textContent = `${slot.start} - ${slot.end}`;
+      availableElement.appendChild(timeText);
     });
+
     appTable.appendChild(timeline); // 挂载至 #app .page-container .table-layer下
   });
 }
@@ -224,13 +229,13 @@ body {
   z-index: 1;
 }
 .busy-time-slot {
-  background-color: gray;
+  background-color: #FFFFFF;
   position: absolute;
-  height: 100%;
+  width: 100%;
   z-index: 1;
 }
 .available-time-slot {
-  background-color: deepskyblue;
+  background-color: #F0F5FF;
   position: absolute;
   width: 100%;
   z-index: 1;

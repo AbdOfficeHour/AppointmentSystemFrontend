@@ -8,7 +8,6 @@ import TableComponent from "@/components/index/TableComponent.vue";
 import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
 import { UserInfoFormat, PickerFormat } from "@/utils/index/format.js";
 
-
 // 用户基本信息
 let username = ref(null) // 用户名
 let userID = ref(null) // 用户ID(与其他系统对齐为学生学号/教师工号)
@@ -19,7 +18,6 @@ let authorityTable = ref({}) // 经过格式化后的权限表
 
 // 全局基本变量
 let isDialogVisible = ref(false); // 禁用时段弹框是否可见
-let selectedTab = ref('tutor'); // 当前被选中的平台
 
 // OfficeHour的基本变量 - Picker Layer
 let teacherList = ref([]) // 后端返回的教师列表
@@ -234,6 +232,7 @@ const handleDisableTimeSlotClose = () => {
 }
 .app-container{
   height: 100vh;
+  background-color: #F7FAFF;
 }
 .table-layer{
   height: 60vh;
