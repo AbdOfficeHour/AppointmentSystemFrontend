@@ -4,7 +4,6 @@ import Navigation from "@/component/Navigation.vue";
 </script>
 
 <template>
-  <Navigation/>
   <RouterView />
 </template>
 
