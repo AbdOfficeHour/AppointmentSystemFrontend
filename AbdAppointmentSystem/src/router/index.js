@@ -24,7 +24,7 @@ const router = createRouter({
     {
       path: '/list',
       name: 'Appointment',
-      component:Appointment // 替换成预约列表界面实际组件名称
+      component: Appointment // 替换成预约列表界面实际组件名称
     }
   ]
 })

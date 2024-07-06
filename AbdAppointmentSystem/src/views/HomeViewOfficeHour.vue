@@ -1,11 +1,8 @@
 <script setup>
-import { ElButton } from 'element-plus';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import router from '@/router';
 import PickerOfficeHour from "@/components/index/PickerOfficeHour.vue";
 import TableComponent from "@/components/index/TableComponent.vue";
-import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
 import FunctionalOfficeHour from "@/components/index/FunctionalOfficeHour.vue";
 import { UserInfoFormat, PickerFormat } from "@/utils/index/format.js";
 

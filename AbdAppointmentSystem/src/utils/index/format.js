@@ -134,6 +134,32 @@ let TimeFormat = {
 let TableFormat = {
     /**
      * 负责对OfficeHour时间表信息相关数据执行格式化操作
+     * [{
+     *   date: '2024-07-17',
+     *   available: [
+     *     {start: '09:30', end: '11:00'},
+     *     {start: '12:30', end: '14:00'},
+     *     {start: '17:00', end: '20:00'}
+     *   ],
+     *   busy: [
+     *     {start: '08:00', end: '09:30'},
+     *     {start: '11:00', end: '12:30'},
+     *     {start: '14:00', end: '17:00'}
+     *   ]
+     * },
+     * {
+     *   date: '2024-07-18',
+     *   busy: [
+     *     {start: '08:00', end: '09:30'},
+     *     {start: '11:00', end: '12:30'},
+     *     {start: '14:00', end: '17:00'}
+     *   ],
+     *   available: [
+     *     {start: '09:30', end: '11:00'},
+     *     {start: '12:30', end: '14:00'},
+     *     {start: '17:00', end: '20:00'}
+     *   ]
+     * }]
      */
     timetable_format(timeTableTeacher) {
         // 从后端返回的时间表，格式化为前端渲染所需的数据结构

@@ -19,8 +19,6 @@ onMounted(() => {
 watch(props, (newVal, oldVal) => {
   local_authorityTable = newVal.authorityTable;
   local_backendData = newVal.backendData;
-  console.log(local_backendData)
-  console.log(local_authorityTable)
 })
 
 const navigateToAppointment = () => {
