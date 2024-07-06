@@ -27,6 +27,9 @@ let timeSlots = ref([]) // 转换后的时间表
 let isBackendDataNone = ref(null) // 后端返回的时间表数据是否为空
 let isDatePicked = ref(false) // 是否选择了日期
 
+const allHours = Array.from({ length: 24 }, (_, index) => index); // [0, ..., 23]
+const allMinutes = Array.from({ length: 60 }, (_, index) => index); // [0, ..., 59]
+
 // 快捷日期选定项
 const shortcuts = [
   {
@@ -84,6 +87,11 @@ const makeRange = (start, end) => {
 const getBusyTimes = (date) => {
   const day = timeSlots.value.find(d => d.date === date);
   return day ? day.busy : [];
+};
+
+const getAvailableTimes = (date) => {
+  const day = timeSlots.value.find(d => d.date === date);
+  return day ? day.available : [];
 };
 
 const getDateRange = (start, end) => {
@@ -188,6 +196,121 @@ const disabledMinutesStartWrapper = (hour) => {
   return [];
 };
 
+const parseTimeInCalculateForm = (timeStr) => {
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  const date = new Date();
+  date.setHours(hours, minutes, 0, 0);
+  return date;
+}
+
+function getAvailableTimeRange(startTime, endTime) {
+  const parseTime = (timeStr) => {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return { hours, minutes };
+  };
+
+  const start = parseTime(startTime);
+  const end = parseTime(endTime);
+
+  // 计算小时范围
+  const hourRange = [];
+  for (let hour = start.hours; hour <= end.hours; hour++) {
+    hourRange.push(hour);
+  }
+
+  // 计算分钟范围
+  const minuteRange = {};
+  hourRange.forEach(hour => {
+    if (hour === start.hours && hour === end.hours) {
+      minuteRange[hour] = Array.from({ length: end.minutes - start.minutes + 1 }, (_, i) => i + start.minutes);
+    } else if (hour === start.hours) {
+      minuteRange[hour] = Array.from({ length: 60 - start.minutes }, (_, i) => i + start.minutes);
+    } else if (hour === end.hours) {
+      minuteRange[hour] = Array.from({ length: end.minutes + 1 }, (_, i) => i);
+    } else {
+      minuteRange[hour] = Array.from({ length: 60 }, (_, i) => i);
+    }
+  });
+
+  return {
+    hourRange,
+    minuteRange
+  };
+}
+
+const disabledHoursEnd = (startDate, endDate, startTime) => {
+  const dates = getDateRange(startDate, endDate);
+  let totalDisabledHours = [];
+  let beginTime = parseTimeInCalculateForm(startTime);
+  dates.forEach(date => {
+    const availableTimes = getAvailableTimes(date);
+    let disabledHours = new Set();
+    availableTimes.forEach(period => {
+      const periodStart = period.start
+      const periodEnd = period.end
+      let isBeginTimeInPeriod = beginTime >= parseTimeInCalculateForm(periodStart) && beginTime <= parseTimeInCalculateForm(periodEnd);
+      if (isBeginTimeInPeriod) {
+        const { hourRange } = getAvailableTimeRange(startTime, periodEnd);
+        disabledHours = allHours.filter(hour => !hourRange.includes(hour));
+      }
+    });
+    let dateDisabledHours = Array.from(disabledHours).sort((a, b) => a - b);
+    let newElements = dateDisabledHours.filter(element => !totalDisabledHours.includes(element));
+    totalDisabledHours = totalDisabledHours.concat(newElements);
+    totalDisabledHours = [...new Set(totalDisabledHours)];
+  })
+  return Array.from(totalDisabledHours).sort((a, b) => a - b);
+};
+
+const disabledMinutesEnd = (startDate, endDate, startTime, hour) => {
+  const dates = getDateRange(startDate, endDate);
+  let totalDisabledMinutes = [];
+  let beginTime = parseTimeInCalculateForm(startTime);
+  dates.forEach(date => {
+    const availableTimes = getAvailableTimes(date);
+    let disabledMinutes = new Set();
+    availableTimes.forEach(period => {
+      const periodStart = period.start
+      const periodEnd = period.end
+      let isBeginTimeInPeriod = beginTime >= parseTimeInCalculateForm(periodStart) && beginTime <= parseTimeInCalculateForm(periodEnd);
+      if (isBeginTimeInPeriod) {
+        const { minuteRange } = getAvailableTimeRange(startTime, periodEnd);
+        disabledMinutes = allMinutes.filter(minute => !minuteRange[hour].includes(minute));
+      }
+    });
+    let dateDisabledMinutes = Array.from(disabledMinutes).sort((a, b) => a - b);
+    let newElements = dateDisabledMinutes.filter(element => !totalDisabledMinutes.includes(element));
+    totalDisabledMinutes = totalDisabledMinutes.concat(newElements);
+    totalDisabledMinutes = [...new Set(totalDisabledMinutes)];
+  })
+  return Array.from(totalDisabledMinutes).sort((a, b) => a - b);
+};
+
+function dateStringInHHMM(dateString) {
+  let dateStr = new Date(dateString)
+  let hours = dateStr.getHours()
+  let minutes = dateStr.getMinutes()
+  let formattedHours = hours.toString().padStart(2, '0');
+  let formattedMinutes = minutes.toString().padStart(2, '0');
+  let formattedTime = `${formattedHours}:${formattedMinutes}`;
+  return formattedTime
+}
+
+const disabledHoursEndWrapper = () => {
+  if (selectDate.value[0] && selectDate.value[1] && startTime.value) {
+    let formattedTime = dateStringInHHMM(startTime.value)
+    return disabledHoursEnd(selectDate.value[0], selectDate.value[1], formattedTime);
+  }
+  return [];
+};
+
+const disabledMinutesEndWrapper = (hour) => {
+  if (selectDate.value[0] && selectDate.value[1] && startTime.value) {
+    let formattedTime = dateStringInHHMM(startTime.value)
+    return disabledMinutesEnd(selectDate.value[0], selectDate.value[1], formattedTime, hour);
+  }
+  return [];
+};
 
 watch(props, (newVal) => {
   /**
@@ -245,6 +368,7 @@ function closeDisableComponents() {
    */
   emit('close');
   // 数据置为空，下次选择时重新加载
+
   clearSelection();
 }
 
@@ -306,8 +430,8 @@ function submitDisableInfo() {
           <el-time-picker
               v-model="endTime"
               placeholder="End time"
-              :disabled-hours="disabledHoursWrapper"
-              :disabled-minutes="disabledMinutesWrapper"
+              :disabled-hours="disabledHoursEndWrapper"
+              :disabled-minutes="disabledMinutesEndWrapper"
               :disabled-seconds="disabledSeconds"
           />
         </div>

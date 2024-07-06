@@ -40,3 +40,16 @@ const { hourRange, minuteRange } = getTimeRange(startTime, endTime);
 
 console.log('Hour Range:', hourRange);
 console.log('Minute Range:', minuteRange);
+
+const allHours = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
+const availableHours = [10, 11, 12];
+
+const disabledHours = allHours.filter(hour => !availableHours.includes(hour));
+
+console.log(disabledHours);
+// 输出: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+
+const array = Array.from({ length: 24 }, (_, index) => index);
+console.log(array);
+
+
