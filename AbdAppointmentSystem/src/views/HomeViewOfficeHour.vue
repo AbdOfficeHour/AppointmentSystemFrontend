@@ -102,7 +102,6 @@ function getOfficeHourTableInfo() {
     url:`/User/TableInfo/officehour/${getOfficeHourSelectionId.value}`
   }).then(res =>{
     if (res.data.code === 0){
-      console.log(res)
       officeHourTimeTableOrigin.value = res.data.data
     }
     else {

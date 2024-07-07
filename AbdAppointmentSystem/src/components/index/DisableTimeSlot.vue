@@ -244,6 +244,7 @@ const disabledHoursEnd = (startDate, endDate, startTime) => {
   const dates = getDateRange(startDate, endDate);
   let totalDisabledHours = [];
   let beginTime = parseTimeInCalculateForm(startTime);
+  let foundFlag = false;
   dates.forEach(date => {
     const availableTimes = getAvailableTimes(date);
     let disabledHours = new Set();
@@ -254,12 +255,24 @@ const disabledHoursEnd = (startDate, endDate, startTime) => {
       if (isBeginTimeInPeriod) {
         const { hourRange } = getAvailableTimeRange(startTime, periodEnd);
         disabledHours = allHours.filter(hour => !hourRange.includes(hour));
+        foundFlag = true;
       }
     });
-    let dateDisabledHours = Array.from(disabledHours).sort((a, b) => a - b);
-    let newElements = dateDisabledHours.filter(element => !totalDisabledHours.includes(element));
-    totalDisabledHours = totalDisabledHours.concat(newElements);
-    totalDisabledHours = [...new Set(totalDisabledHours)];
+    if (foundFlag) {
+      let dateDisabledHours = Array.from(disabledHours).sort((a, b) => a - b);
+      let newElements = dateDisabledHours.filter(element => !totalDisabledHours.includes(element));
+      totalDisabledHours = totalDisabledHours.concat(newElements);
+      totalDisabledHours = [...new Set(totalDisabledHours)];
+    }
+    else {
+      const { hourRange } = getAvailableTimeRange(startTime, "20:00");
+      disabledHours = allHours.filter(hour => !hourRange.includes(hour));
+      let dateDisabledHours = Array.from(disabledHours).sort((a, b) => a - b);
+      let newElements = dateDisabledHours.filter(element => !totalDisabledHours.includes(element));
+      totalDisabledHours = totalDisabledHours.concat(newElements);
+      totalDisabledHours = [...new Set(totalDisabledHours)];
+    }
+
   })
   return Array.from(totalDisabledHours).sort((a, b) => a - b);
 };
@@ -268,6 +281,7 @@ const disabledMinutesEnd = (startDate, endDate, startTime, hour) => {
   const dates = getDateRange(startDate, endDate);
   let totalDisabledMinutes = [];
   let beginTime = parseTimeInCalculateForm(startTime);
+  let foundFlag = false;
   dates.forEach(date => {
     const availableTimes = getAvailableTimes(date);
     let disabledMinutes = new Set();
@@ -278,12 +292,23 @@ const disabledMinutesEnd = (startDate, endDate, startTime, hour) => {
       if (isBeginTimeInPeriod) {
         const { minuteRange } = getAvailableTimeRange(startTime, periodEnd);
         disabledMinutes = allMinutes.filter(minute => !minuteRange[hour].includes(minute));
+        foundFlag = true;
       }
     });
-    let dateDisabledMinutes = Array.from(disabledMinutes).sort((a, b) => a - b);
-    let newElements = dateDisabledMinutes.filter(element => !totalDisabledMinutes.includes(element));
-    totalDisabledMinutes = totalDisabledMinutes.concat(newElements);
-    totalDisabledMinutes = [...new Set(totalDisabledMinutes)];
+    if (foundFlag) {
+      let dateDisabledMinutes = Array.from(disabledMinutes).sort((a, b) => a - b);
+      let newElements = dateDisabledMinutes.filter(element => !totalDisabledMinutes.includes(element));
+      totalDisabledMinutes = totalDisabledMinutes.concat(newElements);
+      totalDisabledMinutes = [...new Set(totalDisabledMinutes)];
+    }
+    else {
+      const { minuteRange } = getAvailableTimeRange(startTime, "20:00");
+      disabledMinutes = allMinutes.filter(minute => !minuteRange[hour].includes(minute));
+      let dateDisabledMinutes = Array.from(disabledMinutes).sort((a, b) => a - b);
+      let newElements = dateDisabledMinutes.filter(element => !totalDisabledMinutes.includes(element));
+      totalDisabledMinutes = totalDisabledMinutes.concat(newElements);
+      totalDisabledMinutes = [...new Set(totalDisabledMinutes)];
+    }
   })
   return Array.from(totalDisabledMinutes).sort((a, b) => a - b);
 };

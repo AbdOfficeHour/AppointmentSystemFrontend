@@ -23,7 +23,6 @@ watch(props, (newVal, oldVal) => {
   local_authorityTable.value = newVal.authorityTable;
   local_backendData.value = newVal.backendData;
   local_userId.value = newVal.userId;
-  console.log(newVal.userId)
 })
 
 const navigateToAppointment = () => {

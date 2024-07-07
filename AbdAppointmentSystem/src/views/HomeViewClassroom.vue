@@ -83,7 +83,6 @@ function getClassroomTableInfo(){
     url:`/User/TableInfo/classroom/${getClassroomSelectionId.value}`
   }).then(res =>{
     if (res.data.code === 0){
-      console.log(res)
       classroomTimeTableOrigin.value = res.data.data
     }
     else {
