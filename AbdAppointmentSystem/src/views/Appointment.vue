@@ -1,6 +1,6 @@
 <script setup>
 import {reactive, ref, computed} from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import appointmentTable from '@/components/appointmentList/appointmentTable.vue'
 import appointmentDetail from '@/components/appointmentList/appointmentDetail.vue'
 import EventUtil from '@/utils/MyAppointment/eventUtil.js'
@@ -150,7 +150,7 @@ const handleModeChange = (newMode) => {
 /**
  * 处理详细信息的展示
  */
-const handleRowClick = (row,colum,event) => {
+const handleRowClick = (row,colum) => {
   if(colum.property === "operation")return
 
   detailMessage.data = data.value[row.originIndex] // todo 记得改变量

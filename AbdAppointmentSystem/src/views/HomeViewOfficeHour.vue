@@ -1,9 +1,8 @@
 <script setup>
 import { ElButton } from 'element-plus';
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted} from 'vue';
 import axios from 'axios';
 import router from '@/router';
-import TabSelector from "@/components/TabSelector.vue";
 import PickerOfficeHour from "@/components/index/PickerOfficeHour.vue";
 import TableComponent from "@/components/index/TableComponent.vue";
 import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";

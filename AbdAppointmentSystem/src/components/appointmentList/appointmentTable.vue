@@ -20,7 +20,7 @@ const props = defineProps(["data","mode","operationMode"])
  * @param rowIndex 索引
  * @return {string} 添加的类
  */
-const tableRowClassName = ({row, rowIndex,}) => {
+const tableRowClassName = ({rowIndex,}) => {
   if (rowIndex%2 === 1) {
     return 'odd'
   }
