@@ -223,9 +223,6 @@ const handleDisableTimeSlotClose = () => {
 
 <template>
   <div class="app-container">
-    <div class="tab-selector">
-      <TabSelector @update:selectedTab="handleTabChange" :selected-tab="selectedTab"></TabSelector>
-    </div>
     <div class="picker-layer">
       <div v-if="authorityTable['OfficeHour:timeTable:all']" class="picker-tutor-stu">
         <PickerOfficeHour :selectors="pickerTeacherListFormat" @update:selectedTeacher="handleSelectedTeacher" />

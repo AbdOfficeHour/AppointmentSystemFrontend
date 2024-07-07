@@ -6,6 +6,8 @@ import appointmentDetail from '@/components/appointmentList/appointmentDetail.vu
 import EventUtil from '@/utils/MyAppointment/eventUtil.js'
 
 const dialogTableVisible = ref(false)
+const workSummaryVisible = ref(false)
+const refuseReasonVisible = ref(false)
 const data = ref([])
 const mode = ref(localStorage.getItem("mode")?localStorage.getItem("mode"):"officeHour")
 const formatData = computed(() => {
@@ -14,9 +16,7 @@ const formatData = computed(() => {
   else
     return EventUtil.getClassroomFormatData(data.value)
 })
-const detailMessage = reactive({
-  data: {}
-})
+const detailMessage = ref({})
 
 /*
 模拟数据
@@ -153,8 +153,24 @@ const handleModeChange = (newMode) => {
 const handleRowClick = (row,colum,event) => {
   if(colum.property === "operation")return
 
-  detailMessage.data = data.value[row.originIndex] // todo 记得改变量
+  detailMessage.value = data.value[row.originIndex] // todo 记得改变量
   dialogTableVisible.value = true
+}
+
+
+let currentEventId = null;
+/**
+ * 处理填写工作总结
+ */
+const handleWorkSummary = () => {
+  if(!eventId)return
+}
+
+/**
+ * 处理填写拒绝原因
+ */
+const handleRefuse = () => {
+  if(!eventId)return
 }
 
 const handleDataOperation = (eventId,operate) => {
@@ -167,6 +183,23 @@ const handleDataOperation = (eventId,operate) => {
         .then(res=>{
 
         })
+  }else if(operate === 2){
+    // 同意预约的情况
+    ElMessageBox.confirm("确定要同意该预约吗","提示",{
+      confirmButtonText:"确定",
+      cancelButtonText:"取消"
+    })
+        .then(res=>{
+
+        })
+  }else if(operate === 3){
+    // 拒绝预约的情况
+    currentEventId = eventId
+    refuseReasonVisible.value = true
+  }else if(operate === 4){
+    // 完成预约的情况
+    currentEventId = eventId
+    workSummaryVisible.value = true
   }
 }
 
@@ -185,7 +218,7 @@ else
   <div class="main-container">
     <div class="main-title">
       <h1>我的预约</h1>
-      <h1>My Appointment</h1>
+      <h1>My Appointment / Schedule</h1>
     </div>
     <appointment-table
         :mode="mode"
@@ -197,14 +230,42 @@ else
         @add-event-clicked=""
         @edit-event-clicked="handleDataOperation"
     />
-<!--    详细信息展示-->
+    <!--    详细信息展示-->
     <el-dialog
         v-model="dialogTableVisible"
         title="详细信息"
     >
       <appointment-detail
-          :data="detailMessage.data"
+          :data="detailMessage"
       />
+    </el-dialog>
+    <!--    工作总结-->
+    <el-dialog
+      v-model="workSummaryVisible"
+      title="工作总结"
+    >
+      <label>请输入你的工作总结</label>
+      <el-input
+          type="textarea"
+      />
+      <template #footer>
+        <el-button type="primary" @click="handleWorkSummary">确认</el-button>
+        <el-button @click="workSummaryVisible = false">取消</el-button>
+      </template>
+    </el-dialog>
+    <!--    拒绝原因-->
+    <el-dialog
+      v-model="refuseReasonVisible"
+      title="拒绝原因"
+    >
+      <label>请输入你的拒绝原因</label>
+      <el-input
+        type="textarea"
+      />
+      <template #footer>
+          <el-button type="primary" @click="handleRefuse">确认</el-button>
+          <el-button @click="refuseReasonVisible = false">取消</el-button>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -221,7 +282,7 @@ else
 
 .main-title {
   display: grid;
-  grid-template-columns: 0.6fr 1fr;
+  grid-template-columns: 0.4fr 1fr;
 
   height: 78px;
   font-size: 24px;
