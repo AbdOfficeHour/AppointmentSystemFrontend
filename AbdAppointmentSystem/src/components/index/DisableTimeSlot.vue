@@ -11,21 +11,25 @@ const props = defineProps({
 
 // 向父组件传递的事件
 const emit = defineEmits(
-    [
-      'close',
-      'submit'
-    ]
+  [
+    'close',
+    'submit'
+  ]
 )
 
 // 组件内全局变量定义
 let selectDate = ref([null, null]) // 被选中的日期，和组件绑定，[ "2024-07-04T16:00:00.000Z", "2024-07-11T16:00:00.000Z" ]
-
-let startTime = ref(null) // 被选中的开始时间
-let endTime = ref(null) // 被选中的结束时间
+let startTime = ref(null) // 被选中的开始时间，Sat Jul 06 2024 09:46:00 GMT+0800 (GMT+08:00)，只关注时间部分即可
+let endTime = ref(null) // 被选中的结束时间，Sat Jul 06 2024 09:46:00 GMT+0800 (GMT+08:00)，只关注时间部分即可
 
 let timeSlots = ref([]) // 转换后的时间表
 let isBackendDataNone = ref(null) // 后端返回的时间表数据是否为空
 let isDatePicked = ref(false) // 是否选择了日期
+
+let startTimeInt = ref(null) // 开始时间的整数表示，时间戳
+let endTimeInt = ref(null) // 结束时间的整数表示，时间戳
+let startDateInt = ref(null) // 开始日期的整数表示，时间戳
+let endDateInt = ref(null) // 结束日期的整数表示，时间戳
 
 const allHours = Array.from({ length: 24 }, (_, index) => index); // [0, ..., 23]
 const allMinutes = Array.from({ length: 60 }, (_, index) => index); // [0, ..., 59]
@@ -109,14 +113,12 @@ const getDateRange = (start, end) => {
 const disabledHoursStart = (startDate, endDate) => {
   const dates = getDateRange(startDate, endDate);
   let totalDisabledHours = [];
-
   dates.forEach(date => {
     const busyTimes = getBusyTimes(date);
     const disabled = new Set([...makeRange(0, 7), ...makeRange(20, 23)]);
     busyTimes.forEach(period => {
       const [startHour, startMinute] = period.start.split(':').map(Number);
       const [endHour, endMinute] = period.end.split(':').map(Number);
-
       for (let hour = startHour; hour <= endHour; hour++) {
         if (startHour !== endHour) {
           if (hour === startHour && startMinute === 0) {
@@ -342,15 +344,12 @@ function banTimeInfoCheck() {
   /**
    * 对用户提交的表单信息进行合理性检测
    */
-  // 当信息填写不完整时
   if (selectDate.value === null || startTime.value === null || endTime.value === null) {
     console.warn("日期或时间未选择")
     alert("警告：暂时未选择需要禁用的日期或时间")
-    return;
+    return false;
   }
-
-  // 信息填写完整，进行时间段合理性校验
-
+  return true;
 }
 
 function clearSelection() {
@@ -367,28 +366,36 @@ function closeDisableComponents() {
    * 当用户关闭禁用组件时触发
    */
   emit('close');
-  // 数据置为空，下次选择时重新加载
-
   clearSelection();
+}
+
+function getTimeStamps(timeString) {
+  return new Date(timeString).getTime();
 }
 
 function submitDisableInfo() {
   /**
    * 当用户提交禁用表单时触发
    */
-  banTimeInfoCheck()
-  console.log(startTime.value)
-  let confirm_result = confirm("确认要禁用这个时间段？")
-  if (confirm_result){
-    console.log("时间段合理性校验通过，上传禁用时间表单")
-    confirm("禁用时间段成功")
-    emit('submit')
+  let isCheckOK = banTimeInfoCheck()
+  if (isCheckOK) {
+    let confirm_result = confirm("确认要禁用这个时间段？")
+    if (confirm_result) {
+      startDateInt = getTimeStamps(selectDate.value[0])
+      endDateInt = getTimeStamps(selectDate.value[1])
+      startTimeInt = getTimeStamps(startTime.value)
+      endTimeInt = getTimeStamps(endTime.value)
+      emit('submit', {
+        startDate: startDateInt,
+        endDate: endDateInt,
+        startTime: startTimeInt,
+        endTime: endTimeInt
+      })
+    } else {
+      emit('close')
+    }
+    clearSelection()
   }
-  else {
-    console.log("取消上传禁用时间表单")
-    emit('close')
-  }
-  clearSelection()
 }
 </script>
 

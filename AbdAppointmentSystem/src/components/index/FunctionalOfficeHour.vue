@@ -2,14 +2,17 @@
 import router from "@/router/index.js";
 import {defineProps, onMounted, ref, watch} from 'vue';
 import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
+import axios from "axios";
 
 const props = defineProps({
   authorityTable: Object,
-  backendData: Object
+  backendData: Object,
+  userId: String
 })
 
-let local_authorityTable =props.authorityTable;
-let local_backendData = props.backendData;
+let local_authorityTable = ref(null);
+let local_backendData = ref(null);
+let local_userId = ref(null);
 let isDialogVisible = ref(false); // 禁用时段弹框是否可见
 
 onMounted(() => {
@@ -17,8 +20,10 @@ onMounted(() => {
 });
 
 watch(props, (newVal, oldVal) => {
-  local_authorityTable = newVal.authorityTable;
-  local_backendData = newVal.backendData;
+  local_authorityTable.value = newVal.authorityTable;
+  local_backendData.value = newVal.backendData;
+  local_userId.value = newVal.userId;
+  console.log(newVal.userId)
 })
 
 const navigateToAppointment = () => {
@@ -42,11 +47,28 @@ const banTimeShow = () => {
   isDialogVisible.value = true
 };
 
-const handleDisableTimeSlotSubmit = (form) => {
+const handleDisableTimeSlotSubmit = (timeForm) => {
   /**
    * 当用户点击禁用时段弹框表单的提交按钮时触发
-   * 向后端发送禁用时段的请求
+   * 关闭窗口，表单数据提交由子组件DisableTimeSlot处理
    */
+  axios({
+    method: 'post',
+    url: `/User/ban/${local_userId.value}`,
+    data: {
+      startDate: timeForm.startDate,
+      endDate: timeForm.endDate,
+      startTime: timeForm.startTime,
+      endTime: timeForm.endTime
+    }
+  }).then(res => {
+    if (res.data.code === 0) {
+      confirm('禁用时段成功')
+    } else {
+      alert('禁用时段失败，请检查禁用时段的合理性')
+      console.log(res.data.message)
+    }
+  })
   isDialogVisible.value = false
 };
 

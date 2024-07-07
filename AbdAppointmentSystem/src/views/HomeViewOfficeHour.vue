@@ -149,7 +149,7 @@ const handleSelectedTeacher = (teacher) => {
 <template>
   <div class="app-container">
     <div class="functional-layer">
-      <FunctionalOfficeHour :authority-table="authorityTable" :backend-data="officeHourTimeTableOrigin"/>
+      <FunctionalOfficeHour :authority-table="authorityTable" :backend-data="officeHourTimeTableOrigin" :user-id="userID"/>
     </div>
     <div class="picker-layer">
       <div v-if="authorityTable['OfficeHour:timeTable:all']" class="picker-tutor-stu">
