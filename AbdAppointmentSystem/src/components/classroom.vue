@@ -159,7 +159,7 @@ interface RuleForm {
     state: number // 事件状态
 }
 
-const classrooms = ref([])  //老师们的名字和id
+const classrooms = ref([])  //教室和id
 const usefulTime = ref([]) //可用时间
 
 //初始化可选教师姓名
@@ -174,7 +174,7 @@ onMounted(() => {
     }, {
         "classroom": "103",
         "classroomID": "1037392"
-    },]  //老师们的名字和id
+    },]  //教室id
 
     // axios.get('/Appointment/list/classroom/pickerList')
     //     .then(response => {
@@ -300,7 +300,7 @@ const post_it = () => {
 };
 
 
-//得到对应老师的可使用时间
+//得到对应教室的可使用时间
 const getTime = () => {
     //     axios.get('/Appointment/list/classroom/pickerTime/${ruleForm.classroom}')
     //         .then(response => {
