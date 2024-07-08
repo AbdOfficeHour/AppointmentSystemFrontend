@@ -37,25 +37,11 @@ const navigateToAppointment = () => {
    * 当用户点击预约按钮时触发
    * 根据用户当前所在平台和选择的教师/教室跳转至对应的预约页面
    */
-
-  // todo: 解决跳转时导航栏选项不变更的问题
   router.push({
     name: 'Appointment', // 跳转至预约列表页面
     query: {
       if_appointment: true
     }
-  })
-};
-
-const navigateToApprove = () => {
-  /**
-   * 当用户点击预约按钮时触发
-   * 根据用户当前所在平台和选择的教师/教室跳转至对应的审批页面
-   */
-
-  // todo: 解决跳转时导航栏选项不变更的问题
-  router.push({
-    name: 'approve', // 跳转至审批页面
   })
 };
 
@@ -119,7 +105,6 @@ const handleDisableTimeSlotClose = () => {
     </div>
     <div v-if="authorityTable['OfficeHour:approve']" class="ban-button">
       <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>
-      <ElButton type="primary" round @click="navigateToApprove">查看我的预约 Appointment</ElButton>
     </div>
     <div class="ban-layer">
       <DisableTimeSlot

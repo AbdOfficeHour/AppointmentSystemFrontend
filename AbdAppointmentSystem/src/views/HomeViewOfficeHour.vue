@@ -156,7 +156,11 @@ const handleSelectedTeacher = (teacher) => {
     </div>
     <div class="table-layer">
       <div class="table-component">
-        <TableComponent :backend-data="officeHourTimeTableOrigin" is-room="false"/>
+        <TableComponent
+            :backend-data="officeHourTimeTableOrigin"
+            :authority-table="authorityTable"
+            :is-office-hour="true"
+        />
       </div>
     </div>
   </div>

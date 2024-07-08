@@ -125,7 +125,10 @@ const handleSelectedClassroom = (classroom) => {
     </div>
     <div class="table-layer">
       <div class="table-component">
-        <TableComponent :backend-data="classroomTimeTableOrigin" :is-room="true"/>
+        <TableComponent
+            :backend-data="classroomTimeTableOrigin"
+            :authority-table="authorityTable"
+            :is-office-hour="false"/>
       </div>
     </div>
   </div>
