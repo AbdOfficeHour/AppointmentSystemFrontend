@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeViewOfficeHour from "@/views/HomeViewOfficeHour.vue";
 import HomeViewClassroom from "@/views/HomeViewClassroom.vue";
 import Appointment from "@/views/Appointment.vue";
+import Approve from "@/views/Approve.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,7 +25,12 @@ const router = createRouter({
     {
       path: '/list',
       name: 'Appointment',
-      component: Appointment // 替换成预约列表界面实际组件名称
+      component:Appointment
+    },
+    {
+      path: '/approve',
+      name: 'approve',
+      component: Approve
     }
   ]
 })
