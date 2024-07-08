@@ -65,10 +65,11 @@ const shortcuts = [
   },
 ]
 
+/**
+ * 组件初始化时被触发，从父组件接收信息并进行条件渲染/时间表数据处理
+ */
 onMounted(() => {
-  /**
-   * 组件初始化时被触发，从父组件接收信息并进行条件渲染/时间表数据处理
-   */
+
   console.log("禁用时间段组件开始挂载")
   if (props.backendData === null) {
     isBackendDataNone = true
@@ -80,6 +81,9 @@ onMounted(() => {
   }
 })
 
+/**
+ * 转换整数区间为整数数组
+ */
 const makeRange = (start, end) => {
   const result = [];
   for (let i = start; i <= end; i++) {
@@ -88,16 +92,28 @@ const makeRange = (start, end) => {
   return result;
 };
 
+/**
+ * 从每日的时间表中提取出繁忙时段时间表
+ */
 const getBusyTimes = (date) => {
+
   const day = timeSlots.value.find(d => d.date === date);
   return day ? day.busy : [];
 };
 
+/**
+ * 从每日的时间表中提取出繁忙时段时间表
+ */
 const getAvailableTimes = (date) => {
+
   const day = timeSlots.value.find(d => d.date === date);
   return day ? day.available : [];
 };
 
+
+/**
+ * 转换日期区间为连续的日期数组
+ */
 const getDateRange = (start, end) => {
   const startDate = new Date(start);
   const endDate = new Date(end);
@@ -110,13 +126,18 @@ const getDateRange = (start, end) => {
   return dates;
 };
 
+/**
+ * 禁用时间点选择器开始时间点部分的小时选择器
+ * 计算需要禁用的小时数，以数组形式返回
+ * e.g. [1,2,3,4,5,6,10,23]
+ */
 const disabledHoursStart = (startDate, endDate) => {
   const dates = getDateRange(startDate, endDate);
   let totalDisabledHours = [];
-  dates.forEach(date => {
+  dates.forEach(date => { // 遍历所有选中日期
     const busyTimes = getBusyTimes(date);
     const disabled = new Set([...makeRange(0, 7), ...makeRange(20, 23)]);
-    busyTimes.forEach(period => {
+    busyTimes.forEach(period => { // 遍历选中日期的所有繁忙时段
       const [startHour, startMinute] = period.start.split(':').map(Number);
       const [endHour, endMinute] = period.end.split(':').map(Number);
       for (let hour = startHour; hour <= endHour; hour++) {
@@ -135,8 +156,8 @@ const disabledHoursStart = (startDate, endDate) => {
         }
       }
     });
+    // 对该日期的禁用时段进行处理，以在totalDisabledHours变量取得每个日期禁用小时数组的并集
     let dateDisabledHours = Array.from(disabled).sort((a, b) => a - b);
-
     let newElements = dateDisabledHours.filter(element => !totalDisabledHours.includes(element));
     totalDisabledHours = totalDisabledHours.concat(newElements);
     totalDisabledHours = [...new Set(totalDisabledHours)];
@@ -144,14 +165,19 @@ const disabledHoursStart = (startDate, endDate) => {
   return Array.from(totalDisabledHours).sort((a, b) => a - b);
 };
 
+/**
+ * 禁用时间点选择器开始时间点部分的分钟选择器
+ * 计算需要禁用的分钟数，以数组形式返回
+ * e.g. [1,2,3,4,5,6,10,23]
+ */
 const disabledMinutesStart = (startDate, endDate, hour) => {
   const dates = getDateRange(startDate, endDate);
   let totalDisabledMinutes = [];
 
-  dates.forEach(date => {
+  dates.forEach(date => { // 遍历选中日期
     const busyTimes = getBusyTimes(date);
     const disabled = new Set();
-    busyTimes.forEach(period => {
+    busyTimes.forEach(period => {  // 遍历选中日期的所有繁忙时段
       const [startHour, startMinute] = period.start.split(':').map(Number);
       const [endHour, endMinute] = period.end.split(':').map(Number);
 
@@ -171,8 +197,8 @@ const disabledMinutesStart = (startDate, endDate, hour) => {
         }
       }
     });
+    // 对该日期的禁用时段进行处理，以在totalDisabledHours变量取得每个日期禁用小时数组的并集
     let dateDisabledMinutes = Array.from(disabled).sort((a, b) => a - b);
-
     let newElements = dateDisabledMinutes.filter(element => !totalDisabledMinutes.includes(element));
     totalDisabledMinutes = totalDisabledMinutes.concat(newElements);
     totalDisabledMinutes = [...new Set(totalDisabledMinutes)];
@@ -180,10 +206,18 @@ const disabledMinutesStart = (startDate, endDate, hour) => {
   return Array.from(totalDisabledMinutes).sort((a, b) => a - b);
 };
 
+/**
+ * 禁用时间点选择器的秒数选择器
+ * 计算需要禁用的小时数，以数组形式返回
+ * 从不需要计算秒数，1-59全部禁用
+ */
 const disabledSeconds = () => {
   return makeRange(1, 59);
 };
 
+/**
+ * 包裹disabledHoursStart为一个组件可以接受的函数
+ */
 const disabledHoursStartWrapper = () => {
   if (selectDate.value[0] && selectDate.value[1]) {
     return disabledHoursStart(selectDate.value[0], selectDate.value[1]);
@@ -191,6 +225,9 @@ const disabledHoursStartWrapper = () => {
   return [];
 };
 
+/**
+ * 包裹disabledMinutesStart为一个组件可以接受的函数
+ */
 const disabledMinutesStartWrapper = (hour) => {
   if (selectDate.value[0] && selectDate.value[1]) {
     return disabledMinutesStart(selectDate.value[0], selectDate.value[1], hour);
@@ -198,6 +235,10 @@ const disabledMinutesStartWrapper = (hour) => {
   return [];
 };
 
+/**
+ * 将类似于Sat Jul 06 2024 09:46:00 GMT+0800 (GMT+08:00)格式的时间字符串
+ * 转换为JavaScript的日期格式用于计算
+ */
 const parseTimeInCalculateForm = (timeStr) => {
   const [hours, minutes] = timeStr.split(':').map(Number);
   const date = new Date();
@@ -205,8 +246,19 @@ const parseTimeInCalculateForm = (timeStr) => {
   return date;
 }
 
+/**
+ * 通过开始时间点和结束时间点，判断可以选中的小时数和对应小时数可用的分钟数
+ * 开始时间和结束时间数据结构：e.g."10:23"
+ * 返回的类型为选择器可选小时数组：[10,11,12]
+ * 选择器可选分钟数组关于小时的对象：{
+ *   '10': [1,2,3],
+ *   '11': [51,52,53],
+ *   '12': [33,34,35]
+ * }
+ */
 function getAvailableTimeRange(startTime, endTime) {
   const parseTime = (timeStr) => {
+    // 时间格式转换
     const [hours, minutes] = timeStr.split(':').map(Number);
     return { hours, minutes };
   };
@@ -240,35 +292,46 @@ function getAvailableTimeRange(startTime, endTime) {
   };
 }
 
+/**
+ * 禁用时间点选择器结束时间点部分的小时选择器
+ * 计算需要禁用的小时数，以数组形式返回
+ * e.g. [1,2,3,4,5,6,10,23]
+ */
 const disabledHoursEnd = (startDate, endDate, startTime) => {
   const dates = getDateRange(startDate, endDate);
   let totalDisabledHours = [];
   let beginTime = parseTimeInCalculateForm(startTime);
-  let foundFlag = false;
-  dates.forEach(date => {
+  let foundFlag = false; // 用于判断用户选中的日期中，是否存在一天，处于后端返回的时间表范围内
+  // 若不存在，需要特殊处理
+  dates.forEach(date => { // 遍历用户选中的日期
     const availableTimes = getAvailableTimes(date);
     let disabledHours = new Set();
-    availableTimes.forEach(period => {
+    availableTimes.forEach(period => { // 遍历日期对应的可用时间表
       const periodStart = period.start
       const periodEnd = period.end
       let isBeginTimeInPeriod = beginTime >= parseTimeInCalculateForm(periodStart) && beginTime <= parseTimeInCalculateForm(periodEnd);
-      if (isBeginTimeInPeriod) {
+      if (isBeginTimeInPeriod) { // 判断用户选中的开始时间，是否处于可用时间表中时间段范围内
+        // 有且仅有一个时间段可用满足要求以执行if块内代码
         const { hourRange } = getAvailableTimeRange(startTime, periodEnd);
-        disabledHours = allHours.filter(hour => !hourRange.includes(hour));
+        disabledHours = allHours.filter(hour => !hourRange.includes(hour)); // 可用时段数组取补集为不可用时段数组
         foundFlag = true;
       }
     });
     if (foundFlag) {
+      // 若找到一个时段，处于可用时间表中时间段范围内
+      // 对该日期的禁用时段进行处理，以在totalDisabledHours变量取得每个日期禁用小时数组的并集
       let dateDisabledHours = Array.from(disabledHours).sort((a, b) => a - b);
       let newElements = dateDisabledHours.filter(element => !totalDisabledHours.includes(element));
       totalDisabledHours = totalDisabledHours.concat(newElements);
       totalDisabledHours = [...new Set(totalDisabledHours)];
     }
     else {
-      const { hourRange } = getAvailableTimeRange(startTime, "20:00");
+      // 若未找到一个时段，处于可用时间表中时间段范围内，则特殊处理
+      // 对该日期的禁用时段进行处理，以在totalDisabledHours变量取得每个日期禁用小时数组的并集
+      const { hourRange } = getAvailableTimeRange(startTime, "20:00"); // 可用时间起始未用户选中时间 - 晚上8点
       disabledHours = allHours.filter(hour => !hourRange.includes(hour));
       let dateDisabledHours = Array.from(disabledHours).sort((a, b) => a - b);
-      let newElements = dateDisabledHours.filter(element => !totalDisabledHours.includes(element));
+      let newElements = dateDisabledHours.filter(element => !totalDisabledHours.includes(element)); // 可用时段数组取补集为不可用时段数组
       totalDisabledHours = totalDisabledHours.concat(newElements);
       totalDisabledHours = [...new Set(totalDisabledHours)];
     }
@@ -277,31 +340,42 @@ const disabledHoursEnd = (startDate, endDate, startTime) => {
   return Array.from(totalDisabledHours).sort((a, b) => a - b);
 };
 
+/**
+ * 禁用时间点选择器结束时间点部分的分钟选择器
+ * 计算需要禁用的分钟数，以数组形式返回
+ * e.g. [1,2,3,4,5,6,10,23]
+ */
 const disabledMinutesEnd = (startDate, endDate, startTime, hour) => {
   const dates = getDateRange(startDate, endDate);
   let totalDisabledMinutes = [];
   let beginTime = parseTimeInCalculateForm(startTime);
-  let foundFlag = false;
-  dates.forEach(date => {
+  let foundFlag = false;// 用于判断用户选中的日期中，是否存在一天，处于后端返回的时间表范围内
+  // 若不存在，需要特殊处理
+  dates.forEach(date => { // 遍历用户选中的日期
     const availableTimes = getAvailableTimes(date);
     let disabledMinutes = new Set();
-    availableTimes.forEach(period => {
+    availableTimes.forEach(period => { // 遍历日期对应的可用时间表
       const periodStart = period.start
       const periodEnd = period.end
       let isBeginTimeInPeriod = beginTime >= parseTimeInCalculateForm(periodStart) && beginTime <= parseTimeInCalculateForm(periodEnd);
-      if (isBeginTimeInPeriod) {
+      if (isBeginTimeInPeriod) { // 判断用户选中的开始时间，是否处于可用时间表中时间段范围内
+        // 有且仅有一个时间段可用满足要求以执行if块内代码
         const { minuteRange } = getAvailableTimeRange(startTime, periodEnd);
         disabledMinutes = allMinutes.filter(minute => !minuteRange[hour].includes(minute));
         foundFlag = true;
       }
     });
     if (foundFlag) {
+      // 若找到一个时段，处于可用时间表中时间段范围内
+      // 对该日期的禁用时段进行处理，以在totalDisabledHours变量取得每个日期禁用小时数组的并集
       let dateDisabledMinutes = Array.from(disabledMinutes).sort((a, b) => a - b);
       let newElements = dateDisabledMinutes.filter(element => !totalDisabledMinutes.includes(element));
       totalDisabledMinutes = totalDisabledMinutes.concat(newElements);
       totalDisabledMinutes = [...new Set(totalDisabledMinutes)];
     }
     else {
+      // 若未找到一个时段，处于可用时间表中时间段范围内，则特殊处理
+      // 对该日期的禁用时段进行处理，以在totalDisabledHours变量取得每个日期禁用小时数组的并集
       const { minuteRange } = getAvailableTimeRange(startTime, "20:00");
       disabledMinutes = allMinutes.filter(minute => !minuteRange[hour].includes(minute));
       let dateDisabledMinutes = Array.from(disabledMinutes).sort((a, b) => a - b);
@@ -313,14 +387,17 @@ const disabledMinutesEnd = (startDate, endDate, startTime, hour) => {
   return Array.from(totalDisabledMinutes).sort((a, b) => a - b);
 };
 
+/**
+ * 将类似于Sat Jul 06 2024 09:46:00 GMT+0800 (GMT+08:00)格式的时间字符串
+ * 转换为HH:MM格式的时间，用于传递给父组件向后端发起请求
+ */
 function dateStringInHHMM(dateString) {
   let dateStr = new Date(dateString)
   let hours = dateStr.getHours()
   let minutes = dateStr.getMinutes()
   let formattedHours = hours.toString().padStart(2, '0');
   let formattedMinutes = minutes.toString().padStart(2, '0');
-  let formattedTime = `${formattedHours}:${formattedMinutes}`;
-  return formattedTime
+  return `${formattedHours}:${formattedMinutes}`
 }
 
 const disabledHoursEndWrapper = () => {

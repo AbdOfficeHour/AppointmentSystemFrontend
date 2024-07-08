@@ -3,6 +3,9 @@ import router from "@/router/index.js";
 import {onMounted} from "vue";
 
 onMounted(() => {
+  /**
+   * 组件初始化
+   */
   console.log('FunctionalClassroom组件开始挂载');
 });
 

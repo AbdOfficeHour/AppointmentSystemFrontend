@@ -14,8 +14,7 @@ let role = ref([]) // 后端返回的权限信息
 let credits = ref([]) // 后端返回的用户权限
 let authorityTable = ref({}) // 经过格式化后的权限表
 
-// 全局基本变量
-// None
+// 全局基本变量 - 暂无
 
 // OfficeHour的基本变量 - Picker Layer
 let teacherList = ref([]) // 后端返回的教师列表

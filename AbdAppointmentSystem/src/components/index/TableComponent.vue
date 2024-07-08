@@ -4,19 +4,21 @@
 import {ref, onMounted, watch} from 'vue';
 import {TableFormat} from "@/utils/index/format.js";
 
+// 接收父组件传递的props
+const props = defineProps(
+    [
+      "backendData",
+    ]
+);
+
 // 组件全局变量定义
 const totalMinutes = 12 * 60 * 60 * 1000; // 12小时对应的毫秒数（8：00-20：00）
 let timeSlots = ref([]); // 用于渲染的时间表信息
 
-// 接收父组件传递的props
-const props = defineProps(
-  [
-      "backendData",
-  ]
-);
-
-watch(props, (newVal, oldVal) => {
-  // 监听父组件传入参数变更
+watch(props, (newVal) => {
+  /**
+   * 监听父组件传入参数的变更
+   */
   if (newVal.backendData === null) {
     renderNoTable()
   }
@@ -110,7 +112,7 @@ function renderTimeline() {
   // 查找DOM元素，用于执行挂载
   let appTable = queryElements();
   // 清除现有时间表
-  let timelines = clearTimeTable();
+  clearTimeTable();
 
   const timeLabels = document.createElement('div');
   timeLabels.classList.add('time-labels');

@@ -1,8 +1,6 @@
 <script setup>
-import { ElButton } from 'element-plus';  // 引入Element-Plus按钮组件
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import router from '@/router';
 import PickerClassroom from "@/components/index/PickerClassroom.vue";
 import TableComponent from "@/components/index/TableComponent.vue";
 import FunctionalClassroom from "@/components/index/FunctionalClassroom.vue";
@@ -17,8 +15,7 @@ let role = ref([]) // 后端返回的权限信息
 let credits = ref([]) // 后端返回的用户权限
 let authorityTable = ref({}) // 经过格式化后的权限表
 
-// 全局基本变量
-// None
+// 全局基本变量 - 暂无
 
 // Classroom的基本变量 - Picker Layer
 let classroomList = ref([]) // 后端返回的教室列表
@@ -115,19 +112,6 @@ const handleSelectedClassroom = (classroom) => {
 
   // 通过选中的教室的ID向后端动态路由请求数据
   getClassroomTableInfo()
-};
-
-const navigateToAppointment = () => {
-  /**
-   * 当用户点击预约按钮时触发
-   * 根据用户当前所在平台和选择的教师/教室跳转至对应的预约页面
-   */
-  router.push({
-    name: 'Appointment', // 跳转至预约列表页面
-    query: {
-      if_appointment: true
-    }
-  })
 };
 </script >
 

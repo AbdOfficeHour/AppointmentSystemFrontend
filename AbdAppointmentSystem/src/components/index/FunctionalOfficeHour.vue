@@ -4,22 +4,29 @@ import {defineProps, onMounted, ref, watch} from 'vue';
 import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
 import axios from "axios";
 
+// 接收父组件传递的props
 const props = defineProps({
   authorityTable: Object,
   backendData: Object,
   userId: String
 })
 
-let local_authorityTable = ref(null);
-let local_backendData = ref(null);
-let local_userId = ref(null);
+let local_authorityTable = ref(null); // 父组件传入的用户权限表
+let local_backendData = ref(null); // 父组件传入的后端返回时间表
+let local_userId = ref(null); // 父组件传入用户id
 let isDialogVisible = ref(false); // 禁用时段弹框是否可见
 
 onMounted(() => {
+  /**
+   * FunctionalOfficeHour组件初始化
+   */
   console.log('FunctionalOfficeHour组件开始挂载');
 });
 
 watch(props, (newVal, oldVal) => {
+  /**
+   * 监听父组件传入参数变更
+   */
   local_authorityTable.value = newVal.authorityTable;
   local_backendData.value = newVal.backendData;
   local_userId.value = newVal.userId;
@@ -30,11 +37,25 @@ const navigateToAppointment = () => {
    * 当用户点击预约按钮时触发
    * 根据用户当前所在平台和选择的教师/教室跳转至对应的预约页面
    */
+
+  // todo: 解决跳转时导航栏选项不变更的问题
   router.push({
     name: 'Appointment', // 跳转至预约列表页面
     query: {
       if_appointment: true
     }
+  })
+};
+
+const navigateToApprove = () => {
+  /**
+   * 当用户点击预约按钮时触发
+   * 根据用户当前所在平台和选择的教师/教室跳转至对应的审批页面
+   */
+
+  // todo: 解决跳转时导航栏选项不变更的问题
+  router.push({
+    name: 'approve', // 跳转至审批页面
   })
 };
 
@@ -98,7 +119,7 @@ const handleDisableTimeSlotClose = () => {
     </div>
     <div v-if="authorityTable['OfficeHour:approve']" class="ban-button">
       <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>
-      <ElButton type="primary" round @click="navigateToAppointment">查看我的预约 Appointment</ElButton>
+      <ElButton type="primary" round @click="navigateToApprove">查看我的预约 Appointment</ElButton>
     </div>
     <div class="ban-layer">
       <DisableTimeSlot
