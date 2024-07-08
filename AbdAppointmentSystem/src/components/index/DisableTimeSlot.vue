@@ -3,14 +3,6 @@ import {defineEmits, defineProps} from "vue";
 import {onMounted, ref, watch} from "vue";
 import {TableFormat} from "@/utils/index/format.js";
 
-// 组件内全局变量定义
-let selectDate = ref(null) // 被选中的日期
-let startTime = ref(null) // 被选中的开始时间
-let endTime = ref(null) // 被选中的结束时间
-let timeSlots = ref([]) // 转换后的时间表
-
-let isBackendDataNone = ref(null) // 后端返回的时间表数据是否为空
-
 // 接收父组件传递的props
 const props = defineProps({
   isDialogVisible: Boolean,
@@ -19,11 +11,59 @@ const props = defineProps({
 
 // 向父组件传递的事件
 const emit = defineEmits(
-    [
-        'close',
-        'submit'
-    ]
+  [
+    'close',
+    'submit'
+  ]
 )
+
+// 组件内全局变量定义
+let selectDate = ref([null, null]) // 被选中的日期，和组件绑定，[ "2024-07-04T16:00:00.000Z", "2024-07-11T16:00:00.000Z" ]
+let startTime = ref(null) // 被选中的开始时间，Sat Jul 06 2024 09:46:00 GMT+0800 (GMT+08:00)，只关注时间部分即可
+let endTime = ref(null) // 被选中的结束时间，Sat Jul 06 2024 09:46:00 GMT+0800 (GMT+08:00)，只关注时间部分即可
+
+let timeSlots = ref([]) // 转换后的时间表
+let isBackendDataNone = ref(null) // 后端返回的时间表数据是否为空
+let isDatePicked = ref(false) // 是否选择了日期
+
+let startTimeInt = ref(null) // 开始时间的整数表示，时间戳
+let endTimeInt = ref(null) // 结束时间的整数表示，时间戳
+let startDateInt = ref(null) // 开始日期的整数表示，时间戳
+let endDateInt = ref(null) // 结束日期的整数表示，时间戳
+
+const allHours = Array.from({ length: 24 }, (_, index) => index); // [0, ..., 23]
+const allMinutes = Array.from({ length: 60 }, (_, index) => index); // [0, ..., 59]
+
+// 快捷日期选定项
+const shortcuts = [
+  {
+    text: 'Last week',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+      return [start, end]
+    },
+  },
+  {
+    text: 'Last month',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+      return [start, end]
+    },
+  },
+  {
+    text: 'Last 3 months',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+      return [start, end]
+    },
+  },
+]
 
 onMounted(() => {
   /**
@@ -38,15 +78,271 @@ onMounted(() => {
     let timeTableTemp = props.backendData.timeTable
     timeSlots.value = TableFormat.timetable_format(timeTableTemp)
   }
-  console.log(timeSlots.value)
 })
 
-watch(props, (newVal, oldVal) => {
+const makeRange = (start, end) => {
+  const result = [];
+  for (let i = start; i <= end; i++) {
+    result.push(i);
+  }
+  return result;
+};
+
+const getBusyTimes = (date) => {
+  const day = timeSlots.value.find(d => d.date === date);
+  return day ? day.busy : [];
+};
+
+const getAvailableTimes = (date) => {
+  const day = timeSlots.value.find(d => d.date === date);
+  return day ? day.available : [];
+};
+
+const getDateRange = (start, end) => {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  const dates = [];
+  let currentDate = startDate;
+  while (currentDate <= endDate) {
+    dates.push(currentDate.toISOString().split('T')[0]);
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  return dates;
+};
+
+const disabledHoursStart = (startDate, endDate) => {
+  const dates = getDateRange(startDate, endDate);
+  let totalDisabledHours = [];
+  dates.forEach(date => {
+    const busyTimes = getBusyTimes(date);
+    const disabled = new Set([...makeRange(0, 7), ...makeRange(20, 23)]);
+    busyTimes.forEach(period => {
+      const [startHour, startMinute] = period.start.split(':').map(Number);
+      const [endHour, endMinute] = period.end.split(':').map(Number);
+      for (let hour = startHour; hour <= endHour; hour++) {
+        if (startHour !== endHour) {
+          if (hour === startHour && startMinute === 0) {
+            disabled.add(hour);
+          } else if (hour === endHour && endMinute === 59) {
+            disabled.add(hour);
+          } else if (hour !== startHour && hour !== endHour) {
+            disabled.add(hour);
+          }
+        } else {
+          if (startMinute === 0 && endMinute === 59) {
+            disabled.add(hour);
+          }
+        }
+      }
+    });
+    let dateDisabledHours = Array.from(disabled).sort((a, b) => a - b);
+
+    let newElements = dateDisabledHours.filter(element => !totalDisabledHours.includes(element));
+    totalDisabledHours = totalDisabledHours.concat(newElements);
+    totalDisabledHours = [...new Set(totalDisabledHours)];
+  })
+  return Array.from(totalDisabledHours).sort((a, b) => a - b);
+};
+
+const disabledMinutesStart = (startDate, endDate, hour) => {
+  const dates = getDateRange(startDate, endDate);
+  let totalDisabledMinutes = [];
+
+  dates.forEach(date => {
+    const busyTimes = getBusyTimes(date);
+    const disabled = new Set();
+    busyTimes.forEach(period => {
+      const [startHour, startMinute] = period.start.split(':').map(Number);
+      const [endHour, endMinute] = period.end.split(':').map(Number);
+
+      if (hour === startHour) {
+        for (let minute = startMinute; minute < 60; minute++) {
+          disabled.add(minute);
+        }
+      }
+      if (hour === endHour) {
+        for (let minute = 0; minute <= endMinute; minute++) {
+          disabled.add(minute);
+        }
+      }
+      if (hour > startHour && hour < endHour) {
+        for (let minute = 0; minute < 60; minute++) {
+          disabled.add(minute);
+        }
+      }
+    });
+    let dateDisabledMinutes = Array.from(disabled).sort((a, b) => a - b);
+
+    let newElements = dateDisabledMinutes.filter(element => !totalDisabledMinutes.includes(element));
+    totalDisabledMinutes = totalDisabledMinutes.concat(newElements);
+    totalDisabledMinutes = [...new Set(totalDisabledMinutes)];
+  });
+  return Array.from(totalDisabledMinutes).sort((a, b) => a - b);
+};
+
+const disabledSeconds = () => {
+  return makeRange(1, 59);
+};
+
+const disabledHoursStartWrapper = () => {
+  if (selectDate.value[0] && selectDate.value[1]) {
+    return disabledHoursStart(selectDate.value[0], selectDate.value[1]);
+  }
+  return [];
+};
+
+const disabledMinutesStartWrapper = (hour) => {
+  if (selectDate.value[0] && selectDate.value[1]) {
+    return disabledMinutesStart(selectDate.value[0], selectDate.value[1], hour);
+  }
+  return [];
+};
+
+const parseTimeInCalculateForm = (timeStr) => {
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  const date = new Date();
+  date.setHours(hours, minutes, 0, 0);
+  return date;
+}
+
+function getAvailableTimeRange(startTime, endTime) {
+  const parseTime = (timeStr) => {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return { hours, minutes };
+  };
+
+  const start = parseTime(startTime);
+  const end = parseTime(endTime);
+
+  // 计算小时范围
+  const hourRange = [];
+  for (let hour = start.hours; hour <= end.hours; hour++) {
+    hourRange.push(hour);
+  }
+
+  // 计算分钟范围
+  const minuteRange = {};
+  hourRange.forEach(hour => {
+    if (hour === start.hours && hour === end.hours) {
+      minuteRange[hour] = Array.from({ length: end.minutes - start.minutes + 1 }, (_, i) => i + start.minutes);
+    } else if (hour === start.hours) {
+      minuteRange[hour] = Array.from({ length: 60 - start.minutes }, (_, i) => i + start.minutes);
+    } else if (hour === end.hours) {
+      minuteRange[hour] = Array.from({ length: end.minutes + 1 }, (_, i) => i);
+    } else {
+      minuteRange[hour] = Array.from({ length: 60 }, (_, i) => i);
+    }
+  });
+
+  return {
+    hourRange,
+    minuteRange
+  };
+}
+
+const disabledHoursEnd = (startDate, endDate, startTime) => {
+  const dates = getDateRange(startDate, endDate);
+  let totalDisabledHours = [];
+  let beginTime = parseTimeInCalculateForm(startTime);
+  let foundFlag = false;
+  dates.forEach(date => {
+    const availableTimes = getAvailableTimes(date);
+    let disabledHours = new Set();
+    availableTimes.forEach(period => {
+      const periodStart = period.start
+      const periodEnd = period.end
+      let isBeginTimeInPeriod = beginTime >= parseTimeInCalculateForm(periodStart) && beginTime <= parseTimeInCalculateForm(periodEnd);
+      if (isBeginTimeInPeriod) {
+        const { hourRange } = getAvailableTimeRange(startTime, periodEnd);
+        disabledHours = allHours.filter(hour => !hourRange.includes(hour));
+        foundFlag = true;
+      }
+    });
+    if (foundFlag) {
+      let dateDisabledHours = Array.from(disabledHours).sort((a, b) => a - b);
+      let newElements = dateDisabledHours.filter(element => !totalDisabledHours.includes(element));
+      totalDisabledHours = totalDisabledHours.concat(newElements);
+      totalDisabledHours = [...new Set(totalDisabledHours)];
+    }
+    else {
+      const { hourRange } = getAvailableTimeRange(startTime, "20:00");
+      disabledHours = allHours.filter(hour => !hourRange.includes(hour));
+      let dateDisabledHours = Array.from(disabledHours).sort((a, b) => a - b);
+      let newElements = dateDisabledHours.filter(element => !totalDisabledHours.includes(element));
+      totalDisabledHours = totalDisabledHours.concat(newElements);
+      totalDisabledHours = [...new Set(totalDisabledHours)];
+    }
+
+  })
+  return Array.from(totalDisabledHours).sort((a, b) => a - b);
+};
+
+const disabledMinutesEnd = (startDate, endDate, startTime, hour) => {
+  const dates = getDateRange(startDate, endDate);
+  let totalDisabledMinutes = [];
+  let beginTime = parseTimeInCalculateForm(startTime);
+  let foundFlag = false;
+  dates.forEach(date => {
+    const availableTimes = getAvailableTimes(date);
+    let disabledMinutes = new Set();
+    availableTimes.forEach(period => {
+      const periodStart = period.start
+      const periodEnd = period.end
+      let isBeginTimeInPeriod = beginTime >= parseTimeInCalculateForm(periodStart) && beginTime <= parseTimeInCalculateForm(periodEnd);
+      if (isBeginTimeInPeriod) {
+        const { minuteRange } = getAvailableTimeRange(startTime, periodEnd);
+        disabledMinutes = allMinutes.filter(minute => !minuteRange[hour].includes(minute));
+        foundFlag = true;
+      }
+    });
+    if (foundFlag) {
+      let dateDisabledMinutes = Array.from(disabledMinutes).sort((a, b) => a - b);
+      let newElements = dateDisabledMinutes.filter(element => !totalDisabledMinutes.includes(element));
+      totalDisabledMinutes = totalDisabledMinutes.concat(newElements);
+      totalDisabledMinutes = [...new Set(totalDisabledMinutes)];
+    }
+    else {
+      const { minuteRange } = getAvailableTimeRange(startTime, "20:00");
+      disabledMinutes = allMinutes.filter(minute => !minuteRange[hour].includes(minute));
+      let dateDisabledMinutes = Array.from(disabledMinutes).sort((a, b) => a - b);
+      let newElements = dateDisabledMinutes.filter(element => !totalDisabledMinutes.includes(element));
+      totalDisabledMinutes = totalDisabledMinutes.concat(newElements);
+      totalDisabledMinutes = [...new Set(totalDisabledMinutes)];
+    }
+  })
+  return Array.from(totalDisabledMinutes).sort((a, b) => a - b);
+};
+
+function dateStringInHHMM(dateString) {
+  let dateStr = new Date(dateString)
+  let hours = dateStr.getHours()
+  let minutes = dateStr.getMinutes()
+  let formattedHours = hours.toString().padStart(2, '0');
+  let formattedMinutes = minutes.toString().padStart(2, '0');
+  let formattedTime = `${formattedHours}:${formattedMinutes}`;
+  return formattedTime
+}
+
+const disabledHoursEndWrapper = () => {
+  if (selectDate.value[0] && selectDate.value[1] && startTime.value) {
+    let formattedTime = dateStringInHHMM(startTime.value)
+    return disabledHoursEnd(selectDate.value[0], selectDate.value[1], formattedTime);
+  }
+  return [];
+};
+
+const disabledMinutesEndWrapper = (hour) => {
+  if (selectDate.value[0] && selectDate.value[1] && startTime.value) {
+    let formattedTime = dateStringInHHMM(startTime.value)
+    return disabledMinutesEnd(selectDate.value[0], selectDate.value[1], formattedTime, hour);
+  }
+  return [];
+};
+
+watch(props, (newVal) => {
   /**
    * 监听父组件传入参数变更
    */
-  console.log('禁用时间段组件侦听器发现父组件传递的信息发生变化，' +
-      '并开始更新');
   if (newVal.backendData === null) {
     isBackendDataNone = true
   }
@@ -55,58 +351,39 @@ watch(props, (newVal, oldVal) => {
     let timeTableTemp = newVal.backendData.timeTable
     timeSlots.value = TableFormat.timetable_format(timeTableTemp)
   }
-  console.log('禁用时间段组件侦听器发现父组件传递的信息发生变化，' +
-      '并更新完成');
+})
+
+watch(selectDate, (newVal) => {
+  /**
+   * 监听日期选择变化
+   */
+  if (newVal !== null) {
+    isDatePicked.value = true
+  }
+  else {
+    isDatePicked.value = false
+  }
 })
 
 function banTimeInfoCheck() {
   /**
    * 对用户提交的表单信息进行合理性检测
    */
-  // 当信息填写不完整时
   if (selectDate.value === null || startTime.value === null || endTime.value === null) {
     console.warn("日期或时间未选择")
     alert("警告：暂时未选择需要禁用的日期或时间")
-    return;
+    return false;
   }
+  return true;
+}
 
-  // 信息填写完整，进行时间段合理性校验
-  for (let i = 0; i < timeSlots.value.length; i++) {
-    console.log("时间段合理性校验，正在校验第" + (i+1) + "个时间段")
-    // 对日期进行格式化，只比较日期本身
-    // 此时只需要比较日期本身，故设置时间均为0点0分0秒0毫秒
-    let timeSlotsDate = new Date(timeSlots.value[i].date)
-    timeSlotsDate.setHours(0, 0, 0, 0)
-    let selectDateDate = new Date(selectDate.value)
-    selectDateDate.setHours(0, 0, 0, 0)
-
-    if (selectDateDate.getTime() === timeSlotsDate.getTime()) { // 要比较日期的值，使用getTime方法
-      let busyTimeList = timeSlots.value[i].busy
-
-      // 时间格式化
-      // 设置start和end变量的日期部分与之前的日期一致
-      let start = new Date(selectDateDate)
-      let end = new Date(selectDateDate)
-
-      // 设置start和end变量的时间部分
-      start.setHours(startTime.value.split(":")[0], startTime.value.split(":")[1], 0, 0);
-      end.setHours(endTime.value.split(":")[0], endTime.value.split(":")[1], 0, 0);
-
-      for (let j = 0; j < busyTimeList.length; j++) {
-        let busyStart = new Date(busyTimeList[j].start)
-        let busyEnd = new Date(busyTimeList[j].end)
-
-        // 判断时间是否重叠
-        if ((start.getTime() >= busyStart.getTime() && start.getTime() < busyEnd.getTime()) ||
-            (end.getTime() > busyStart.getTime() && end.getTime() <= busyEnd.getTime()) ||
-            (start.getTime() <= busyStart.getTime() && end.getTime() >= busyEnd.getTime())) {
-          console.warn("禁用时间段和繁忙时间段重叠")
-          alert("警告：禁用时间段和繁忙时间段重叠，请处理学生预约事件后重试")
-          return;
-        }
-      }
-    }
-  }
+function clearSelection() {
+  /**
+   * 清空用户选择的禁用时段
+   */
+  selectDate.value = null
+  startTime.value = null
+  endTime.value = null
 }
 
 function closeDisableComponents() {
@@ -114,22 +391,35 @@ function closeDisableComponents() {
    * 当用户关闭禁用组件时触发
    */
   emit('close');
+  clearSelection();
+}
+
+function getTimeStamps(timeString) {
+  return new Date(timeString).getTime();
 }
 
 function submitDisableInfo() {
   /**
    * 当用户提交禁用表单时触发
    */
-  banTimeInfoCheck()
-  let comfirm_result = confirm("确认要禁用这个时间段？")
-  if (comfirm_result){
-    console.log("时间段合理性校验通过，上传禁用时间表单")
-    confirm("禁用时间段成功")
-    emit('submit')
-  }
-  else {
-    console.log("取消上传禁用时间表单")
-    emit('close')
+  let isCheckOK = banTimeInfoCheck()
+  if (isCheckOK) {
+    let confirm_result = confirm("确认要禁用这个时间段？")
+    if (confirm_result) {
+      startDateInt = getTimeStamps(selectDate.value[0])
+      endDateInt = getTimeStamps(selectDate.value[1])
+      startTimeInt = getTimeStamps(startTime.value)
+      endTimeInt = getTimeStamps(endTime.value)
+      emit('submit', {
+        startDate: startDateInt,
+        endDate: endDateInt,
+        startTime: startTimeInt,
+        endTime: endTimeInt
+      })
+    } else {
+      emit('close')
+    }
+    clearSelection()
   }
 }
 </script>
@@ -148,35 +438,33 @@ function submitDisableInfo() {
         </div>
       </div>
       <div v-else>
-        <div class="dateSelector">
+        <div class="date-selector">
           <div class="intro">禁用时间日期</div>
           <el-date-picker
               v-model="selectDate"
-              type="date"
-              placeholder="Select a date"
+              type="daterange"
+              range-separator="To"
+              start-placeholder="Start date"
+              end-placeholder="End date"
+              :shortcuts="shortcuts"
           />
         </div>
-        <div class="timeSelector">
+        <div class="time-selector" v-if="isDatePicked">
           <div class="intro">禁用时间段</div>
-          <el-time-select
+          <el-time-picker
               v-model="startTime"
-              style="width: 240px"
-              :max-time="endTime"
-              class="mr-4"
               placeholder="Start time"
-              start="08:00"
-              step="00:05"
-              end="20:00"
+              :disabled-hours="disabledHoursStartWrapper"
+              :disabled-minutes="disabledMinutesStartWrapper"
+              :disabled-seconds="disabledSeconds"
           />
-          <span> --> </span>
-          <el-time-select
+          <span> To </span>
+          <el-time-picker
               v-model="endTime"
-              style="width: 240px"
-              :min-time="startTime"
               placeholder="End time"
-              start="08:00"
-              step="00:05"
-              end="20:00"
+              :disabled-hours="disabledHoursEndWrapper"
+              :disabled-minutes="disabledMinutesEndWrapper"
+              :disabled-seconds="disabledSeconds"
           />
         </div>
         <div class="uploadButton">
@@ -205,7 +493,7 @@ function submitDisableInfo() {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100; /* 确保弹框在次上方 */
+  z-index: 100;
 }
 
 .disable-components {
@@ -220,7 +508,7 @@ button {
   margin-right: 10px;
 }
 
-.dateSelector, .timeSelector, .uploadButton {
+.date-selector, .time-selector, .uploadButton {
   margin-top: 20px;
 }
 </style>

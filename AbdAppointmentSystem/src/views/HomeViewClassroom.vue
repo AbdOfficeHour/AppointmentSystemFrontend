@@ -1,11 +1,11 @@
 <script setup>
 import { ElButton } from 'element-plus';  // 引入Element-Plus按钮组件
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import router from '@/router';
-import TabSelector from "@/components/TabSelector.vue";
 import PickerClassroom from "@/components/index/PickerClassroom.vue";
 import TableComponent from "@/components/index/TableComponent.vue";
+import FunctionalClassroom from "@/components/index/FunctionalClassroom.vue";
 import { UserInfoFormat, PickerFormat } from "@/utils/index/format.js";
 
 
@@ -18,7 +18,7 @@ let credits = ref([]) // 后端返回的用户权限
 let authorityTable = ref({}) // 经过格式化后的权限表
 
 // 全局基本变量
-let selectedTab = ref('room'); // 当前被选中的平台
+// None
 
 // Classroom的基本变量 - Picker Layer
 let classroomList = ref([]) // 后端返回的教室列表
@@ -83,7 +83,6 @@ function getClassroomTableInfo(){
     url:`/User/TableInfo/classroom/${getClassroomSelectionId.value}`
   }).then(res =>{
     if (res.data.code === 0){
-      console.log(res)
       classroomTimeTableOrigin.value = res.data.data
     }
     else {
@@ -104,32 +103,6 @@ onMounted( function(){
   // 从后端获取Classroom选择器信息
   getClassroomPickerInfo()
 })
-
-const handleTabChange = (tab) => {
-  /**
-   * 当接收到来自TabSelector组件传递的用户选择的平台变更时触发
-   */
-  if(tab === 'tutor'){ // 教师预约tutor平台
-    router.push({
-      name: 'HomeViewOfficeHour' // 跳转至教师预约页面
-    })
-  }
-  else if (tab === 'room') { // 教室预约room平台
-
-    getClassroomSelectionId.value = null
-    getClassroomSelection.value = null
-    classroomTimeTableOrigin.value = null
-    // 选项和时间表信息置为空
-  }
-  else if (tab === 'appointment') {
-    router.push({
-      name: 'Appointment', // 跳转至我的预约页面
-      query: {
-        if_appointment: false
-      }
-    })
-  }
-};
 
 const handleSelectedClassroom = (classroom) => {
   /**
@@ -160,8 +133,8 @@ const navigateToAppointment = () => {
 
 <template>
   <div class="app-container">
-    <div class="tab-selector">
-      <TabSelector @update:selectedTab="handleTabChange" :selected-tab="selectedTab"></TabSelector>
+    <div class="functional-layer">
+      <FunctionalClassroom />
     </div>
     <div class="picker-layer">
       <PickerClassroom :selectors="allowClassroomInfo" @update:selectedClassroom="handleSelectedClassroom"/>
@@ -171,26 +144,31 @@ const navigateToAppointment = () => {
         <TableComponent :backend-data="classroomTimeTableOrigin" :is-room="true"/>
       </div>
     </div>
-    <div class="button-layer">
-      <ElButton type="primary" round @click="navigateToAppointment">发起预约 Appointment</ElButton>
-    </div>
   </div>
 </template>
 
 <style scoped>
-.button-layer {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
 .table-component{
   display: flex;
   height: 100%;
 }
 .app-container{
   height: 100vh;
+  background-color: #F7FAFF;
 }
+
 .table-layer{
   height: 60vh;
+}
+
+.picker-layer {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.functional-layer {
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 </style>
