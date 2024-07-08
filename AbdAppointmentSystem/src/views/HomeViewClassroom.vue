@@ -1,11 +1,14 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+
 import PickerClassroom from "@/components/index/PickerClassroom.vue";
 import TableComponent from "@/components/index/TableComponent.vue";
 import FunctionalClassroom from "@/components/index/FunctionalClassroom.vue";
+
 import { UserInfoFormat, PickerFormat } from "@/utils/index/format.js";
 
+// HomeViewClassroom组件全局变量定义
 
 // 用户基本信息
 let username = ref(null) // 用户名
@@ -14,8 +17,6 @@ let email = ref(null) // 用户邮箱
 let role = ref([]) // 后端返回的权限信息
 let credits = ref([]) // 后端返回的用户权限
 let authorityTable = ref({}) // 经过格式化后的权限表
-
-// 全局基本变量 - 暂无
 
 // Classroom的基本变量 - Picker Layer
 let classroomList = ref([]) // 后端返回的教室列表
@@ -135,16 +136,16 @@ const handleSelectedClassroom = (classroom) => {
 </template>
 
 <style scoped>
-.table-component{
+.table-component {
   display: flex;
   height: 100%;
 }
-.app-container{
+.app-container {
   height: 100vh;
   background-color: #F7FAFF;
 }
 
-.table-layer{
+.table-layer {
   height: 60vh;
 }
 

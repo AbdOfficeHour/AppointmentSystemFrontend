@@ -1,6 +1,7 @@
 <script setup>
 import {RouterView, useRoute} from 'vue-router'
 import {onMounted, watch, ref} from 'vue';
+
 import TabSelector from "@/components/TabSelector.vue";
 
 // App.vue组件全局变量定义

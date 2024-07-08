@@ -2,18 +2,18 @@
 import router from "@/router/index.js";
 import {onMounted} from "vue";
 
+/**
+ * FunctionalClassroom组件初始化
+ */
 onMounted(() => {
-  /**
-   * 组件初始化
-   */
   console.log('FunctionalClassroom组件开始挂载');
 });
 
+/**
+ * 当用户点击预约按钮时触发
+ * 根据用户当前所在平台和选择的教师/教室跳转至对应的预约页面
+ */
 const navigateToAppointment = () => {
-  /**
-   * 当用户点击预约按钮时触发
-   * 根据用户当前所在平台和选择的教师/教室跳转至对应的预约页面
-   */
   router.push({
     name: 'Appointment', // 跳转至预约列表页面
     query: {

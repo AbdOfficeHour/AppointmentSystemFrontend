@@ -1,18 +1,19 @@
 <script setup>
-import {ref, onMounted, watch} from 'vue';
-import {TableFormat} from "@/utils/index/format.js";
+import { ref, onMounted, watch } from 'vue';
+
+import { TableFormat } from "@/utils/index/format.js";
 /* 注: 由于时间粒度为1分钟的需求，难以复用现有的开源框架内组件，本组件从DOM树开始实现 */
 
 // 接收父组件传递的props
 const props = defineProps(
     [
-        "backendData",
-        "authorityTable",
-        "isOfficeHour"
+        "backendData", // 后端返回的时间表数据，用于渲染时间表
+        "authorityTable", // 用户的权限表数据
+        "isOfficeHour" // 当前界面是否为OfficeHour界面
     ]
 );
 
-// TableComponent.vue组件全局变量定义
+// TableComponent组件全局变量定义
 const totalMinutes = 12 * 60 * 60 * 1000; // 12小时对应的毫秒数（8：00-20：00）
 let timeSlots = ref([]); // 用于渲染的时间表信息
 let local_authorityTable = ref({}); // 本地权限表
@@ -27,7 +28,16 @@ watch(props, (newVal) => {
   }
   else {
     let backendDataTemp = newVal.backendData;
-    local_authorityTable = newVal.authorityTable;
+    if (props.authorityTable) {
+      // 父组件传入了权限表数据，按照权限表数据渲染
+      local_authorityTable.value = newVal.authorityTable;
+    }
+    else {
+      // 父组件传入权限表为空，为学生选中了"no teachers available"，按照默认权限表数据渲染
+      local_authorityTable.value = {
+        'OfficeHour:approve': false,
+      }
+    }
     let timeTableTemp = backendDataTemp.timeTable;
     timeSlots.value = TableFormat.timetable_format(timeTableTemp); // 格式化传入数据为渲染用数据
     renderTimeline(); // 执行时间表渲染，修改DOM树
@@ -97,43 +107,50 @@ function renderNoTable() {
   clearTimeTable();
 
   // 渲染为空情况下的提示
-  const emptyPrompt = document.createElement('div');
+  const emptyPrompt = document.createElement('div'); // 嵌套两个div的父组件，用于展示空时间表信息
   emptyPrompt.classList.add('empty-prompt-parent');
-  const emptyPrompt_1 = document.createElement('div');
-  const emptyPrompt_2 = document.createElement('div');
+
+  const emptyPrompt_1 = document.createElement('div'); // 展示空时间表信息的第一行
+  const emptyPrompt_2 = document.createElement('div'); // 展示空时间表信息的第二行
+
   emptyPrompt_1.classList.add('empty-prompt')
   emptyPrompt_1.textContent = '暂无可查看时间表信息 No timetable information available';
   emptyPrompt_1.style.textAlign = 'center';
   emptyPrompt_1.style.color = 'gray';
   emptyPrompt_1.style.marginTop = '20px';
   emptyPrompt_1.style.fontSize = '18px';
+
   emptyPrompt_2.classList.add('empty-prompt')
   emptyPrompt_2.style.textAlign = 'center';
   emptyPrompt_2.style.color = 'gray';
   emptyPrompt_2.style.marginTop = '20px';
   emptyPrompt_2.style.fontSize = '18px';
+
   if (props.isOfficeHour) {
+    // OfficeHour平台下的空时间表提示
     if (local_authorityTable.value['OfficeHour:approve']) {
+      // 对于有OfficeHour审批权限的用户(教师)
       emptyPrompt_2.textContent = '当前暂无OfficeHour活动 There is no OfficeHour activity';
     } else {
+      // 其他用户(学生)
       emptyPrompt_2.textContent = '请选择要查看的教师 Please select the teacher you want to view';
     }
   }
   else{
+    // Classroom平台下的空时间表提示
     emptyPrompt_2.textContent = '请选择要查看的教室 Please select the classroom you want to view';
   }
 
-  // 将提示挂载到appTable下
+  // 将空时间表提示一并挂载到appTable下
   emptyPrompt.appendChild(emptyPrompt_1);
   emptyPrompt.appendChild(emptyPrompt_2);
   appTable.appendChild(emptyPrompt);
 }
 
+/**
+ * 当父组件传入的数据可以用于渲染时间表，将传入数据转换为时间表
+ */
 function renderTimeline() {
-  /**
-   * 当父组件传入的数据可以用于渲染时间表，将传入数据转换为时间表
-   */
-
   // 查找DOM元素，用于执行挂载
   let appTable = queryElements();
   // 清除现有时间表
@@ -149,7 +166,6 @@ function renderTimeline() {
     timeLabel.textContent = `${i}:00`;
     timeLabels.appendChild(timeLabel);
   } // 渲染timeLabel标签，为timeLabels的子标签
-
 
   // 渲染时间表
   timeSlots.value.forEach(slot => {

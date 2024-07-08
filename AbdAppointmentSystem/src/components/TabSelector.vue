@@ -11,13 +11,13 @@ const route = useRoute(); // 获取当前路由
  */
 const updateSelectedTab = (path) => {
   if (path.includes('/index/classroom')) {
-    selectedTab.value = 'room';
+    selectedTab.value = 'room'; // 教室预约首页
   }
   else if (path.includes('/index/officehour')) {
-    selectedTab.value = 'tutor';
+    selectedTab.value = 'tutor'; // 教师预约首页
   }
   else if (path.includes('/list')) {
-    selectedTab.value = 'appointment';
+    selectedTab.value = 'appointment'; // 预约列表(我的预约)
   }
 };
 
@@ -64,6 +64,7 @@ const selectTab = (tab) => {
   border-radius: 15px;
   overflow: hidden;
 }
+
 .tab {
   flex: 1;
   text-align: center;
@@ -75,12 +76,14 @@ const selectTab = (tab) => {
   font-size: 25px;
   font-weight: 700;
 }
+
 .tab.active {
   background-color: #E3ECFF;
   color: #10239E;
   font-size: 25px;
   font-weight: 700;
 }
+
 .tab:not(.active):hover {
   background-color: #101010;
   color: #E3ECFF;

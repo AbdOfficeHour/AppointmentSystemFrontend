@@ -1,32 +1,31 @@
 <script setup>
-import {ref, onMounted} from 'vue';
-import { defineProps, defineEmits } from 'vue';
+import { ref, onMounted } from 'vue';
 
 // 接收父组件传递的props
 const props = defineProps({
-  selectors: Array
+  selectors: Array // Classroom选择器列表信息
 });
 
 // 向父组件传递的事件
 const emit = defineEmits(
-    ['update:selectedClassroom']
+    ['update:selectedClassroom'] // 选中教室后，触发的变更事件
 );
 
-// 组件内全局变量定义
+// PickerClassroom组件全局变量定义
 const selectedClassroom = ref(null);
 
+/**
+ * PickerClassroom组件初始化
+ */
 onMounted(function () {
-  /**
-   * 组件初始化
-   */
   console.log("PickerClassroom组件开始挂载")
 });
 
+/**
+ * 选择器选项发生变化时触发
+ * 向父组件传递选中教师变更信息
+ */
 const handleChange = (item) => {
-  /**
-   * 选择器选项发生变化时触发
-   * 向父组件传递选中教师变更信息
-   */
   selectedClassroom.value = item;
   emit('update:selectedClassroom', item);
 };
