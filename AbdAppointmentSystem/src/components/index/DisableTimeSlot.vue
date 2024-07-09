@@ -469,12 +469,7 @@ watch(props, (newVal) => {
  * 监听日期选择变化
  */
 watch(selectDate, (newVal) => {
-  if (newVal !== null) {
-    isDatePicked.value = true
-  }
-  else {
-    isDatePicked.value = false
-  }
+  isDatePicked.value = newVal !== null;
 })
 
 /**

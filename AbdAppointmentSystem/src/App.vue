@@ -12,12 +12,7 @@ let isApprove = ref(false); // 是否为审批页面，默认为否，用于条�
  * 监听路由变化并更新选中的Tab
  */
 watch(route, (newRoute) => {
-  if (newRoute.path.includes('/approve')) {
-    isApprove.value = true;
-  }
-  else {
-    isApprove.value = false;
-  }
+  isApprove.value = newRoute.path.includes('/approve');
 });
 
 /**

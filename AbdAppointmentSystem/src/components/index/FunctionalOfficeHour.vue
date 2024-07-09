@@ -14,9 +14,9 @@ const props = defineProps({
 })
 
 // FunctionalOfficeHour组件全局变量定义
-let local_authorityTable = ref(null); // 父组件传入的用户权限表
-let local_backendData = ref(null); // 父组件传入的后端返回时间表
-let local_userId = ref(null); // 父组件传入用户id
+let local_authorityTable = ref(null); // 父组件传入的用户权限表，本地暂存
+let local_backendData = ref(null); // 父组件传入的后端返回时间表，本地暂存
+let local_userId = ref(null); // 父组件传入用户id，本地暂存
 let isDialogVisible = ref(false); // 禁用时段弹框是否可见
 
 /**
@@ -29,7 +29,7 @@ onMounted(() => {
 /**
  * 监听父组件传入参数变更
  */
-watch(props, (newVal, oldVal) => {
+watch(props, (newVal) => {
   local_authorityTable.value = newVal.authorityTable;
   local_backendData.value = newVal.backendData;
   local_userId.value = newVal.userId;
