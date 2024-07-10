@@ -35,7 +35,7 @@ officeHourTimeTableOrigin.value = null // 数据项初始化为null，供子组�
 function getTeacherTableInfoWithNoSelector(){
   axios({
     method:"get",
-    url:`/User/TableInfo/officehour/${userID.value}`
+    url:`/TableInfo/officehour/${userID.value}`
   }).then(res =>{
     if (res.data.code === 0){
       officeHourTimeTableOrigin.value = res.data.data
@@ -80,7 +80,7 @@ function getUserInfo() {
 function getOfficeHourPickerInfo() {
   axios({
     method:'get',
-    url:'/User/picker/officehour',
+    url:'/TableInfo/picker/officehour',
   }).then(res =>{
     if(res.data.code === 0){
       teacherList.value = res.data.data.pickerList // 后端返回的教师列表信息
@@ -100,7 +100,7 @@ function getOfficeHourPickerInfo() {
 function getOfficeHourTableInfo() {
   axios({
     method:"get",
-    url:`/User/TableInfo/officehour/${getOfficeHourSelectionId.value}`
+    url:`/TableInfo/officehour/${getOfficeHourSelectionId.value}`
   }).then(res =>{
     if (res.data.code === 0){
       officeHourTimeTableOrigin.value = res.data.data

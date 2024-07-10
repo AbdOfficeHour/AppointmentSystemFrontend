@@ -1,7 +1,7 @@
 <script setup>
 import {defineProps,defineEmits} from 'vue';
 
-const props = defineProps(["operateType","state","operateMode","eventId"])
+const props = defineProps(["operateType","state","operateMode","eventId","mode"])
 const emit = defineEmits(["addEventClicked","editEventClicked"])
 
 
@@ -59,6 +59,7 @@ const handleEventOp = (operate) => {
             @click="handleEventOp(1)"
         >撤回</button>
         <button
+            v-if="props.mode === 'officeHour'"
             class="approve-button"
             style="color:white;background-color:#1d39c4"
             @click="handleEventOp(4)"

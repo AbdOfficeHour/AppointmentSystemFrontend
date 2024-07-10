@@ -1,13 +1,22 @@
 <script setup>
-import {reactive, ref, computed} from 'vue'
-import { ElMessageBox } from 'element-plus'
+import {reactive, ref, computed, onMounted} from 'vue'
+import {useRoute} from "vue-router";
+import {ElMessage, ElMessageBox} from 'element-plus'
 import appointmentTable from '@/components/appointmentList/appointmentTable.vue'
 import appointmentDetail from '@/components/appointmentList/appointmentDetail.vue'
 import EventUtil from '@/utils/MyAppointment/eventUtil.js'
+import Officehour from "@/components/officehour.vue";
+import Classroom from "@/components/classroom.vue";
+import axios from "axios";
+import router from "@/router/index.js";
 
+const route = useRoute()
+
+const loading = ref(false)
 const dialogTableVisible = ref(false)
 const data = ref([])
-const mode = ref(localStorage.getItem("mode")?localStorage.getItem("mode"):"officeHour")
+const mode = ref("officeHour")
+const month = ref(0)
 const formatData = computed(() => {
   if(mode.value === "officeHour")
     return EventUtil.getOfficeHourFormatData(data.value)
@@ -17,134 +26,118 @@ const formatData = computed(() => {
 const detailMessage = reactive({
   data: {}
 })
+const showOfficeHourAppoint = ref(false)
+const showClassroomAppoint = ref(false)
+const userInfo = reactive({
+  "phone":"",
+  "userAuthority":{},
+  "email":"",
+  "username":""
+})
 
-/*
-模拟数据
- */
-const virtualDataOfficeHour = [
-  {
-    id: 1,
-    student_name: "陈思凡",
-    teacher_name: "张三",
-    time: {
-      date: new Date(2024, 7 - 1, 5, 0, 0, 0,).getTime(),
-      startTime: new Date(2024, 7 - 1, 5, 14, 0, 0).getTime(),
-      endTime: new Date(2024, 7 - 1, 5, 14, 30, 0).getTime()
-    },
-    note: "一些备注",
-    question: "问题",
-    present: ["李四", "王五"],
-    state: 2,
-    refuse_result: "",
-    work_summary: ""
-  },
-  {
-    id: 2,
-    student_name: "陈思凡",
-    teacher_name: "张三",
-    time: {
-      date: new Date(2024, 7 - 1, 4, 0, 0, 0,).getTime(),
-      startTime: new Date(2024, 7 - 1, 4, 14, 0, 0).getTime(),
-      endTime: new Date(2024, 7 - 1, 4, 14, 30, 0).getTime()
-    },
-    note: "一些备注",
-    question: "问题",
-    present: ["李四", "王五"],
-    state: 3,
-    refuse_result: "",
-    work_summary: ""
-  },
-  {
-    id: 3,
-    student_name: "陈思凡",
-    teacher_name: "张三",
-    time: {
-      date: new Date(2024, 7 - 1, 5, 0, 0, 0,).getTime(),
-      startTime: new Date(2024, 7 - 1, 5, 15, 0, 0).getTime(),
-      endTime: new Date(2024, 7 - 1, 5, 15, 30, 0).getTime()
-    },
-    note: "一些备注",
-    question: "问题",
-    present: ["李四", "王五"],
-    state: 7,
-    refuse_result: "",
-    work_summary: ""
-  },
-]
-const virtualDataClassroom = [
-  {
-    id: 1,
-    applicant: "陈思凡",
-    classroom: "106",
-    time: {
-      date: new Date(2024, 7 - 1, 5, 0, 0, 0,).getTime(),
-      startTime: new Date(2024, 7 - 1, 5, 14, 0, 0).getTime(),
-      endTime: new Date(2024, 7 - 1, 5, 14, 30, 0).getTime()
-    },
-    isMedia:false,
-    isComputer:false,
-    isSound:false,
-    present: ["李四", "王五"],
-    state: 2,
-    event: "开趴",
-    aim:"开趴"
-  },{
-    id: 2,
-    applicant: "陈思凡",
-    classroom: "106",
-    time: {
-      date: new Date(2024, 7 - 1, 5, 0, 0, 0,).getTime(),
-      startTime: new Date(2024, 7 - 1, 5, 14, 0, 0).getTime(),
-      endTime: new Date(2024, 7 - 1, 5, 14, 30, 0).getTime()
-    },
-    isMedia:false,
-    isComputer:false,
-    isSound:false,
-    present: ["李四", "王五"],
-    state: 2,
-    event: "开趴",
-    aim:"开趴"
-  }
-]
-
-
-let currentData = mode.value==="officeHour"?"officeHour":"classroom"
-function getNewData(){
-  if(currentData === "officeHour") {
-    data.value = virtualDataClassroom;
-    currentData = "classroom"
-  }else{
-    data.value = virtualDataOfficeHour
-    currentData = "officeHour"
-  }
+if(route.query.if_appointment === "true"){
+  if(mode.value === 'officeHour')showOfficeHourAppoint.value = true
+  else showClassroomAppoint.value = true
 }
 
 /*
-这一块都是模拟数据
+请求部分
  */
+
+/**
+ * 获取列表数据
+ */
+const fetchListData = ()=>{
+  const selectMode = mode.value === 'officeHour'?"officehour":"classroom"
+  let listUrl = `/Appointment/list/${selectMode}`
+
+  axios.get(listUrl,{
+    params:{
+      time:month.value
+    }
+  })
+      .then(res=>{
+        if(res.status === 200)
+          data.value = res.data.data
+        else
+          ElMessage.error("获取数据失败")
+      })
+
+}
+
+const fetchUserInfo = ()=>{
+  loading.value = true
+  axios.get("/User/info")
+      .then(res=>{
+        if(res.status === 200){
+          userInfo.email = res.data.data.email
+          userInfo.userAuthority = res.data.data.userAuthority
+          userInfo.phone = res.data.data.phone
+          userInfo.username = res.data.data.username
+        }
+        getDefaultMode()
+        fetchListData()
+        loading.value = false
+      })
+}
+
+/**
+ * 用于获取默认的模式
+ * 只有在完成用户信息的获取时才会被调用
+ */
+const getDefaultMode = ()=>{
+  const creditList = userInfo.userAuthority.credit
+  const classroomList = [
+    "classroom:appointment:104",
+    "classroom:appointment:106",
+    "classroom:appointment:202B",
+  ]
+  if(creditList.includes("OfficeHour:appointment")&&classroomList.some(item=>classroomList.includes(item))){
+
+    if(!localStorage.getItem("mode")){
+      mode.value = "officeHour"
+      localStorage.setItem("mode",mode.value)
+    }else{
+      mode.value = localStorage.getItem("mode")
+    }
+  }
+  else if(classroomList.some(item=>classroomList.includes(item))) {
+    mode.value = "教室预约"
+  }
+  else if(creditList.includes("OfficeHour:appointment")){
+    mode.value = "officeHour"
+  }else{
+    //无权限的情况
+    ElMessageBox.confirm("您没有预约权限","提示",{
+      confirmButtonText:"确定",
+      showCancelButton:false,
+      callback:()=>{
+        router.push("/index/classroom")
+      }
+    })
+  }
+}
 
 
 /*
 事件处理函数
  */
-// todo 处理操作筛选
 /**
  * 处理筛选日期的变化
- * todo 修改筛选日期
  */
-const handleDateChange = () => {
-
+const handleDateChange = (newVal) => {
+  month.value = newVal
+  fetchListData()
 }
 
 /**
  * 处理模式的变化
- * todo 修改模式
+ *
  */
 const handleModeChange = (newMode) => {
   mode.value = newMode
   localStorage.setItem("mode", mode.value)
-  // 这里有获取新数据的逻辑 todo 记得修改
-  getNewData()
+  fetchListData()
 }
 
 /**
@@ -158,43 +151,73 @@ const handleRowClick = (row,colum) => {
 }
 
 const handleDataOperation = (eventId,operate) => {
+  let modeUrl
+  if(mode.value === "officeHour")
+    modeUrl = "officehour"
+  else
+    modeUrl = "classroom"
+
   if(operate === 1){
     // 撤回预约的情况
     ElMessageBox.confirm("确定要撤回该预约吗","提示",{
       confirmButtonText:"确定",
       cancelButtonText:"取消"
     })
+        .then(async res=>{
+          return axios.put(`/Appointment/list/${modeUrl}/${eventId}`,{
+            state: 6
+          })
+        })
         .then(res=>{
-
+          if(res.status === 200 && res.data.code === 0){
+            ElMessage.success("撤回成功")
+            window.location.reload()
+          }else{
+            ElMessage.error("撤回失败")
+          }
+        })
+        .catch(res=>{
+          ElMessage.error("请求失败")
         })
   }
 }
 
-// 初始化
-if(!localStorage.getItem("mode")){
-  localStorage.setItem("mode",mode.value)
+/**
+ * 处理发起预约的点击
+ */
+const handleAddButtonClick = ()=>{
+  if(mode.value === "officeHour") {
+    console.log("点击")
+    showOfficeHourAppoint.value = true
+  }
+  else {
+    console.log("点击")
+    showClassroomAppoint.value = true
+  }
 }
-if(mode.value === "officeHour")
-  data.value = virtualDataOfficeHour
-else
-  data.value = virtualDataClassroom
+
+
+onMounted(()=>{
+  fetchUserInfo()
+})
 
 </script>
 
 <template>
-  <div class="main-container">
+  <div class="main-container" v-loading="loading">
     <div class="main-title">
       <h1>我的预约</h1>
       <h1>My Appointment</h1>
     </div>
     <appointment-table
         :mode="mode"
-        operation-mode="approve"
+        operation-mode="view"
         :data="formatData"
+        :user-info="userInfo"
         @date-change="handleDateChange"
         @mode-change="handleModeChange"
         @row-click="handleRowClick"
-        @add-event-clicked=""
+        @add-event-clicked="handleAddButtonClick"
         @edit-event-clicked="handleDataOperation"
     />
 <!--    详细信息展示-->
@@ -206,6 +229,10 @@ else
           :data="detailMessage.data"
       />
     </el-dialog>
+<!--    officeHour发起预约-->
+    <officehour :if-visible="showOfficeHourAppoint" @close-dialog="showOfficeHourAppoint = false" :userInfo="userInfo"/>
+<!--    classroom发起预约-->
+    <classroom :if-visible="showClassroomAppoint" @close-dialog="showClassroomAppoint = false" :userInfo="userInfo"/>
   </div>
 </template>
 

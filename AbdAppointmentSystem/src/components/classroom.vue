@@ -16,136 +16,148 @@
         </el-checkbox-group>
       </el-form-item> -->
 <template>
-    <el-form ref="ruleFormRef" style="max-width: 600px" :model="ruleForm" :rules="rules" label-width="auto"
-        class="demo-ruleForm" :size="formSize" status-icon>
+    <el-dialog :model-value="ifVisible" @close="emit('closeDialog')">
+      <el-form
+          ref="ruleFormRef"
+          style="max-width: 600px"
+          :model="ruleForm"
+          :rules="rules"
+          label-width="auto"
+          class="demo-ruleForm"
+          :size="formSize"
+          status-icon>
         <!-- 名字 -->
         <el-form-item label="姓名" prop="name">
-            <el-input v-model="ruleForm.name" disabled="true" />
+          <el-input v-model="props.userInfo.username" disabled />
         </el-form-item>
 
         <!-- 选择教室 -->
         <el-form-item label="选择教室" prop="classroom">
-            <el-select v-model="ruleForm.classroom" placeholder="选择空教室">
-                <el-option v-for="item in classrooms" :key="item.classroomID" :label="item.classroom"
-                    :value="item.classroomID" @click="getTime" />
+          <el-select v-model="ruleForm.classroom" placeholder="选择空教室">
+            <el-option v-for="item in classrooms" :key="item.classroomID" :label="item.classroom"
+                       :value="item.classroomID" @click="getTime" />
 
-            </el-select>
+          </el-select>
         </el-form-item>
 
         <!-- 选择时间 -->
         <el-form-item label="选择时间" required>
 
-            <!-- 日期 -->
-            <el-col :span="11">
-                <el-form-item prop="date">
-                    <el-date-picker v-model="ruleForm.date" type="date" aria-label="选择日期" placeholder="选择日期"
-                        style="width: 100%" value-format="x" :disabled-date="disabledDate" />
-                </el-form-item>
-            </el-col>
-            <br>
+          <!-- 日期 -->
+            <el-form-item prop="date">
+              <el-date-picker v-model="ruleForm.date" type="date" aria-label="选择日期" placeholder="选择日期"
+                              style="width: 100%" value-format="x" :disabled-date="disabledDate" />
+            </el-form-item>
+          <br>
 
-            <!-- 开始时间 -->
-            <el-col :span="11">
-                <el-form-item prop="start_time">
-                    <el-time-picker v-model="ruleForm.start_time" aria-label="Pick a time" placeholder="开始时间"
-                        style="width: 100%" value-format="x" :disabled-hours="disabledHours"
-                        :disabled-minutes="disabledMinutes" :disabled-seconds="disabledSeconds" />
-                </el-form-item>
-            </el-col>
+          <!-- 开始时间 -->
+          <el-col :span="11">
+            <el-form-item prop="start_time">
+              <el-time-picker v-model="ruleForm.start_time" aria-label="Pick a time" placeholder="开始时间"
+                              style="width: 100%" value-format="x" :disabled-hours="disabledHours"
+                              :disabled-minutes="disabledMinutes" :disabled-seconds="disabledSeconds" />
+            </el-form-item>
+          </el-col>
 
-            <el-col class="text-center" :span="2">
-                <span class="text-gray-500">-</span>
-            </el-col>
+          <el-col class="text-center" :span="2">
+            <span class="text-gray-500">&nbsp;&nbsp;---</span>
+          </el-col>
 
-            <!-- 结束时间 -->
-            <el-col :span="11">
-                <el-form-item prop="end_time">
-                    <el-time-picker v-model="ruleForm.end_time" aria-label="Pick a time" placeholder="结束时间"
-                        style="width: 100%" value-format="x" :disabled-hours="disabledHours2"
-                        :disabled-minutes="disabledMinutes2" :disabled-seconds="disabledSeconds" />
-                </el-form-item>
-            </el-col>
+          <!-- 结束时间 -->
+          <el-col :span="11">
+            <el-form-item prop="end_time">
+              <el-time-picker v-model="ruleForm.end_time" aria-label="Pick a time" placeholder="结束时间"
+                              style="width: 100%" value-format="x" :disabled-hours="disabledHours2"
+                              :disabled-minutes="disabledMinutes2" :disabled-seconds="disabledSeconds" />
+            </el-form-item>
+          </el-col>
         </el-form-item>
 
         <!-- 模糊搜索 -->
         <el-form-item label="搜索成员">
-            <el-input type="text" v-model="searchQuery" @input="fetchNames" placeholder="搜索成员" />
+          <el-input type="text" v-model="searchQuery" @input="fetchNames" placeholder="搜索成员" />
 
-            <!-- 结果列表 -->
-            <el-table :data="names" style="width: 100%" v-if="names.length > 0">
-                <el-table-column prop="username" label="姓名" width="180" />
-                <el-table-column prop="userID" label="学号" width="180" />
-                <el-table-column align="right">
-                    <template #default="scope">
-                        <el-button size="small" @click="presentAdd(scope.row)">
-                            加入
-                        </el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
+          <!-- 结果列表 -->
+          <el-table :data="names" style="width: 100%" v-if="names.length > 0">
+            <el-table-column prop="username" label="姓名" width="180" />
+            <el-table-column prop="userID" label="学号" width="180" />
+            <el-table-column align="right">
+              <template #default="scope">
+                <el-button size="small" @click="presentAdd(scope.row)">
+                  加入
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </el-form-item>
 
         <!-- 人员名单 -->
         <el-form-item label="人员名单" v-if="fpresent.length > 0">
-            <el-table :data="fpresent" style="width: 100%">
-                <el-table-column prop="username" label="姓名" width="180" />
-                <el-table-column prop="userID" label="学号" width="180" />
-                <el-table-column align="right">
-                    <template #default="scope">
-                        <el-button size="small" type="danger" @click="presentDelete(scope.$index)">
-                            删除
-                        </el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
+          <el-table :data="fpresent" style="width: 100%">
+            <el-table-column prop="username" label="姓名" width="180" />
+            <el-table-column prop="userID" label="学号" width="180" />
+            <el-table-column align="right">
+              <template #default="scope">
+                <el-button size="small" type="danger" @click="presentDelete(scope.$index)">
+                  删除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
 
         </el-form-item>
 
 
         <!-- 使用目的 -->
         <el-form-item label="请输入使用目的" prop="aim">
-            <el-input v-model="ruleForm.aim" type="textarea" />
+          <el-select v-model="ruleForm.aim">
+            <el-option label="会议" value="会议"/>
+            <el-option label="研讨" value="研讨"/>
+            <el-option label="团建" value="团建"/>
+            <el-option label="讲座" value="讲座"/>
+            <el-option label="其他" value="其他"/>
+          </el-select>
         </el-form-item>
         <!-- 活动内容 -->
         <el-form-item label="活动内容(可选)" prop="events">
-            <el-input v-model="ruleForm.events" type="textarea" />
+          <el-input v-model="ruleForm.events" type="textarea" />
         </el-form-item>
 
         <!-- 器材选择 -->
         <el-form-item label="仪器设备" prop="facility">
-            <el-checkbox name="type" v-model="ruleForm.isMedia">
-                投影仪
-            </el-checkbox>
+          <el-checkbox name="type" v-model="ruleForm.isMedia">
+            投影仪
+          </el-checkbox>
 
 
 
-            <el-checkbox name="type" v-model="ruleForm.isComputer">
-                电脑
-            </el-checkbox>
-            <el-checkbox name="type" v-model="ruleForm.isSound">
-                音响
-            </el-checkbox>
+          <el-checkbox name="type" v-model="ruleForm.isComputer">
+            电脑
+          </el-checkbox>
+          <el-checkbox name="type" v-model="ruleForm.isSound">
+            音响
+          </el-checkbox>
 
 
         </el-form-item>
         <!-- 按钮 -->
         <el-form-item>
-            <el-button type="primary" @click="submitForm(ruleFormRef)">
-                确认
-            </el-button>
+          <el-button type="primary" @click="submitForm(ruleFormRef)">
+            确认
+          </el-button>
         </el-form-item>
-    </el-form>
+      </el-form>
+    </el-dialog>
 
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
+import { reactive, ref, defineProps, defineEmits } from 'vue'
+import {ComponentSize, ElMessage, FormInstance, FormRules} from 'element-plus'
 import axios from "axios";
 import { onMounted } from 'vue';
 
 interface RuleForm {
-    name: string
     classroom: string
     date: number
     start_time: number
@@ -159,33 +171,24 @@ interface RuleForm {
     state: number // 事件状态
 }
 
+const props = defineProps(["ifVisible","userInfo"])
+
+const emit = defineEmits(["closeDialog"])
+
 const classrooms = ref([])  //教室和id
 const usefulTime = ref([]) //可用时间
 
 //初始化可选教师姓名
 onMounted(() => {
     console.log("挂载中")
-    classrooms.value = [{
-        "classroom": "101",
-        "classroomID": "10108899"
-    }, {
-        "classroom": "102",
-        "classroomID": "1022793"
-    }, {
-        "classroom": "103",
-        "classroomID": "1037392"
-    },]  //教室id
+    axios.get('/Appointment/list/classroom/pickerList')
+        .then(response => {
+            classrooms.value=response.data.data.classrooms;
+        })
+        .catch(error => {
+            console.error('错误:', error);
+        });
 
-    // axios.get('/Appointment/list/classroom/pickerList')
-    //     .then(response => {
-    //         classrooms.value=response.data.data.classrooms;
-    //     })
-    //     .catch(error => {
-    //         console.error('错误:', error);
-    //     });
-
-
-    // console.log(classrooms.value);
 });
 
 
@@ -201,7 +204,6 @@ const fpresent = ref([]);//伪present，为了显示而创造的fpresent数组
 const formSize = ref<ComponentSize>('default')
 const ruleFormRef = ref<FormInstance>()
 const ruleForm = reactive<RuleForm>({
-    name: "kfc",
     classroom: "",
     date: 0,
     start_time: 0,
@@ -209,8 +211,8 @@ const ruleForm = reactive<RuleForm>({
     isMedia: false, // 是否使用投影仪
     isComputer: false, // 是否使用电脑
     isSound: false, // 是否使用音响
-    present: [""], // 参与成员数据库id主键对应值的字符串
-    aim: '', // 使用目的（枚举类）
+    present: [], // 参与成员数据库id主键对应值的字符串
+    aim: '会议', // 使用目的（枚举类）
     events: '', // 活动内容
     state: 2 // 事件状态
 })
@@ -287,14 +289,17 @@ const post_it = () => {
         "isSound": ruleForm.isSound,
         "state":ruleForm.state
     };
-    console.log("postData", postData);
     axios.post('/Appointment/list/classroom', postData)
         .then(response => {
-
-            console.log('Response:', response.data);
+            if(response.status === 200 && response.data.code === 0){
+              ElMessage.success('提交成功')
+              window.location.reload()
+            }else{
+              ElMessage.error('提交失败')
+            }
         })
         .catch(error => {
-
+            ElMessage.error('提交失败')
             console.error('Error:', error);
         });
 };
@@ -302,13 +307,13 @@ const post_it = () => {
 
 //得到对应教室的可使用时间
 const getTime = () => {
-    //     axios.get('/Appointment/list/classroom/pickerTime/${ruleForm.classroom}')
-    //         .then(response => {
-    //             usefulTime.value=response.data.data.dateTime;
-    //         })
-    //         .catch(error => {
-    //             console.error('错误:', error);
-    //         });
+        axios.get(`/Appointment/list/classroom/pickerTime/${ruleForm.classroom}`)
+            .then(response => {
+                usefulTime.value=response.data.data.dateTime;
+            })
+            .catch(error => {
+                console.error('错误:', error);
+            });
     console.log("gettime触发");
 
     //测试数据
@@ -346,15 +351,14 @@ const fetchNames = () => {
     if (searchQuery.value.length == 0) resetnames();
     else {
         console.log("发送模糊搜索请求", searchQuery.value);
-        setnames();//测试
-        // axios.get('/User/search', {
-        //     params: {
-        //         "searchData":searchQuery.value
-        //     }
-        // }).then((res) => {
-        //     if (res.data.code==0) names.value=res.data.data.userList;
-        //     else resetnames()
-        // })
+        axios.get('/User/search', {
+            params: {
+                "searchData":searchQuery.value
+            }
+        }).then((res) => {
+            if (res.data.code==0) names.value=res.data.data.userList;
+            else resetnames()
+        })
     }
 }
 

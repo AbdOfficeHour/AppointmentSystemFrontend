@@ -37,6 +37,11 @@ axios.interceptors.response.use((response) =>{
     return Promise.reject(error);
 })
 
+axios.interceptors.request.use((request)=>{
+    request.headers.Authorization = `Bearer ${localStorage.getItem("token")}`
+    return request
+})
+
 
 app.use(router)
 app.use(VueAxios, axios)

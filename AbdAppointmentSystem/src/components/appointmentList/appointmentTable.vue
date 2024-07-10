@@ -11,7 +11,7 @@ const emit = defineEmits(["modeChange","dateChange","rowClick","addEventClicked"
 /*
 定义属性
  */
-const props = defineProps(["data","mode","operationMode"])
+const props = defineProps(["data","mode","operationMode","userInfo"])
 
 
 /**
@@ -142,15 +142,50 @@ const theadOfClassroom = [
 const selectDate = ref("0");
 const currentPage = ref(1)
 const pageSize = ref(5)
-const mode = reactive({
-  mode:props.mode,
-  thead:props.mode === "officeHour"?theadOfOfficeHour:theadOfClassroom
+const thead = ref(props.mode === "officeHour"?theadOfOfficeHour:theadOfClassroom)
+const ifOfficeHour = ref(false)
+const ifClassroom = ref(false)
+const mode = ref("officeHour")
+
+watch(()=>props.mode,(newVal)=>{
+  mode.value = newVal
+  if(newVal === "officeHour")
+    thead.value = theadOfOfficeHour
+  else
+    thead.value = theadOfClassroom
 })
+
 /*
  * 切换日期选择
  */
 watch(selectDate, (newVal) => {
   emit('dateChange', newVal);
+})
+watch(props.userInfo,(newVal)=> {
+  const creditList = newVal.userAuthority.credit
+  console.log(props.operationMode)
+  console.log(creditList)
+  if(props.operationMode === "view") {
+    if (creditList.includes("OfficeHour:appointment")) {
+      ifOfficeHour.value = true
+    }
+    const classroomList = [
+      "classroom:appointment:104",
+      "classroom:appointment:106",
+      "classroom:appointment:202B",
+    ]
+    if (classroomList.some(item => classroomList.includes(item))){
+      ifClassroom.value = true
+    }
+  }else{
+    console.log(creditList)
+    if (creditList.includes("OfficeHour:approve")){
+      ifOfficeHour.value = true
+    }
+    if(creditList.includes("classroom:approve")){
+      ifClassroom.value = true
+    }
+  }
 })
 
 // 计算分页
@@ -169,14 +204,14 @@ const pageData = computed(()=>{
  */
 const handleModeChange = () => {
   // 先进行一些值的改变
-  if(mode.mode === "officeHour"){
-    mode.thead = theadOfOfficeHour;
-  }else if(mode.mode === "教室预约"){
-    mode.thead = theadOfClassroom;
+  if(mode.value === "officeHour"){
+    thead.value = theadOfOfficeHour;
+  }else{
+    thead.value = theadOfClassroom;
   }
 
   // 再触发事件
-  emit("modeChange",mode.mode);
+  emit("modeChange",mode.value);
 }
 
 </script>
@@ -197,7 +232,6 @@ const handleModeChange = () => {
         <span class="option-box">一年内</span>
       </label>
     </div>
-
     <div class="appointment-table">
       <div class="icon-field">
         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="21" height="21" viewBox="0 0 21 21" fill="none">
@@ -210,11 +244,15 @@ const handleModeChange = () => {
         <state-icon :state="5"/>
       </div>
       <div class="button-field">
-        <el-select class="mode-option" placeholder="请选择预约类型" v-model="mode.mode" @change="handleModeChange">
-          <el-option value="officeHour">officeHour</el-option>
-          <el-option value="教室预约">教室预约</el-option>
+        <el-select class="mode-option" placeholder="请选择预约类型" v-model="mode" @change="handleModeChange">
+          <el-option v-if="ifOfficeHour" value="officeHour">officeHour</el-option>
+          <el-option v-if="ifClassroom" value="教室预约">教室预约</el-option>
         </el-select>
-        <operate-button :operate-type="1" style="margin-left: auto;" v-if="props.operationMode === 'view' "/>
+        <operate-button
+            :operate-type="1"
+            style="margin-left: auto;"
+            @addEventClicked="()=>{emit('addEventClicked')}"
+            v-if="props.operationMode === 'view' "/>
       </div>
 
       <el-table
@@ -225,7 +263,7 @@ const handleModeChange = () => {
         <el-table-column type="selection"/>
         <el-table-column type="index" label="序号" width="60"/>
         <el-table-column
-            v-for="item in mode.thead"
+            v-for="item in thead"
             :prop="item.prop"
             :label="item.name"
             :width="item.width"
@@ -237,7 +275,7 @@ const handleModeChange = () => {
                 :state="scope.row.state"
                 :operateMode="props.operationMode"
                 :event-id="scope.row.id"
-                @add-event-clicked="()=>{emit('addEventClicked')}"
+                :mode="mode"
                 @edit-event-clicked="(eventId,operate)=>{emit('editEventClicked',eventId,operate)}"
             />
           </template>

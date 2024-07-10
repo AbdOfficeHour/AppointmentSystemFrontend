@@ -124,11 +124,34 @@ let TimeFormat = {
     formatTimestamp: function(timestamp, isDate = false) {
         let date = new Date(timestamp);
         if (isDate) {
-            return date.toISOString().split('T')[0]; // 格式化为 YYYY-MM-DD
+            return date.toLocaleDateString().replaceAll("/","-"); // 格式化为 YYYY-MM-DD
         } else {
             return date.toTimeString().split(' ')[0].slice(0, 5); // 格式化为 HH:mm
         }
+    },
+
+    /**
+     * 用于组合一天的日期和时间
+     * @param __date 时间戳只有日期正确
+     * @param __time 时间戳只有时间正确
+     * @return {Date} 真正的日期时间
+     */
+    combineDateAndTime: function (__date,__time){
+        const date = new Date(__date)
+        const time = new Date(__time)
+        return new Date(date.getFullYear(),date.getMonth(),date.getDate(),time.getHours(),time.getMinutes(),time.getSeconds())
+    },
+
+    /**
+     * 将date对象归零，作为一天的开始
+     * @param timestamp
+     * @return {Date}
+     */
+    timestampAsStartOfDate: function (timestamp){
+        const date = new Date(timestamp);
+        return new Date(date.getFullYear(),date.getMonth(),date.getDate())
     }
+
 };
 
 /**

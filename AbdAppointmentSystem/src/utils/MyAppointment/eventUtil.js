@@ -13,6 +13,7 @@ const EventUtils = {
         refuse_result: "拒绝原因",
         work_summary: "工作总结",
         applicant:"申请人",
+        approver:"审批人",
         classroom:"教室",
         isMedia:"是否使用投影仪",
         isComputer:"是否使用电脑",

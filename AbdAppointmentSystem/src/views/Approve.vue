@@ -1,15 +1,21 @@
 <script setup>
-import {ref, computed} from 'vue'
-import { ElMessageBox } from 'element-plus'
+import {ref, computed, onMounted, reactive} from 'vue'
+import {useRouter} from "vue-router";
+import {ElMessage, ElMessageBox} from 'element-plus'
 import appointmentTable from '@/components/appointmentList/appointmentTable.vue'
 import appointmentDetail from '@/components/appointmentList/appointmentDetail.vue'
 import EventUtil from '@/utils/MyAppointment/eventUtil.js'
+import axios from "axios";
 
+const router = useRouter()
+
+const loading = ref(false)
 const dialogTableVisible = ref(false)
 const workSummaryVisible = ref(false)
 const refuseReasonVisible = ref(false)
 const data = ref([])
-const mode = ref(localStorage.getItem("mode")?localStorage.getItem("mode"):"officeHour")
+const mode = ref("officeHour")
+const month = ref(0)
 const formatData = computed(() => {
   if(mode.value === "officeHour")
     return EventUtil.getOfficeHourFormatData(data.value)
@@ -17,134 +23,101 @@ const formatData = computed(() => {
     return EventUtil.getClassroomFormatData(data.value)
 })
 const detailMessage = ref({})
+const userInfo = reactive({
+  "phone":"",
+  "userAuthority":{},
+  "email":"",
+  "username":""
+})
+const refuseResult = ref("")
+const workSummary = ref("")
 
-/*
-模拟数据
+
+/**
+ * 用于获取默认的模式
+ * 只有在完成用户信息的获取时才会被调用
  */
-const virtualDataOfficeHour = [
-  {
-    id: 1,
-    student_name: "陈思凡",
-    teacher_name: "张三",
-    time: {
-      date: new Date(2024, 7 - 1, 5, 0, 0, 0,).getTime(),
-      startTime: new Date(2024, 7 - 1, 5, 14, 0, 0).getTime(),
-      endTime: new Date(2024, 7 - 1, 5, 14, 30, 0).getTime()
-    },
-    note: "一些备注",
-    question: "问题",
-    present: ["李四", "王五"],
-    state: 2,
-    refuse_result: "",
-    work_summary: ""
-  },
-  {
-    id: 2,
-    student_name: "陈思凡",
-    teacher_name: "张三",
-    time: {
-      date: new Date(2024, 7 - 1, 4, 0, 0, 0,).getTime(),
-      startTime: new Date(2024, 7 - 1, 4, 14, 0, 0).getTime(),
-      endTime: new Date(2024, 7 - 1, 4, 14, 30, 0).getTime()
-    },
-    note: "一些备注",
-    question: "问题",
-    present: ["李四", "王五"],
-    state: 3,
-    refuse_result: "",
-    work_summary: ""
-  },
-  {
-    id: 3,
-    student_name: "陈思凡",
-    teacher_name: "张三",
-    time: {
-      date: new Date(2024, 7 - 1, 5, 0, 0, 0,).getTime(),
-      startTime: new Date(2024, 7 - 1, 5, 15, 0, 0).getTime(),
-      endTime: new Date(2024, 7 - 1, 5, 15, 30, 0).getTime()
-    },
-    note: "一些备注",
-    question: "问题",
-    present: ["李四", "王五"],
-    state: 7,
-    refuse_result: "",
-    work_summary: ""
-  },
-]
-const virtualDataClassroom = [
-  {
-    id: 1,
-    applicant: "陈思凡",
-    classroom: "106",
-    time: {
-      date: new Date(2024, 7 - 1, 5, 0, 0, 0,).getTime(),
-      startTime: new Date(2024, 7 - 1, 5, 14, 0, 0).getTime(),
-      endTime: new Date(2024, 7 - 1, 5, 14, 30, 0).getTime()
-    },
-    isMedia:false,
-    isComputer:false,
-    isSound:false,
-    present: ["李四", "王五"],
-    state: 2,
-    event: "开趴",
-    aim:"开趴"
-  },{
-    id: 2,
-    applicant: "陈思凡",
-    classroom: "106",
-    time: {
-      date: new Date(2024, 7 - 1, 5, 0, 0, 0,).getTime(),
-      startTime: new Date(2024, 7 - 1, 5, 14, 0, 0).getTime(),
-      endTime: new Date(2024, 7 - 1, 5, 14, 30, 0).getTime()
-    },
-    isMedia:false,
-    isComputer:false,
-    isSound:false,
-    present: ["李四", "王五"],
-    state: 2,
-    event: "开趴",
-    aim:"开趴"
+const getDefaultMode = ()=>{
+  const creditList = userInfo.userAuthority.credit
+  if(creditList.includes("OfficeHour:approve")&&creditList.includes("classroom:approve")){
+
+    if(!localStorage.getItem("mode")){
+      mode.value = "officeHour"
+      localStorage.setItem("mode",mode.value)
+    }else{
+      mode.value = localStorage.getItem("mode")
+    }
   }
-]
-
-
-let currentData = mode.value==="officeHour"?"officeHour":"classroom"
-function getNewData(){
-  if(currentData === "officeHour") {
-    data.value = virtualDataClassroom;
-    currentData = "classroom"
+  else if(creditList.includes("classroom:approve")) {
+    mode.value = "教室预约"
+  }
+  else if(creditList.includes("OfficeHour:approve")){
+    mode.value = "officeHour"
   }else{
-    data.value = virtualDataOfficeHour
-    currentData = "officeHour"
+    //无权限的情况
+    ElMessageBox.confirm("您没有审批权限","提示",{
+      confirmButtonText:"确定",
+      showCancelButton:false,
+      callback:()=>{
+        router.push("/index/classroom")
+      }
+    })
   }
 }
 
-/*
-这一块都是模拟数据
- */
+const fetchListData = ()=>{
+  const selectMode = mode.value === 'officeHour'?"officehour":"classroom"
+  let listUrl = `/Appointment/approve/${selectMode}`
 
+  axios.get(listUrl,{
+    params:{
+      time:month.value
+    }
+  })
+      .then(res=>{
+        if(res.status === 200)
+          data.value = res.data.data
+        else
+          ElMessage.error("获取数据失败")
+      })
+
+}
+
+const fetchUserInfo = ()=>{
+  loading.value = true
+  axios.get("/User/info")
+      .then(res=>{
+        if(res.status === 200){
+          userInfo.email = res.data.data.email
+          userInfo.userAuthority = res.data.data.userAuthority
+          userInfo.phone = res.data.data.phone
+          userInfo.username = res.data.data.username
+        }
+        getDefaultMode()
+        fetchListData()
+        loading.value = false
+      })
+}
 
 /*
 事件处理函数
  */
-// todo 处理操作筛选
 /**
  * 处理筛选日期的变化
- * todo 修改筛选日期
  */
-const handleDateChange = () => {
-
+const handleDateChange = (newVal) => {
+  month.value = newVal
+  fetchListData()
 }
+
 
 /**
  * 处理模式的变化
- * todo 修改模式
  */
 const handleModeChange = (newMode) => {
   mode.value = newMode
   localStorage.setItem("mode", mode.value)
-  // 这里有获取新数据的逻辑 todo 记得修改
-  getNewData()
+  fetchListData()
 }
 
 /**
@@ -163,25 +136,83 @@ let currentEventId = null;
  * 处理填写工作总结
  */
 const handleWorkSummary = () => {
-  if(!eventId)return
+  if(!currentEventId)return
+  let selectMode
+  if(mode.value === "officeHour")
+    selectMode = "officehour"
+  else
+    selectMode = "classroom"
+
+  axios.put(`/Appointment/list/${selectMode}/${currentEventId}`,
+      {
+        state:5,
+        work_summary:workSummary.value
+      }
+  )
+      .then(res=>{
+
+        if(res.status===200&&res.data.code===0){
+          ElMessage.success("请求成功")
+          window.location.reload()
+        }else {
+
+          ElMessage.error("请求失败")
+        }
+      })
+
 }
 
 /**
  * 处理填写拒绝原因
  */
 const handleRefuse = () => {
-  if(!eventId)return
+  if(!currentEventId)return
+  let selectMode
+  if(mode.value === "officeHour")
+    selectMode = "officehour"
+  else
+    selectMode = "classroom"
+
+
+  axios.put(`/Appointment/list/${selectMode}/${currentEventId}`,
+      {
+        state:4,
+        refuse_result:refuseResult.value
+      }
+  )
+      .then(res=>{
+
+        if(res.status===200&&res.data.code===0){
+          ElMessage.success("请求成功")
+          window.location.reload()
+        }else {
+
+          ElMessage.error("请求失败")
+        }
+      })
 }
 
 const handleDataOperation = (eventId,operate) => {
+  let selectMode
+  if(mode.value === "officeHour")
+    selectMode = "officehour"
+  else
+    selectMode = "classroom"
+
   if(operate === 1){
     // 撤回预约的情况
     ElMessageBox.confirm("确定要撤回该预约吗","提示",{
       confirmButtonText:"确定",
       cancelButtonText:"取消"
     })
+        .then(async ()=>axios.put(`/Appointment/list/${selectMode}/${eventId}`,{state:6}))
         .then(res=>{
-
+          if(res.status===200&&res.data.code===0){
+            ElMessage.success("取消成功")
+            window.location.reload()
+          }else{
+            ElMessage.error("请求失败")
+          }
         })
   }else if(operate === 2){
     // 同意预约的情况
@@ -189,33 +220,51 @@ const handleDataOperation = (eventId,operate) => {
       confirmButtonText:"确定",
       cancelButtonText:"取消"
     })
+        .then(async()=>axios.put(`/Appointment/list/${selectMode}/${eventId}`,{state:3}))
         .then(res=>{
-
+          if(res.status===200&&res.data.code===0){
+            ElMessage.success("请求成功")
+            window.location.reload()
+          }else{
+            ElMessage.error("请求失败")
+          }
         })
   }else if(operate === 3){
     // 拒绝预约的情况
     currentEventId = eventId
-    refuseReasonVisible.value = true
+    if(mode.value === "officeHour")
+      refuseReasonVisible.value = true
+    else{
+      ElMessageBox.confirm("确定要拒绝该预约吗","提示",{
+        confirmButtonText:"确定",
+        cancelButtonText:"取消"
+      })
+          .then(async()=>axios.put(`/Appointment/list/${selectMode}/${eventId}`,{state:4}))
+          .then(res=>{
+            if(res.status===200&&res.data.code===0){
+              ElMessage.success("请求成功")
+              window.location.reload()
+            }else{
+              ElMessage.error("请求失败")
+            }
+          })
+    }
   }else if(operate === 4){
     // 完成预约的情况
     currentEventId = eventId
-    workSummaryVisible.value = true
+    if(mode.value === "officeHour")
+      workSummaryVisible.value = true
   }
 }
 
-// 初始化
-if(!localStorage.getItem("mode")){
-  localStorage.setItem("mode",mode.value)
-}
-if(mode.value === "officeHour")
-  data.value = virtualDataOfficeHour
-else
-  data.value = virtualDataClassroom
+onMounted(()=>{
+  fetchUserInfo()
+})
 
 </script>
 
 <template>
-  <div class="main-container">
+  <div class="main-container" v-loading="loading">
     <div class="main-title">
       <h1>我的预约</h1>
       <h1>My Appointment / Schedule</h1>
@@ -224,6 +273,7 @@ else
         :mode="mode"
         operation-mode="approve"
         :data="formatData"
+        :user-info="userInfo"
         @date-change="handleDateChange"
         @mode-change="handleModeChange"
         @row-click="handleRowClick"
@@ -247,6 +297,7 @@ else
       <label>请输入你的工作总结</label>
       <el-input
           type="textarea"
+          v-model="workSummary"
       />
       <template #footer>
         <el-button type="primary" @click="handleWorkSummary">确认</el-button>
@@ -261,6 +312,7 @@ else
       <label>请输入你的拒绝原因</label>
       <el-input
         type="textarea"
+        v-model="refuseResult"
       />
       <template #footer>
           <el-button type="primary" @click="handleRefuse">确认</el-button>

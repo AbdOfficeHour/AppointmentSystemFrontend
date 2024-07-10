@@ -58,7 +58,7 @@ function getClassroomPickerInfo(){
    */
   axios({
     method:'get',
-    url:'/User/picker/classroom',
+    url:'/TableInfo/picker/classroom',
   }).then(res => {
     if(res.data.code === 0){
       classroomList.value = res.data.data.pickerList // 后端返回的教室列表信息
@@ -78,7 +78,7 @@ function getClassroomTableInfo(){
    */
   axios({
     method:"get",
-    url:`/User/TableInfo/classroom/${getClassroomSelectionId.value}`
+    url:`/TableInfo/classroom/${getClassroomSelectionId.value}`
   }).then(res =>{
     if (res.data.code === 0){
       classroomTimeTableOrigin.value = res.data.data
