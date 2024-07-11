@@ -156,6 +156,7 @@ import { reactive, ref, defineProps, defineEmits } from 'vue'
 import {ComponentSize, ElMessage, FormInstance, FormRules} from 'element-plus'
 import axios from "axios";
 import { onMounted } from 'vue';
+import {TimeFormat} from '@/utils/index/format'
 
 interface RuleForm {
     classroom: string
@@ -277,9 +278,9 @@ const post_it = () => {
     let postData = {
         "classroom": ruleForm.classroom,
         "time": {
-            "date": ruleForm.date,
-            "start_time": ruleForm.start_time, // 起始
-            "end_time": ruleForm.end_time,
+            "date": TimeFormat.timestampAsStartOfDate(ruleForm.date).getTime(),
+            "start_time": TimeFormat.combineDateAndTime(ruleForm.date,ruleForm.start_time).getTime(), // 起始
+            "end_time": TimeFormat.combineDateAndTime(ruleForm.date,ruleForm.end_time).getTime(),
         },
         "aim": ruleForm.aim,
         "events": ruleForm.events,
