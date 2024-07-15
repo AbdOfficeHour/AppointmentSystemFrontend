@@ -139,14 +139,20 @@ const handleSelectedClassroom = (classroom) => {
 .table-component {
   display: flex;
   height: 100%;
+  width: 100%;
 }
+
 .app-container {
-  height: 100vh;
+  height: 100vh; /* Use full viewport height */
   background-color: #F7FAFF;
+  display: flex;
+  flex-direction: column;
 }
 
 .table-layer {
-  height: 60vh;
+  flex-grow: 1; /* Allow the table layer to expand */
+  display: flex;
+  flex-direction: column;
 }
 
 .picker-layer {

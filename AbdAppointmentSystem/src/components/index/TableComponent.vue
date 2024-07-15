@@ -194,6 +194,7 @@ function renderTimeline() {
       const currentDate = new Date(); // 使用当前日期（或者使用你需要的日期）
       const startParts = slot.start.split(':');
       const endParts = slot.end.split(':');
+
       const start = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), startParts[0], startParts[1]);
       const end = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), endParts[0], endParts[1]);
       const duration = end - start;
@@ -201,12 +202,13 @@ function renderTimeline() {
       busyElement.classList.add("busy-time-slot");
       busyElement.style.height = `${(duration / totalMinutes) * 100}%`;
       busyElement.style.top = `${((start - new Date(start.getFullYear(), start.getMonth(), start.getDate(), 8)) / totalMinutes) * 100}%`;
+      busyTimeElement.appendChild(busyElement);
 
       // 添加开始和结束时间的文字
       const timeText = document.createElement("span");
       timeText.classList.add("time-text");
       timeText.textContent = `${slot.start} - ${slot.end}`;
-      busyTimeElement.appendChild(busyElement);
+      busyElement.appendChild(timeText);
     });
 
     slot.available.forEach(slot => { // 空闲时间段遍历渲染
@@ -222,12 +224,6 @@ function renderTimeline() {
       availableElement.style.height = `${(duration / totalMinutes) * 100}%`;
       availableElement.style.top = `${((start - new Date(start.getFullYear(), start.getMonth(), start.getDate(), 8)) / totalMinutes) * 100}%`;
       availableTimeElement.appendChild(availableElement);
-
-      // 添加开始和结束时间的文字
-      const timeText = document.createElement("span");
-      timeText.classList.add("time-text");
-      timeText.textContent = `${slot.start} - ${slot.end}`;
-      availableElement.appendChild(timeText);
     });
 
     appTable.appendChild(timeline); // 挂载至 #app .page-container .table-layer下
@@ -272,13 +268,13 @@ body {
   z-index: 1;
 }
 .busy-time-slot {
-  background-color: #f2f2f2; /*淡灰色*/
+  background-color: #b7b4b4; /*淡灰色*/
   position: absolute;
   width: 100%;
   z-index: 1;
 }
 .available-time-slot {
-  background-color: #F0F5FF; /*淡白色*/
+  background-color: #d4dffd; /*淡蓝色*/
   position: absolute;
   width: 100%;
   z-index: 1;
