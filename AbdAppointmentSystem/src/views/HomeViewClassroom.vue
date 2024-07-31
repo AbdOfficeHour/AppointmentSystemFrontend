@@ -119,7 +119,7 @@ const handleSelectedClassroom = (classroom) => {
 <template>
   <div class="app-container">
     <div class="functional-layer">
-      <FunctionalClassroom />
+      <FunctionalClassroom :authority-table="authorityTable" :backend-data="classroomTimeTableOrigin"/>
     </div>
     <div class="picker-layer">
       <PickerClassroom :selectors="allowClassroomInfo" @update:selectedClassroom="handleSelectedClassroom"/>
