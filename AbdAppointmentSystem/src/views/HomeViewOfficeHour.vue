@@ -177,7 +177,7 @@ const handleSelectedTeacher = (teacher) => {
 }
 
 .app-container {
-  height: 100vh; /* Use full viewport height */
+  height: 1200px;
   background-color: #F7FAFF;
   display: flex;
   flex-direction: column;

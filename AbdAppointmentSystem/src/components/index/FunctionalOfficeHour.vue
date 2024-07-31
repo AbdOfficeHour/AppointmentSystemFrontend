@@ -63,7 +63,7 @@ const banTimeShow = () => {
 const handleDisableTimeSlotSubmit = (timeForm) => {
   axios({
     method: 'post',
-    url: `/User/ban/${local_userId.value}`,
+    url: `/TableInfo/ban/${local_userId.value}`,
     data: {
       startDate: timeForm.startDate,
       endDate: timeForm.endDate,

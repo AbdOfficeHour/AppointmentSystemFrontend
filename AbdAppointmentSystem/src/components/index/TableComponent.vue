@@ -246,38 +246,47 @@ body {
   flex-direction: column;
   border: 1px solid;
 }
+
 .time-labels {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding-top: 30px;
 }
+
 .time-label {
   flex: 1;
   text-align: left;
 }
+
 .time-bar {
   height: 100%;
   background-color: #f0f0f0;
   position: relative;
 }
+
 .busy-time, .available-time {
   position: absolute;
   height: 100%;
   width: 100%;
   z-index: 1;
 }
+
 .busy-time-slot {
   background-color: #b7b4b4; /*淡灰色*/
   position: absolute;
   width: 100%;
   z-index: 1;
+  display: grid;
+  place-items: center;
 }
+
 .available-time-slot {
   background-color: #d4dffd; /*淡蓝色*/
   position: absolute;
   width: 100%;
   z-index: 1;
+  display: grid;
 }
 
 .time-labels {
@@ -302,5 +311,19 @@ body {
   flex-direction: column;
   align-items: center;
   width: 100%;
+}
+
+.time-text {
+  width: 100%;
+  text-align: center;
+}
+
+.table-layer {
+  height: 1000px;
+  display: grid;
+}
+
+.table-component {
+  height: 100%;
 }
 </style>
