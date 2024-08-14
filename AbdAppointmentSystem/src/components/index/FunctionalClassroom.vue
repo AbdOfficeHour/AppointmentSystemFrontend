@@ -10,7 +10,7 @@ import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
 const props = defineProps({
   authorityTable: Object, // 用户权限表
   backendData: Object, // 后端返回时间表，用于限制禁用时段的选择范围
-  classroomId: Number // 用户选中操作的教室ID
+  classroomId: String // 用户选中操作的教室ID
 })
 
 // FunctionalClassroom组件全局变量定义
