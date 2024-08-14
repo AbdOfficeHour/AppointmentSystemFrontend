@@ -105,17 +105,17 @@ const handleDisableTimeSlotClose = () => {
     <div v-if="authorityTable['OfficeHour:appointment']" class="appointment-button">
       <ElButton type="primary" round @click="navigateToAppointment">发起预约 Appointment</ElButton>
     </div>
-    <div v-if="authorityTable['OfficeHour:approve']" class="ban-button">
-      <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>
-    </div>
-    <div class="ban-layer">
-      <DisableTimeSlot
-          :isDialogVisible="isDialogVisible"
-          :backend-data="local_backendData"
-          @submit="handleDisableTimeSlotSubmit"
-          @close="handleDisableTimeSlotClose">
-      </DisableTimeSlot>
-    </div>
+<!--    <div v-if="authorityTable['OfficeHour:approve']" class="ban-button">-->
+<!--      <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>-->
+<!--    </div>-->
+<!--    <div class="ban-layer">-->
+<!--      <DisableTimeSlot-->
+<!--          :isDialogVisible="isDialogVisible"-->
+<!--          :backend-data="local_backendData"-->
+<!--          @submit="handleDisableTimeSlotSubmit"-->
+<!--          @close="handleDisableTimeSlotClose">-->
+<!--      </DisableTimeSlot>-->
+<!--    </div>-->
   </div>
 </template>
 
