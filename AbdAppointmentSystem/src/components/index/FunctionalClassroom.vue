@@ -10,12 +10,14 @@ import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
 const props = defineProps({
   authorityTable: Object, // 用户权限表
   backendData: Object, // 后端返回时间表，用于限制禁用时段的选择范围
+  classroomId: Number // 用户选中操作的教室ID
 })
 
 // FunctionalClassroom组件全局变量定义
 let local_authorityTable = ref(null); // 父组件传入的用户权限表，本地暂存
 let local_backendData = ref(null); // 父组件传入的后端返回时间表，本地暂存
 let isDialogVisible = ref(false); // 禁用时段弹框是否可见
+let local_classroomId = ref(null); // 被选中的教室对应的数据库ID
 
 
 /**
@@ -31,6 +33,7 @@ onMounted(() => {
 watch(props, (newVal) => {
   local_authorityTable.value = newVal.authorityTable;
   local_backendData.value = newVal.backendData;
+  local_classroomId.value = newVal.classroomId;
 })
 
 /**
