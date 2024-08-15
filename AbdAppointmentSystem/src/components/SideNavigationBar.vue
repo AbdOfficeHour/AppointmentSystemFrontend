@@ -13,6 +13,9 @@ const updateSelectedItem = (path) => {
   if (path.includes('/approve')) {
     selectedItem.value = '2'; // 审批
   }
+  else if (path.includes('/login')) {
+    selectedItem.value = '3' // 返回首页 未来要删除这段，因为首页为另外一个路由下的平台
+  }
   else {
     selectedItem.value = '1'; // 预约
   }
@@ -41,24 +44,29 @@ const selectItem = (tab) => {
 <template>
   <div class="side-navigation-container">
     <el-menu class="side-navigation-menu">
-      <el-menu-item index="1" class="menu-item" >
-        <router-link to="/index/classroom"  :class="{ active: selectedItem === '1' }" @click="selectItem('1')">
-          <span>发起预约 </span>
-          <span> Initiate appointment</span>
+      <div class="title-3">导航栏</div>
+      <div class="title-3">Navigation Bar</div>
+<!--      <div class="title-4">预约平台</div>-->
+<!--      <div class="title-4">Appointment System</div>-->
+      <el-menu-item index="1" class="menu-item" :class="{ active: selectedItem === '1' }">
+        <router-link to="/index/classroom" @click="selectItem('1')">
+          <span :class="{ active: selectedItem === '1' }">发起预约 </span>
+          <span :class="{ active: selectedItem === '1' }">Initiate appointment</span>
         </router-link>
       </el-menu-item>
-      <el-menu-item index="2" class="menu-item">
-        <router-link to="/approve" :class="{ active: selectedItem === '2' }" @click="selectItem('2')">
-          <span>审核预约 </span>
-          <span> Audit appointment</span>
+      <el-menu-item index="2" class="menu-item" :class="{ active: selectedItem === '2' }">
+        <router-link to="/approve" @click="selectItem('2')" >
+          <span :class="{ active: selectedItem === '2' }">审核预约 </span>
+          <span :class="{ active: selectedItem === '2' }">Audit appointment</span>
         </router-link>
       </el-menu-item>
-      <el-menu-item index="3" class="menu-item">
-        <router-link to="/login" :class="{ active: selectedItem === '3' }" @click="selectItem('3')">
-          <span>回到首页 </span>
-          <span> Back to HomePage</span>
+      <el-menu-item index="3" class="menu-item" :class="{ active: selectedItem === '3' }">
+        <router-link to="/login" @click="selectItem('3')" >
+          <span :class="{ active: selectedItem === '3' }">回到首页 </span>
+          <span :class="{ active: selectedItem === '3' }">Back to HomePage</span>
         </router-link>
       </el-menu-item>
+      <div style="margin-bottom: 1000px"></div>
     </el-menu>
   </div>
 </template>
@@ -67,6 +75,11 @@ const selectItem = (tab) => {
 .side-navigation-container {
   display: flex;
   overflow: hidden;
+  height: 100%;
+}
+
+.side-navigation-menu {
+  background-color: #f0f0f0;
 }
 
 .menu-item {
@@ -84,15 +97,28 @@ const selectItem = (tab) => {
 
 .menu-item.active {
   background-color: #E3ECFF;
+}
+
+.menu-item:not(.active):hover {
+  background-color: #101010;
+}
+
+span.active {
   color: #10239E;
   font-size: 15px;
   font-weight: 700;
 }
 
-.menu-item:not(.active):hover {
-  background-color: #101010;
-  color: #E3ECFF;
+span:not(.active){
+  color: grey;
   font-size: 15px;
   font-weight: 700;
 }
+
+.title-3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-left: 10px;
+}
+
 </style>
