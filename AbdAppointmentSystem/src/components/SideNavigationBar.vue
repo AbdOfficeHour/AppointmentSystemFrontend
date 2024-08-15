@@ -54,9 +54,9 @@ const selectItem = (tab) => {
         </router-link>
       </el-menu-item>
       <el-menu-item index="3" class="menu-item">
-        <router-link to="/approve" :class="{ active: selectedItem === '3' }" @click="selectItem('3')">
-          <span>审核预约 </span>
-          <span> Audit appointment</span>
+        <router-link to="/login" :class="{ active: selectedItem === '3' }" @click="selectItem('3')">
+          <span>回到首页 </span>
+          <span> Back to HomePage</span>
         </router-link>
       </el-menu-item>
     </el-menu>

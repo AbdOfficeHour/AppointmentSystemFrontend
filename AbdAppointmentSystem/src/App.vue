@@ -34,14 +34,14 @@ onMounted(() => {
 <template>
   <el-row>
     <!-- 左侧侧边导航栏 -->
-    <el-col :span="4">
+    <el-col :span="6">
       <div class="side-navigation">
         <SideNavigationBar />
       </div>
     </el-col>
 
     <!-- 右侧内容区域 -->
-    <el-col :span="20">
+    <el-col :span="18">
       <div class="tab-selector" v-if="!isApprove">
         <TabSelector />
       </div>
