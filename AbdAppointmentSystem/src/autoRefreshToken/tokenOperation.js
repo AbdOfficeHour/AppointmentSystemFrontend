@@ -26,13 +26,13 @@ export async function refreshToken() {
     console.log("刷新token")
     await axios_ins({
       method: 'post',
-      url: `/api/token_refresh`, // 确保为SSO服务器的路由
+      url: `/api/token_refresh`, // 未来确保为SSO服务器的路由
       data: {
         refresh: getRefreshToken()
       },
       __isRefreshToken: true
     }).then(res => {
-      if (res.code === 200) {
+      if (res.code === 0) {
         console.log("刷新token成功")
         setToken(res.data.access)
         resolve(true)
