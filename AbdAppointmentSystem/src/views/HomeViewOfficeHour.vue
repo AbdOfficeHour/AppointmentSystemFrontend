@@ -1,10 +1,14 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+
 import PickerOfficeHour from "@/components/index/PickerOfficeHour.vue";
 import TableComponent from "@/components/index/TableComponent.vue";
 import FunctionalOfficeHour from "@/components/index/FunctionalOfficeHour.vue";
+
 import { UserInfoFormat, PickerFormat } from "@/utils/index/format.js";
+
+// HomeViewOfficeHour组件全局变量定义
 
 // 用户基本信息
 let username = ref(null) // 用户名
@@ -13,9 +17,6 @@ let email = ref(null) // 用户邮箱
 let role = ref([]) // 后端返回的权限信息
 let credits = ref([]) // 后端返回的用户权限
 let authorityTable = ref({}) // 经过格式化后的权限表
-
-// 全局基本变量
-// None
 
 // OfficeHour的基本变量 - Picker Layer
 let teacherList = ref([]) // 后端返回的教师列表
@@ -28,13 +29,13 @@ let getOfficeHourSelectionId = ref(null) // 被用户选中的教师 或 教师�
 let officeHourTimeTableOrigin = ref(null) // 后端返回的教师时间表数据直接存储于此变量
 officeHourTimeTableOrigin.value = null // 数据项初始化为null，供子组件判定时间表是否为空来条件渲染
 
+/**
+ * 当不具有OfficeHour:timeTable:all权限（通常为教师）的用户进入OfficeHour平台时触发，向后端请求自己的时间表数据
+ */
 function getTeacherTableInfoWithNoSelector(){
-  /**
-   * 当不具有OfficeHour:timeTable:all权限（通常为教师）的用户进入OfficeHour平台时触发，向后端请求自己的时间表数据
-   */
   axios({
     method:"get",
-    url:`/User/TableInfo/officehour/${userID.value}`
+    url:`/TableInfo/officehour/${userID.value}`
   }).then(res =>{
     if (res.data.code === 0){
       officeHourTimeTableOrigin.value = res.data.data
@@ -46,10 +47,10 @@ function getTeacherTableInfoWithNoSelector(){
   })
 }
 
+/**
+ * 从后端获取用户信息和权限信息
+ */
 function getUserInfo() {
-  /**
-   * 从后端获取用户信息和权限信息
-   */
   axios({
     method: 'get',
     url: '/User/info',
@@ -73,13 +74,13 @@ function getUserInfo() {
   })
 }
 
+/**
+ * 从后端获取OfficeHour选择器内信息
+ */
 function getOfficeHourPickerInfo() {
-  /**
-   * 从后端获取OfficeHour选择器内信息
-   */
   axios({
     method:'get',
-    url:'/User/picker/officehour',
+    url:'/TableInfo/picker/officehour',
   }).then(res =>{
     if(res.data.code === 0){
       teacherList.value = res.data.data.pickerList // 后端返回的教师列表信息
@@ -93,13 +94,13 @@ function getOfficeHourPickerInfo() {
   })
 }
 
+/**
+ * 通过选中的教师的ID向后端动态路由请求数据
+ */
 function getOfficeHourTableInfo() {
-  /**
-   * 通过选中的教师的ID向后端动态路由请求数据
-   */
   axios({
     method:"get",
-    url:`/User/TableInfo/officehour/${getOfficeHourSelectionId.value}`
+    url:`/TableInfo/officehour/${getOfficeHourSelectionId.value}`
   }).then(res =>{
     if (res.data.code === 0){
       officeHourTimeTableOrigin.value = res.data.data
@@ -111,11 +112,11 @@ function getOfficeHourTableInfo() {
   })
 }
 
+/**
+ * HomeViewOfficeHour组件初始化
+ * 向后端请求数据，获取用户信息、权限信息、选择器内信息
+ */
 onMounted( function(){
-  /**
-   * HomeViewOfficeHour组件挂载时执行
-   * 向后端请求数据，获取用户信息、权限信息、选择器内信息
-   */
   console.log("HomeViewOfficeHour组件开始挂载")
   // 从后端获取用户信息和权限信息
   getUserInfo()
@@ -123,15 +124,17 @@ onMounted( function(){
   getOfficeHourPickerInfo()
 })
 
+/**
+ * 当接收到来自PickerOfficeHour组件传递的选中教师发生变更时触发
+ * 保存用户的变更，用于后续向后端请求时间表数据进行渲染
+ */
 const handleSelectedTeacher = (teacher) => {
-  /**
-   * 当接收到来自PickerOfficeHour组件传递的选中教师发生变更时触发
-   * 保存用户的变更，用于后续向后端请求时间表数据进行渲染
-   */
   if (teacher === "no teachers available") {
-    getOfficeHourSelection.value = null  // 若选中no teachers available，getOfficeHourSelection置为空
+    // 若选中no teachers available，getOfficeHourSelection置为空
+    // 没有向后端请求新数据，故置为空。子组件识别到后展示无时间表时的界面
+    getOfficeHourSelection.value = null
     getOfficeHourSelectionId.value = null
-    officeHourTimeTableOrigin.value = null // 没有向后端请求新数据，故置为空。子组件识别到后展示无时间表时的界面
+    officeHourTimeTableOrigin.value = null
   }
   else {
     // 暂存子组件传来的选择
@@ -142,7 +145,6 @@ const handleSelectedTeacher = (teacher) => {
     getOfficeHourTableInfo()
   }
 };
-
 </script >
 
 <template>
@@ -157,7 +159,11 @@ const handleSelectedTeacher = (teacher) => {
     </div>
     <div class="table-layer">
       <div class="table-component">
-        <TableComponent :backend-data="officeHourTimeTableOrigin" is-room="false"/>
+        <TableComponent
+            :backend-data="officeHourTimeTableOrigin"
+            :authority-table="authorityTable"
+            :is-office-hour="true"
+        />
       </div>
     </div>
   </div>
@@ -167,15 +173,20 @@ const handleSelectedTeacher = (teacher) => {
 .table-component {
   display: flex;
   height: 100%;
+  width: 100%;
 }
 
-.app-container{
-  height: 100vh;
+.app-container {
+  height: 1200px;
   background-color: #F7FAFF;
+  display: flex;
+  flex-direction: column;
 }
 
 .table-layer {
-  height: 60vh;
+  flex-grow: 1; /* Allow the table layer to expand */
+  display: flex;
+  flex-direction: column;
 }
 
 .functional-layer {

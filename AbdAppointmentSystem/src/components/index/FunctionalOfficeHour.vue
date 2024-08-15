@@ -1,35 +1,45 @@
 <script setup>
 import router from "@/router/index.js";
-import {defineProps, onMounted, ref, watch} from 'vue';
-import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
 import axios from "axios";
+import { onMounted, ref, watch } from 'vue';
 
+import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
+
+
+// 接收父组件传递的props
 const props = defineProps({
-  authorityTable: Object,
-  backendData: Object,
-  userId: String
+  authorityTable: Object, // 用户权限表
+  backendData: Object, // 后端返回时间表，用于限制禁用时段的选择范围
+  userId: String // 用户id
 })
 
-let local_authorityTable = ref(null);
-let local_backendData = ref(null);
-let local_userId = ref(null);
+// FunctionalOfficeHour组件全局变量定义
+let local_authorityTable = ref(null); // 父组件传入的用户权限表，本地暂存
+let local_backendData = ref(null); // 父组件传入的后端返回时间表，本地暂存
+let local_userId = ref(null); // 父组件传入用户id，本地暂存
 let isDialogVisible = ref(false); // 禁用时段弹框是否可见
 
+/**
+ * FunctionalOfficeHour组件初始化
+ */
 onMounted(() => {
   console.log('FunctionalOfficeHour组件开始挂载');
 });
 
-watch(props, (newVal, oldVal) => {
+/**
+ * 监听父组件传入参数变更
+ */
+watch(props, (newVal) => {
   local_authorityTable.value = newVal.authorityTable;
   local_backendData.value = newVal.backendData;
   local_userId.value = newVal.userId;
 })
 
+/**
+ * 当用户点击预约按钮时触发
+ * 根据用户当前所在平台和选择的教师/教室跳转至对应的预约页面
+ */
 const navigateToAppointment = () => {
-  /**
-   * 当用户点击预约按钮时触发
-   * 根据用户当前所在平台和选择的教师/教室跳转至对应的预约页面
-   */
   router.push({
     name: 'Appointment', // 跳转至预约列表页面
     query: {
@@ -38,22 +48,22 @@ const navigateToAppointment = () => {
   })
 };
 
+/**
+ * 当用户点击禁用时段按钮时触发
+ * 弹出禁用时段弹框表单
+ */
 const banTimeShow = () => {
-  /**
-   * 当用户点击禁用时段按钮时触发
-   * 弹出禁用时段弹框表单
-   */
   isDialogVisible.value = true
 };
 
+/**
+ * 当用户点击禁用时段弹框表单的提交按钮时触发
+ * 关闭窗口，表单数据提交由子组件DisableTimeSlot处理
+ */
 const handleDisableTimeSlotSubmit = (timeForm) => {
-  /**
-   * 当用户点击禁用时段弹框表单的提交按钮时触发
-   * 关闭窗口，表单数据提交由子组件DisableTimeSlot处理
-   */
   axios({
     method: 'post',
-    url: `/User/ban/${local_userId.value}`,
+    url: `/TableInfo/ban/${local_userId.value}`,
     data: {
       startDate: timeForm.startDate,
       endDate: timeForm.endDate,
@@ -71,14 +81,13 @@ const handleDisableTimeSlotSubmit = (timeForm) => {
   isDialogVisible.value = false
 };
 
+/**
+ * 当用户点击禁用时段弹框表单的关闭按钮时触发
+ * 关闭窗口
+ */
 const handleDisableTimeSlotClose = () => {
-  /**
-   * 当用户点击禁用时段弹框表单的关闭按钮时触发
-   * 关闭窗口
-   */
   isDialogVisible.value = false
 };
-
 </script>
 
 <template>
@@ -96,18 +105,17 @@ const handleDisableTimeSlotClose = () => {
     <div v-if="authorityTable['OfficeHour:appointment']" class="appointment-button">
       <ElButton type="primary" round @click="navigateToAppointment">发起预约 Appointment</ElButton>
     </div>
-    <div v-if="authorityTable['OfficeHour:approve']" class="ban-button">
-      <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>
-      <ElButton type="primary" round @click="navigateToAppointment">查看我的预约 Appointment</ElButton>
-    </div>
-    <div class="ban-layer">
-      <DisableTimeSlot
-          :isDialogVisible="isDialogVisible"
-          :backend-data="local_backendData"
-          @submit="handleDisableTimeSlotSubmit"
-          @close="handleDisableTimeSlotClose">
-      </DisableTimeSlot>
-    </div>
+<!--    <div v-if="authorityTable['OfficeHour:approve']" class="ban-button">-->
+<!--      <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>-->
+<!--    </div>-->
+<!--    <div class="ban-layer">-->
+<!--      <DisableTimeSlot-->
+<!--          :isDialogVisible="isDialogVisible"-->
+<!--          :backend-data="local_backendData"-->
+<!--          @submit="handleDisableTimeSlotSubmit"-->
+<!--          @close="handleDisableTimeSlotClose">-->
+<!--      </DisableTimeSlot>-->
+<!--    </div>-->
   </div>
 </template>
 

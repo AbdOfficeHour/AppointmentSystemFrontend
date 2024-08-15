@@ -1,16 +1,17 @@
 <script setup>
-import {ref, watch, reactive, onMounted} from 'vue';
-import { defineProps, defineEmits } from 'vue';
+import { ref, watch, reactive, onMounted } from 'vue';
 
 // 接收父组件传递的props
 const props = defineProps({
-  selectors: Array
+  selectors: Array // OfficeHour选择器列表信息
 });
 
 // 向父组件传递的事件
 const emit = defineEmits(
-    ['update:selectedTeacher']
+    ['update:selectedTeacher'] // 选中教师后，触发的变更事件
 )
+
+// PickerOfficeHour组件全局变量定义
 
 // 组件内全局变量定义 - 本地状态，避免浅拷贝
 const localSelectors = reactive(JSON.parse(JSON.stringify(props.selectors)));  // 本地状态，深拷贝props避免直接修改props
@@ -19,18 +20,18 @@ const localSelectors = reactive(JSON.parse(JSON.stringify(props.selectors)));  /
 const currentSelection = ref(new Array(localSelectors.length).fill(null));  // 六个选择器内，被选中的选项
 const selectedTeacher = ref(null);  // 被选中的教师
 
+/**
+ * PickerOfficeHour组件初始化
+ */
 onMounted(function (){
-  /**
-   * 组件初始化
-   */
   console.log("PickerOfficeHour组件开始挂载")
 })
 
+/**
+ * 选择器选项发生变化时触发
+ * 向父组件传递选中教师变更信息
+ */
 const handleChange = (event, index) => {
-  /**
-   * 选择器选项发生变化时触发
-   * 向父组件传递选中教师变更信息
-   */
   const selectedValue = event.target.value; // 暂存被选中的数据
   selectedTeacher.value = selectedValue;
 
@@ -47,11 +48,12 @@ const handleChange = (event, index) => {
   });
 };
 
-// 监听props的变化，并同步更新localSelectors
+/**
+ * 监听props的变化，并同步更新localSelectors
+ */
 watch(() => props.selectors, (newSelectors) => {
   Object.assign(localSelectors, JSON.parse(JSON.stringify(newSelectors)));
 }, { deep: true });
-
 </script>
 
 <template>

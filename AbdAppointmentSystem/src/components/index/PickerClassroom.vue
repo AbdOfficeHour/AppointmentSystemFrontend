@@ -1,32 +1,31 @@
 <script setup>
-import {ref, onMounted} from 'vue';
-import { defineProps, defineEmits } from 'vue';
-
-// 组件内全局变量定义
-const selectedClassroom = ref(null);
+import { ref, onMounted } from 'vue';
 
 // 接收父组件传递的props
 const props = defineProps({
-  selectors: Array
+  selectors: Array // Classroom选择器列表信息
 });
 
 // 向父组件传递的事件
 const emit = defineEmits(
-    ['update:selectedClassroom']
+    ['update:selectedClassroom'] // 选中教室后，触发的变更事件
 );
 
+// PickerClassroom组件全局变量定义
+const selectedClassroom = ref(null);
+
+/**
+ * PickerClassroom组件初始化
+ */
 onMounted(function () {
-  /**
-   * 组件初始化
-   */
   console.log("PickerClassroom组件开始挂载")
 });
 
+/**
+ * 选择器选项发生变化时触发
+ * 向父组件传递选中教师变更信息
+ */
 const handleChange = (item) => {
-  /**
-   * 选择器选项发生变化时触发
-   * 向父组件传递选中教师变更信息
-   */
   selectedClassroom.value = item;
   emit('update:selectedClassroom', item);
 };
@@ -55,29 +54,26 @@ const handleChange = (item) => {
 }
 
 .selector-item {
-  font-size: 24px;  /* 字号 */
-  font-weight: 700; /* 字重 */
-  color: #666;      /* 默认字体颜色 */
+  font-size: 24px;
+  font-weight: 700;
+  color: #666;
   cursor: pointer;
-  margin: 0 5px;    /* 每个选项之间的间距 */
-  padding-bottom: 0px; /* 下划线与文字之间的间距 */
-  position: relative; /* 相对定位用于下划线 */
+  margin: 0 5px;
+  position: relative;
 }
 
 .selector-item.selected {
-  color: #10239E; /* 选中项的颜色 */
+  color: #10239E;
 }
 
 .selector-item.selected::after {
   content: '';
   display: block;
-  height: 2px;  /* 下划线的高度 */
-  background-color: #10239E;  /* 下划线的颜色 */
+  height: 2px;
+  background-color: #10239E;
   width: 100%;
   position: absolute;
-  bottom: -2px;  /* 下划线的位置，调整为距离文字更远 */
+  bottom: -2px;
   left: 0;
 }
-
-
 </style>

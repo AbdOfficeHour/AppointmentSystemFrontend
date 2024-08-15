@@ -1,13 +1,14 @@
 <script setup>
-import { ElButton } from 'element-plus';  // 引入Element-Plus按钮组件
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import router from '@/router';
+
 import PickerClassroom from "@/components/index/PickerClassroom.vue";
 import TableComponent from "@/components/index/TableComponent.vue";
 import FunctionalClassroom from "@/components/index/FunctionalClassroom.vue";
+
 import { UserInfoFormat, PickerFormat } from "@/utils/index/format.js";
 
+// HomeViewClassroom组件全局变量定义
 
 // 用户基本信息
 let username = ref(null) // 用户名
@@ -16,9 +17,6 @@ let email = ref(null) // 用户邮箱
 let role = ref([]) // 后端返回的权限信息
 let credits = ref([]) // 后端返回的用户权限
 let authorityTable = ref({}) // 经过格式化后的权限表
-
-// 全局基本变量
-// None
 
 // Classroom的基本变量 - Picker Layer
 let classroomList = ref([]) // 后端返回的教室列表
@@ -60,7 +58,7 @@ function getClassroomPickerInfo(){
    */
   axios({
     method:'get',
-    url:'/User/picker/classroom',
+    url:'/TableInfo/picker/classroom',
   }).then(res => {
     if(res.data.code === 0){
       classroomList.value = res.data.data.pickerList // 后端返回的教室列表信息
@@ -80,7 +78,7 @@ function getClassroomTableInfo(){
    */
   axios({
     method:"get",
-    url:`/User/TableInfo/classroom/${getClassroomSelectionId.value}`
+    url:`/TableInfo/classroom/${getClassroomSelectionId.value}`
   }).then(res =>{
     if (res.data.code === 0){
       classroomTimeTableOrigin.value = res.data.data
@@ -116,49 +114,49 @@ const handleSelectedClassroom = (classroom) => {
   // 通过选中的教室的ID向后端动态路由请求数据
   getClassroomTableInfo()
 };
-
-const navigateToAppointment = () => {
-  /**
-   * 当用户点击预约按钮时触发
-   * 根据用户当前所在平台和选择的教师/教室跳转至对应的预约页面
-   */
-  router.push({
-    name: 'Appointment', // 跳转至预约列表页面
-    query: {
-      if_appointment: true
-    }
-  })
-};
 </script >
 
 <template>
   <div class="app-container">
     <div class="functional-layer">
-      <FunctionalClassroom />
+      <FunctionalClassroom
+          :authority-table="authorityTable"
+          :backend-data="classroomTimeTableOrigin"
+          :classroom-id="getClassroomSelectionId"
+      />
     </div>
     <div class="picker-layer">
       <PickerClassroom :selectors="allowClassroomInfo" @update:selectedClassroom="handleSelectedClassroom"/>
     </div>
     <div class="table-layer">
       <div class="table-component">
-        <TableComponent :backend-data="classroomTimeTableOrigin" :is-room="true"/>
+        <TableComponent
+            :backend-data="classroomTimeTableOrigin"
+            :authority-table="authorityTable"
+            :is-office-hour="false"/>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.table-component{
+.table-component {
   display: flex;
   height: 100%;
-}
-.app-container{
-  height: 100vh;
-  background-color: #F7FAFF;
+  width: 100%;
 }
 
-.table-layer{
-  height: 60vh;
+.app-container {
+  height: 1200px;
+  background-color: #F7FAFF;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-layer {
+  flex-grow: 1; /* Allow the table layer to expand */
+  display: flex;
+  flex-direction: column;
 }
 
 .picker-layer {

@@ -1,21 +1,45 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { RouterLink } from 'vue-router';
+import { ref, onMounted, watch } from 'vue';
+import { RouterLink, useRoute } from 'vue-router';
 
-// 组件全局变量定义
+// TabSelector组件全局变量定义
 const selectedTab = ref('room'); // 被选中的预约平台，默认为教室预约平台
+const route = useRoute(); // 获取当前路由
 
+/**
+ * 根据路径更新选中的Tab
+ */
+const updateSelectedTab = (path) => {
+  if (path.includes('/index/classroom')) {
+    selectedTab.value = 'room'; // 教室预约首页
+  }
+  else if (path.includes('/index/officehour')) {
+    selectedTab.value = 'tutor'; // 教师预约首页
+  }
+  else if (path.includes('/list')) {
+    selectedTab.value = 'appointment'; // 预约列表(我的预约)
+  }
+};
+
+/**
+ * TabSelector组件初始化
+ */
 onMounted(function () {
-  /**
-   * 组件初始化
-   */
   console.log("TabSelector组件开始挂载")
+  updateSelectedTab(route.path); // 初次加载时更新选中的Tab
 });
 
+/**
+ * 监听路由变化并更新选中的Tab
+ */
+watch(route, (newRoute) => {
+  updateSelectedTab(newRoute.path);
+});
+
+/**
+ * 选择器发生变更时触发的函数，点击触发
+ */
 const selectTab = (tab) => {
-  /**
-   * 选择器发生变更时触发的函数，@click点击触发
-   */
   selectedTab.value = tab;
 };
 </script>
@@ -40,6 +64,7 @@ const selectTab = (tab) => {
   border-radius: 15px;
   overflow: hidden;
 }
+
 .tab {
   flex: 1;
   text-align: center;
@@ -51,12 +76,14 @@ const selectTab = (tab) => {
   font-size: 25px;
   font-weight: 700;
 }
+
 .tab.active {
   background-color: #E3ECFF;
   color: #10239E;
   font-size: 25px;
   font-weight: 700;
 }
+
 .tab:not(.active):hover {
   background-color: #101010;
   color: #E3ECFF;

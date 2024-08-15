@@ -1,9 +1,21 @@
 <template>
-    <el-form ref="ruleFormRef" style="max-width: 600px" :model="ruleForm" :rules="rules" label-width="auto"
-        class="demo-ruleForm" :size="formSize" status-icon>
+  <el-dialog
+      :model-value="ifVisible"
+      @closed="()=>emit('closeDialog')"
+      title="Office Hour"
+      center>
+    <el-form
+        ref="ruleFormRef"
+        style="max-width: 600px;"
+        :model="ruleForm"
+        :rules="rules"
+        label-width="auto"
+        class="demo-ruleForm"
+        :size="formSize"
+        status-icon>
         <!-- 名字 -->
         <el-form-item label="姓名" prop="name">
-            <el-input v-model="ruleForm.name" disabled="true" />
+            <el-input v-model="props.userInfo.username" disabled />
         </el-form-item>
 
         <!-- 选择老师 -->
@@ -19,32 +31,29 @@
         <el-form-item label="选择时间" required>
 
             <!-- 日期 -->
-            <el-col :span="11">
-                <el-form-item prop="date">
+            <el-form-item prop="date">
                     <el-date-picker v-model="ruleForm.date" type="date" aria-label="选择日期" placeholder="选择日期"
-                        style="width: 100%" value-format="x" :disabled-date="disabledDate" />
+                        style="width: 100%" :disabled-date="disabledDate" />
                 </el-form-item>
-            </el-col>
-            <br>
 
             <!-- 开始时间 -->
             <el-col :span="11">
                 <el-form-item prop="start_time">
                     <el-time-picker v-model="ruleForm.start_time" aria-label="Pick a time" placeholder="开始时间"
-                        style="width: 100%" value-format="x" :disabled-hours="disabledHours"
+                        style="width: 100%" :disabled-hours="disabledHours"
                         :disabled-minutes="disabledMinutes" :disabled-seconds="disabledSeconds" />
                 </el-form-item>
             </el-col>
 
             <el-col class="text-center" :span="2">
-                <span class="text-gray-500">-</span>
+                <span class="text-gray-500">&nbsp;&nbsp;---</span>
             </el-col>
 
             <!-- 结束时间 -->
             <el-col :span="11">
                 <el-form-item prop="end_time">
                     <el-time-picker v-model="ruleForm.end_time" aria-label="Pick a time" placeholder="结束时间"
-                        style="width: 100%" value-format="x" :disabled-hours="disabledHours2"
+                        style="width: 100%" :disabled-hours="disabledHours2"
                         :disabled-minutes="disabledMinutes2" :disabled-seconds="disabledSeconds" />
                 </el-form-item>
             </el-col>
@@ -101,25 +110,31 @@
             </el-button>
         </el-form-item>
     </el-form>
-
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, defineProps,defineEmits,watch} from 'vue'
 import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
 import axios from "axios";
 import { onMounted } from 'vue';
+import {TimeFormat} from '@/utils/index/format'
+import router from '@/router';
 
 interface RuleForm {
-    name: string
     teacher: string
-    date: number
-    start_time: number
-    end_time: number
+    date: Date
+    start_time: Date
+    end_time: Date
     present: string[]
     question: string
     note: string
 }
+
+const props = defineProps(["ifVisible", "userInfo"])
+
+
+const emit = defineEmits(["closeDialog"])
 
 const teachers = ref([])  //老师们的名字和id
 const usefulTime = ref([]) //可用时间
@@ -138,13 +153,13 @@ onMounted(() => {
         "teacherID": "103"
     },]  //老师们的名字和id
 
-    // axios.get('/Appointment/list/officehour/pickerList')
-    //     .then(response => {
-    //         teachers.value=response.data.teachers;
-    //     })
-    //     .catch(error => {
-    //         console.error('错误:', error);
-    //     });
+    axios.get('/Appointment/list/officehour/pickerList')
+        .then(response => {
+            teachers.value=response.data.data.teachers;
+        })
+        .catch(error => {
+            console.error('错误:', error);
+        });
 
 
     // console.log(teachers.value);
@@ -163,11 +178,10 @@ const fpresent = ref([]);//伪present，为了显示而创造的fpresent数组
 const formSize = ref<ComponentSize>('default')
 const ruleFormRef = ref<FormInstance>()
 const ruleForm = reactive<RuleForm>({
-    name: "kfc",
     teacher: "",
-    date: 0,
-    start_time: 0,
-    end_time: 0,
+    date: new Date(),
+    start_time: new Date(),
+    end_time: new Date(),
     present: [],
     question: "",
     note: "",
@@ -233,19 +247,19 @@ const post_it = () => {
     let postData = {
         "teacher": ruleForm.teacher,
         "time": {
-            "date": ruleForm.date,
-            "start_time": ruleForm.start_time, // 起始
-            "end_time": ruleForm.end_time,
-        }, 
-        "note": ruleForm.note, 
-        "question": ruleForm.question, 
-        "present": ruleForm.present 
+            "date": TimeFormat.timestampAsStartOfDate(ruleForm.date.getTime()).getTime(),
+            "start_time": TimeFormat.combineDateAndTime(ruleForm.date,ruleForm.start_time).getTime(), // 起始
+            "end_time": TimeFormat.combineDateAndTime(ruleForm.date,ruleForm.end_time).getTime(),
+        },
+        "note": ruleForm.note,
+        "question": ruleForm.question,
+        "present": ruleForm.present
     };
     console.log("postData",postData);
     axios.post('/Appointment/list/officehour', postData)
         .then(response => {
-
             console.log('Response:', response.data);
+            window.location.reload();
         })
         .catch(error => {
 
@@ -256,13 +270,14 @@ const post_it = () => {
 
 //得到对应老师的可使用时间
 const getTime = () => {
-    //     axios.get('/Appointment/list/officehour/pickerTime/${ruleForm.teacher}')
-    //         .then(response => {
-    //             usefulTime.value=response.data.data.dateTime;
-    //         })
-    //         .catch(error => {
-    //             console.error('错误:', error);
-    //         });
+    axios.get(`/Appointment/list/officehour/pickerTime/${ruleForm.teacher}`)
+        .then(response => {
+          usefulTime.value=response.data.data.dateTime;
+        })
+        .catch(error => {
+          console.error('错误:', error);
+        });
+
     console.log("gettime触发");
 
     //测试数据
@@ -300,15 +315,14 @@ const fetchNames = () => {
     if (searchQuery.value.length == 0) resetnames();
     else {
         console.log("发送模糊搜索请求", searchQuery.value);
-        setnames();//测试
-        // axios.get('/User/search', {
-        //     params: {
-        //         "searchData":searchQuery.value
-        //     }
-        // }).then((res) => {
-        //     if (res.data.code==0) names.value=res.data.data.userList;
-        //     else resetnames()
-        // })
+        axios.get('/User/search', {
+            params: {
+                "searchData":searchQuery.value
+            }
+        }).then((res) => {
+            if (res.data.code==0) names.value=res.data.data.userList;
+            else resetnames()
+        })
     }
 }
 
@@ -365,7 +379,7 @@ const disabledDate = date => !allowedDates().includes(date.toDateString());
 
 //根据日期显示时间范围
 const selectedTimes = () => {
-    const dateTimestamp = ruleForm.date;
+    const dateTimestamp = ruleForm.date.getTime();
     const timeEntry = usefulTime.value.find(entry => entry.date === dateTimestamp);
     if (timeEntry) {
         // console.log(timeEntry.times);
@@ -505,7 +519,7 @@ function formatDateToTimeString(date) {
 
 //已知开始时间返回时间段
 const get_TimeRange = () => {
-    let start_time = ruleForm.start_time;
+    let start_time = ruleForm.start_time.getTime();
     const start_obj = createDateFromTimeString(timestampToHourMinute(start_time));
     // console.log(start_obj);
     const timeList = selectedTimes();
