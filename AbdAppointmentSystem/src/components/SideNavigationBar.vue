@@ -39,6 +39,12 @@ watch(route, (newRoute) => {
 const selectItem = (tab) => {
   selectedItem.value = tab;
 };
+
+const navigateToLogin = (tab) => {
+  selectedItem.value = tab;
+  window.location.href = 'http://sso.abdn.kirisame.cc/officehour/login.html';
+};
+
 </script>
 
 <template>
@@ -61,10 +67,10 @@ const selectItem = (tab) => {
         </router-link>
       </el-menu-item>
       <el-menu-item index="3" class="menu-item" :class="{ active: selectedItem === '3' }">
-        <router-link to="/login" @click="selectItem('3')" >
+        <div to="/login" @click="navigateToLogin('3')" >
           <span :class="{ active: selectedItem === '3' }">回到首页 </span>
           <span :class="{ active: selectedItem === '3' }">Back to HomePage</span>
-        </router-link>
+        </div>
       </el-menu-item>
       <div style="margin-bottom: 1000px"></div>
     </el-menu>
@@ -76,10 +82,12 @@ const selectItem = (tab) => {
   display: flex;
   overflow: hidden;
   height: 100%;
+  width: 100%;
 }
 
 .side-navigation-menu {
   background-color: #f0f0f0;
+  width: 90%;
 }
 
 .menu-item {
