@@ -11,8 +11,10 @@ import VueAxios from 'vue-axios'
 import axios from 'axios'
 
 import i18n from './vue_i18n/index.js'
+import {ElMessage} from "element-plus";
 
-axios.defaults.baseURL = "/api/v1.1"
+axios.defaults.baseURL = "http://ohour-backend.abdn.kirisame.cc/api/v1.1"
+axios.defaults.withCredentials = true
 
 const app = createApp(App)
 
@@ -30,8 +32,13 @@ const app = createApp(App)
 axios.interceptors.response.use((response) =>{
     return response;
 }, (error)=> {
+    if(!error.response){
+        ElMessage.error("网络错误，请检查网络连接")
+        return Promise.reject(error);
+    }
+
     if (error.response.status === 401) {
-        window.location.href = 'http://sso.abdn.kirisame.cc/officehour/login.html';
+        // window.location.href = 'http://sso.abdn.kirisame.cc/officehour/login.html';
     }
     return Promise.reject(error);
 })
