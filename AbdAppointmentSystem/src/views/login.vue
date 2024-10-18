@@ -12,7 +12,7 @@ const form = reactive({
 const handleClick = () => {
   if(form.username === "" || form.password === "")
     ElMessage.error("用户名或密码不能为空")
-  axios.post("http://localhost:3000/login",{
+  axios.post("http://10.252.128.19:3000/login",{
     id:form.username,
     pass:form.password
   },{
