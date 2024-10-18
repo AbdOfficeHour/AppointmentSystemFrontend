@@ -13,7 +13,7 @@ import axios from 'axios'
 import i18n from './vue_i18n/index.js'
 import {ElMessage} from "element-plus";
 
-axios.defaults.baseURL = "http://ohour-backend.abdn.kirisame.cc/api/v1.1"
+axios.defaults.baseURL = "/api/v1.1"
 axios.defaults.withCredentials = true
 
 const app = createApp(App)
