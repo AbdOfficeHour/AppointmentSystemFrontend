@@ -64,7 +64,7 @@ const banTimeShow = () => {
 const handleDisableTimeSlotSubmit = (timeForm) => {
   axios({
     method: 'post',
-    url: `/TableInfo/ban/${local_backendData.value}`,
+    url: `/TableInfo/ban/${local_classroomId.value}`,
     data: {
       startDate: timeForm.startDate,
       endDate: timeForm.endDate,
@@ -106,17 +106,17 @@ const handleDisableTimeSlotClose = () => {
     <div class="appointment-button">
       <ElButton type="primary" round @click="navigateToAppointment">发起预约 Appointment</ElButton>
     </div>
-<!--    <div v-if="authorityTable['classroom:approve']" class="ban-button">-->
-<!--      <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>-->
-<!--    </div>-->
-<!--    <div class="ban-layer">-->
-<!--      <DisableTimeSlot-->
-<!--          :isDialogVisible="isDialogVisible"-->
-<!--          :backend-data="local_backendData"-->
-<!--          @submit="handleDisableTimeSlotSubmit"-->
-<!--          @close="handleDisableTimeSlotClose">-->
-<!--      </DisableTimeSlot>-->
-<!--    </div>-->
+    <div v-if="authorityTable['classroom:approve']" class="ban-button">
+      <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>
+    </div>
+    <div class="ban-layer">
+      <DisableTimeSlot
+          :isDialogVisible="isDialogVisible"
+          :backend-data="local_backendData"
+          @submit="handleDisableTimeSlotSubmit"
+          @close="handleDisableTimeSlotClose">
+      </DisableTimeSlot>
+    </div>
   </div>
 </template>
 

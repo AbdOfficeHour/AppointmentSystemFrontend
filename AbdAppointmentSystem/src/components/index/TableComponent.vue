@@ -208,7 +208,7 @@ function renderTimeline() {
       const timeText = document.createElement("span");
       timeText.classList.add("time-text");
       timeText.textContent = `${slot.start} - ${slot.end}`;
-      if (duration >= 600000) {
+      if (duration >= 900000) {
         busyElement.appendChild(timeText);
       }
     });
