@@ -56,18 +56,21 @@ const navigateToLogin = (tab) => {
 <!--      <div class="title-4">Appointment System</div>-->
       <el-menu-item index="1" class="menu-item" :class="{ active: selectedItem === '1' }">
         <router-link to="/index/classroom" @click="selectItem('1')">
+          <img src="/预约.png" alt="返回" class="icon" width="32"/>
           <span :class="{ active: selectedItem === '1' }">发起预约 </span>
           <span :class="{ active: selectedItem === '1' }">Initiate appointment</span>
         </router-link>
       </el-menu-item>
       <el-menu-item index="2" class="menu-item" :class="{ active: selectedItem === '2' }">
         <router-link to="/approve" @click="selectItem('2')" >
+          <img src="/审批.png" alt="返回" class="icon" width="32"/>
           <span :class="{ active: selectedItem === '2' }">审核预约 </span>
           <span :class="{ active: selectedItem === '2' }">Audit appointment</span>
         </router-link>
       </el-menu-item>
       <el-menu-item index="3" class="menu-item" :class="{ active: selectedItem === '3' }">
         <div to="/login" @click="navigateToLogin('3')" >
+          <img src="/预约.png" alt="返回" class="icon" width="32"/>
           <span :class="{ active: selectedItem === '3' }">回到首页 </span>
           <span :class="{ active: selectedItem === '3' }">Back to HomePage</span>
         </div>
@@ -121,6 +124,11 @@ span:not(.active){
   color: grey;
   font-size: 15px;
   font-weight: 700;
+}
+
+.icon {
+  margin-right: 8px; /* 调整图标与文字之间的间距 */
+  vertical-align: middle; /* 上下居中 */
 }
 
 .title-3 {
