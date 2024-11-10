@@ -14,7 +14,7 @@ const updateSelectedItem = (path) => {
     selectedItem.value = '2'; // 审批
   }
   else if (path.includes('/login')) {
-    selectedItem.value = '3' // 返回首页 未来要删除这段，因为首页为另外一个路由下的平台
+    selectedItem.value = '3' // 返回首页
   }
   else {
     selectedItem.value = '1'; // 预约
@@ -42,7 +42,7 @@ const selectItem = (tab) => {
 
 const navigateToLogin = (tab) => {
   selectedItem.value = tab;
-  window.location.href = 'http://sso.abdn.kirisame.cc/officehour/login.html';
+  window.location.href = 'http://sso.abdn.kirisame.cc/officehour/login';
 };
 
 </script>
