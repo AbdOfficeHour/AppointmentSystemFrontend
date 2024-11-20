@@ -1,6 +1,6 @@
 <script setup>
-import {useRoute} from "vue-router";
-import {onMounted, watch, ref} from "vue";
+import { useRoute } from "vue-router";
+import { onMounted, watch, ref } from "vue";
 
 // SideNavigationBar组件全局变量定义
 const selectedItem = ref('1'); // 选中的菜单项，默认为1（预约项目）
@@ -12,17 +12,15 @@ const route = useRoute(); // 获取当前路由
 const updateSelectedItem = (path) => {
   if (path.includes('/approve')) {
     selectedItem.value = '2'; // 审批
-  }
-  else if (path.includes('/login')) {
-    selectedItem.value = '3' // 返回首页
-  }
-  else {
+  } else if (path.includes('/login')) {
+    selectedItem.value = '3'; // 返回首页
+  } else {
     selectedItem.value = '1'; // 预约
   }
 };
 
-onMounted(function () {
-  console.log("SideNavigationBar组件开始挂载")
+onMounted(() => {
+  console.log("SideNavigationBar组件开始挂载");
   updateSelectedItem(route.path); // 初次加载时更新选中的Tab
 });
 
@@ -44,97 +42,144 @@ const navigateToLogin = (tab) => {
   selectedItem.value = tab;
   window.location.href = 'http://sso.abdn.kirisame.cc/officehour/login';
 };
-
 </script>
 
 <template>
   <div class="side-navigation-container">
     <el-menu class="side-navigation-menu">
-      <div class="title-3">导航栏</div>
-      <div class="title-3">Navigation Bar</div>
-<!--      <div class="title-4">预约平台</div>-->
-<!--      <div class="title-4">Appointment System</div>-->
-      <el-menu-item index="1" class="menu-item" :class="{ active: selectedItem === '1' }">
-        <router-link to="/index/classroom" @click="selectItem('1')">
-          <img src="/预约.png" alt="返回" class="icon" width="32"/>
-          <span :class="{ active: selectedItem === '1' }">发起预约 </span>
-          <span :class="{ active: selectedItem === '1' }">Initiate appointment</span>
+      <div class="menu-header">
+        <h3 class="menu-title">导航栏</h3>
+        <h3 class="menu-title-sub">Navigation Bar</h3>
+      </div>
+      <el-menu-item index="1" class="menu-item" :class="{ active : selectedItem === '1' }" @click="selectItem('1')">
+        <router-link to="/index/classroom" >
+          <div class="menu-item-text">
+            <span>发起预约</span>
+            <span>Initiate Appointment</span>
+          </div>
         </router-link>
       </el-menu-item>
-      <el-menu-item index="2" class="menu-item" :class="{ active: selectedItem === '2' }">
-        <router-link to="/approve" @click="selectItem('2')" >
-          <img src="/审批.png" alt="返回" class="icon" width="32"/>
-          <span :class="{ active: selectedItem === '2' }">审核预约 </span>
-          <span :class="{ active: selectedItem === '2' }">Audit appointment</span>
+      <el-menu-item index="2" class="menu-item" :class="{ active: selectedItem === '2' }" @click="selectItem('2')" >
+        <router-link to="/approve" >
+          <div class="menu-item-text">
+            <span>审核预约</span>
+            <span>Audit Appointment</span>
+          </div>
         </router-link>
       </el-menu-item>
-      <el-menu-item index="3" class="menu-item" :class="{ active: selectedItem === '3' }">
-        <div to="/login" @click="navigateToLogin('3')" >
-          <img src="/预约.png" alt="返回" class="icon" width="32"/>
-          <span :class="{ active: selectedItem === '3' }">回到首页 </span>
-          <span :class="{ active: selectedItem === '3' }">Back to HomePage</span>
+      <el-menu-item index="3" class="menu-item" :class="{ active: selectedItem === '3' }" @click="navigateToLogin('3')">
+        <div>
+          <div class="menu-item-text">
+            <span>回到首页</span>
+            <span>Back to HomePage</span>
+          </div>
         </div>
       </el-menu-item>
-      <div style="margin-bottom: 1000px"></div>
     </el-menu>
   </div>
 </template>
 
 <style scoped>
+/* 容器样式 */
 .side-navigation-container {
   display: flex;
-  overflow: hidden;
-  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f9fafc;
   width: 100%;
+  height: 100vh;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  overflow: auto;
 }
 
+/* 菜单样式 */
 .side-navigation-menu {
-  background-color: #f0f0f0;
-  width: 90%;
+  background: transparent;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
-.menu-item {
-  flex: 1;
+/* 标题部分 */
+.menu-header {
   text-align: center;
-  padding: 10px;
-  cursor: pointer;
-  background-color: #f0f0f0;
-  color: grey;
-  transition: background-color 0.3s, color 0.3s;
-  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+.menu-title {
+  font-size: 25px;
   font-weight: 700;
-  margin: 10px;
+  color: #10239e;
+}
+
+.menu-title-sub {
+  font-size: 20px;
+  font-weight: 700;
+  color: #6c757d;
+}
+
+/* 菜单项样式 */
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  padding: 15px 20px;
+  margin: 15px 0;
+  width: 100% !important;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .menu-item.active {
-  background-color: #E3ECFF;
+  background-color: #e6f7ff;
+  border-left: 5px solid #1890ff;
 }
 
-.menu-item:not(.active):hover {
-  background-color: #101010;
+.menu-item:hover {
+  transform: scale(1.02);
+  background-color: #f0f5ff;
+}
+
+/* 图标样式 */
+.icon {
+  margin-right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  padding: 5px;
+}
+
+/* 调整文本容器样式 */
+.menu-item-text {
+  display: flex;
+  flex-direction: column; /* 垂直排列子元素 */
+  margin-left: 10px; /* 调整与图标的间距 */
+  gap: 4px; /* 控制两个 <span> 之间的间距 */
+  overflow: hidden; /* 防止内容溢出 */
+}
+
+/* 文本样式 */
+.menu-item-text span {
+  font-size: 14px; /* 适当缩小字体大小，防止超出 */
+  line-height: 1.4; /* 调整行高，保持紧凑 */
+  color: #333333;
+  font-weight: 500;
+}
+
+.menu-item-text span:first-child {
+  font-weight: bold; /* 第一行加粗 */
 }
 
 span.active {
-  color: #10239E;
-  font-size: 15px;
-  font-weight: 700;
+  color: #1890ff;
+  font-weight: bold;
 }
-
-span:not(.active){
-  color: grey;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.icon {
-  margin-right: 8px; /* 调整图标与文字之间的间距 */
-  vertical-align: middle; /* 上下居中 */
-}
-
-.title-3 {
-  font-size: 20px;
-  font-weight: 700;
-  margin-left: 10px;
-}
-
 </style>

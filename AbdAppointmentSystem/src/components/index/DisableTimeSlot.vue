@@ -6,7 +6,8 @@ import {TableFormat} from "@/utils/index/format.js";
 // 接收父组件传递的props
 const props = defineProps({
   isDialogVisible: Boolean, // 禁用时段弹框是否可见
-  backendData: Object // 后端返回时间表，用于限制禁用时段的选择范围
+  backendData: Object, // 后端返回时间表，用于限制禁用时段的选择范围
+  isOfficeHour: Boolean // 是否为OfficeHour时间段
 });
 
 // 向父组件传递的事件
@@ -532,6 +533,52 @@ function submitDisableInfo() {
     clearSelection()
   }
 }
+
+const disabledHoursEndWrapperWithoutConflictCheck = () => {
+  const startHour = new Date(startTime.value).getHours(); // 获取开始时间的小时
+  const allHours = Array.from({ length: 24 }, (_, i) => i); // 所有小时 0-23
+  const validHours = allHours.filter(hour => hour >= 8 && hour <= 19); // 有效的小时范围是 8 到 19
+  const enabledHours = validHours.filter(hour => hour >= startHour); // 启用的小时范围从 startHour 开始到 19
+  const disabledHours = validHours.filter(hour => !enabledHours.includes(hour)); // 禁用的小时 = 有效小时范围中不包含在启用小时范围内的部分
+  const invalidHours = allHours.filter(hour => hour < 8 || hour > 19); // 额外禁用无效范围（0-7 和 20-23）
+
+  return [...disabledHours, ...invalidHours];   // 合并禁用的小时
+};
+
+
+const disabledMinutesEndWrapperWithoutConflictCheck = (hour) => {
+  const startHour = new Date(startTime.value).getHours(); // 获取开始时间的小时
+  const startMinute = new Date(startTime.value).getMinutes(); // 获取开始时间的分钟
+
+  const allMinutes = Array.from({ length: 60 }, (_, i) => i); // 所有分钟 0-59
+
+  if (hour < startHour) {
+    return allMinutes; // 如果小时小于开始时间的小时，禁用所有分钟
+  }
+
+  if (hour === startHour) {
+    const enabledMinutes = Array.from({ length: 60 - startMinute }, (_, i) => i + startMinute); // 启用分钟
+    const disabledMinutes = allMinutes.filter(min => !enabledMinutes.includes(min)); // 差集
+    return disabledMinutes;
+  }
+
+  return []; // 其他情况不禁用任何分钟
+};
+
+const disabledHoursStartWrapperWithoutConflictCheck = () => {
+  const allHours = Array.from({ length: 24 }, (_, i) => i); // 所有小时 0-23
+  const enabledHours = Array.from({ length: 12 }, (_, i) => i + 8); // 启用的小时 8-19
+  const disabledHours = allHours.filter(hour => !enabledHours.includes(hour)); // 差集
+  return disabledHours;
+};
+
+const disabledMinutesStartWrapperWithoutConflictCheck = () => {
+  const allMinutes = Array.from({ length: 60 }, (_, i) => i); // 所有分钟 0-59
+  const enabledMinutes = Array.from({ length: 60 }, (_, i) => i); // 启用的分钟 0-59
+  const disabledMinutes = allMinutes.filter(min => !enabledMinutes.includes(min)); // 差集
+  return disabledMinutes;
+};
+
 </script>
 
 <template>
@@ -564,16 +611,16 @@ function submitDisableInfo() {
           <el-time-picker
               v-model="startTime"
               placeholder="Start time"
-              :disabled-hours="disabledHoursStartWrapper"
-              :disabled-minutes="disabledMinutesStartWrapper"
+              :disabled-hours="disabledHoursStartWrapperWithoutConflictCheck"
+              :disabled-minutes="disabledMinutesStartWrapperWithoutConflictCheck"
               :disabled-seconds="disabledSeconds"
           />
           <span> To </span>
           <el-time-picker
               v-model="endTime"
               placeholder="End time"
-              :disabled-hours="disabledHoursEndWrapper"
-              :disabled-minutes="disabledMinutesEndWrapper"
+              :disabled-hours="disabledHoursEndWrapperWithoutConflictCheck"
+              :disabled-minutes="disabledMinutesEndWrapperWithoutConflictCheck"
               :disabled-seconds="disabledSeconds"
           />
         </div>

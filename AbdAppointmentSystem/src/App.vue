@@ -32,25 +32,46 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-row>
+  <div class="app-container">
     <!-- 左侧侧边导航栏 -->
-    <el-col :span="6">
-      <div class="side-navigation">
-        <SideNavigationBar />
-      </div>
-    </el-col>
+    <div class="side-navigation">
+      <SideNavigationBar />
+    </div>
 
     <!-- 右侧内容区域 -->
-    <el-col :span="18">
+    <div class="content-container">
       <div class="tab-selector" v-if="!isApprove">
         <TabSelector />
       </div>
       <RouterView />
-    </el-col>
-  </el-row>
+    </div>
+  </div>
 </template>
 
-
 <style scoped>
+/* 父容器 */
+.app-container {
+  display: flex; /* 使用Flex布局 */
+  height: 100vh; /* 设置为视口高度 */
+  overflow: hidden; /* 防止溢出 */
+}
 
+/* 左侧侧边导航栏 */
+.side-navigation {
+  flex: 0 0 25%; /* 固定宽度，约占25% */
+  max-width: 300px; /* 最大宽度限制 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 右侧内容区域 */
+.content-container {
+  flex: 1; /* 剩余空间自动填充 */
+  padding: 20px; /* 内边距 */
+  overflow-y: auto; /* 当内容过多时滚动 */
+  background-color: #ffffff; /* 可选：背景颜色 */
+  display: flex;
+  flex-direction: column;
+}
 </style>
+

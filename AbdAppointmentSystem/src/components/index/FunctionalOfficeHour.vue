@@ -18,6 +18,8 @@ let local_authorityTable = ref(null); // 父组件传入的用户权限表，本
 let local_backendData = ref(null); // 父组件传入的后端返回时间表，本地暂存
 let local_userId = ref(null); // 父组件传入用户id，本地暂存
 let isDialogVisible = ref(false); // 禁用时段弹框是否可见
+let conflict_info = ref(null); // 冲突信息
+let is_conflict_info_visible = ref(false); // 冲突信息是否可见
 
 /**
  * FunctionalOfficeHour组件初始化
@@ -73,7 +75,14 @@ const handleDisableTimeSlotSubmit = (timeForm) => {
   }).then(res => {
     if (res.data.code === 0) {
       confirm('禁用时段成功')
-    } else {
+      location.reload();
+    }
+    else if (res.data.code === 101) {
+      is_conflict_info_visible.value = true
+      conflict_info.value = res.data.data.conflict_period
+      console.log(res.data.message)
+    }
+    else {
       alert('禁用时段失败，请检查禁用时段的合理性')
       console.log(res.data.message)
     }
@@ -92,37 +101,58 @@ const handleDisableTimeSlotClose = () => {
 
 <template>
   <div class="functional-container">
-    <div class="legend">
-      <div class="legend-item">
-        <span class="color-box free"></span>
-        <span>空闲，可以预约 Available by appointment</span>
+    <div class="flex-container">
+      <div class="legend">
+        <div class="legend-item">
+          <span class="color-box free"></span>
+          <span>空闲，可以预约 Available by appointment</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-box busy"></span>
+          <span>繁忙，不可预约 Not Available by appointment</span>
+        </div>
       </div>
-      <div class="legend-item">
-        <span class="color-box busy"></span>
-        <span>繁忙，不可预约 Not Available by appointment</span>
+      <div class="button-layer">
+        <div v-if="authorityTable['OfficeHour:appointment']" class="appointment-button">
+          <ElButton type="primary" round @click="navigateToAppointment">发起预约 Appointment</ElButton>
+        </div>
+        <div v-if="authorityTable['OfficeHour:approve']" class="ban-button">
+          <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>
+        </div>
       </div>
-    </div>
-    <div v-if="authorityTable['OfficeHour:appointment']" class="appointment-button">
-      <ElButton type="primary" round @click="navigateToAppointment">发起预约 Appointment</ElButton>
-    </div>
-    <div v-if="authorityTable['OfficeHour:approve']" class="ban-button">
-      <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>
-    </div>
-    <div class="ban-layer">
-      <DisableTimeSlot
-          :isDialogVisible="isDialogVisible"
-          :backend-data="local_backendData"
-          @submit="handleDisableTimeSlotSubmit"
-          @close="handleDisableTimeSlotClose">
-      </DisableTimeSlot>
     </div>
   </div>
+  <div class="ban-layer">
+    <DisableTimeSlot
+        :isDialogVisible="isDialogVisible"
+        :backend-data="local_backendData"
+        :is-office-hour="true"
+        @submit="handleDisableTimeSlotSubmit"
+        @close="handleDisableTimeSlotClose">
+    </DisableTimeSlot>
+  </div>
+  <ConflictInfo
+      :dialogVisible="is_conflict_info_visible"
+      :conflict-info="conflict_info"
+      @closeDialog="is_conflict_info_visible = false"
+  />
 </template>
 
 <style scoped>
+.functional-container {
+  padding: 16px;
+}
+
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .legend {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
 }
 
 .legend-item {
@@ -132,8 +162,8 @@ const handleDisableTimeSlotClose = () => {
 }
 
 .color-box {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   margin-right: 8px;
 }
 
@@ -147,20 +177,14 @@ const handleDisableTimeSlotClose = () => {
   border-style: solid;
 }
 
-.functional-container {
+.button-layer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  height: 100%;
-  background-color: #F0F5FF;
-  padding: 16px;
+  gap: 16px;
 }
 
+.appointment-button,
 .ban-button {
-  margin-left: auto;
-}
-
-.appointment-button {
-  margin-left: auto;
+  margin-left: 8px;
 }
 </style>
