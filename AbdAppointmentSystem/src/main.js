@@ -18,16 +18,6 @@ axios.defaults.withCredentials = true
 
 const app = createApp(App)
 
-//添加路由守卫
-// router.beforeEach((to, from, next) => {
-//     if(to.fullPath==="/"){
-//         next("/index/appointment")
-//     }else if(!localStorage.getItem("token")){
-//         next("/login")
-//     }
-//     next()
-// })
-
 //axios拦截器
 axios.interceptors.response.use((response) =>{
     return response;
@@ -37,16 +27,11 @@ axios.interceptors.response.use((response) =>{
         return Promise.reject(error);
     }
 
-    if (error.response.status === 401) {
-        // window.location.href = 'http://sso.abdn.kirisame.cc/officehour/login.html';
-    }
+    // if (error.response.status === 401) {
+    //     window.location.href = 'http://sso.abdn.kirisame.cc/officehour/login';
+    // }
     return Promise.reject(error);
 })
-
-// axios.interceptors.request.use((request)=>{
-//     request.headers.Authorization = `Bearer ${localStorage.getItem("token")}`
-//     return request
-// })
 
 
 app.use(router)
