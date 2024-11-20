@@ -1,20 +1,3 @@
-<!-- 选择器材 -->
-<!-- <el-form-item label="Activity type" prop="type">
-        <el-checkbox-group v-model="ruleForm.type">
-          <el-checkbox value="Online activities" name="type">
-            Online activities
-          </el-checkbox>
-          <el-checkbox value="Promotion activities" name="type">
-            Promotion activities
-          </el-checkbox>
-          <el-checkbox value="Offline activities" name="type">
-            Offline activities
-          </el-checkbox>
-          <el-checkbox value="Simple brand exposure" name="type">
-            Simple brand exposure
-          </el-checkbox>
-        </el-checkbox-group>
-      </el-form-item> -->
 <template>
     <el-dialog :model-value="ifVisible" @close="emit('closeDialog')">
       <el-form
@@ -145,6 +128,7 @@
           <el-button type="primary" @click="submitForm(ruleFormRef)">
             确认
           </el-button>
+          <!-- <button @click="post_it">测试</button> -->
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -254,7 +238,7 @@ const rules = reactive<FormRules<RuleForm>>({
     ],
     aim: [
         { required: true, message: '请填写使用目的', trigger: 'blur' },
-    ],
+    ]
 })
 
 
@@ -272,8 +256,17 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     })
 }
 
+//检查人数够不够
+const post_it=()=>{
+    if(ruleForm.present.length<3){
+        ElMessage.error('至少需要3名成员');
+    }
+    else {
+        postIt();
+    }
+}
 
-const post_it = () => {
+const postIt = () => {
     // 数据
     let postData = {
         "classroom": ruleForm.classroom,

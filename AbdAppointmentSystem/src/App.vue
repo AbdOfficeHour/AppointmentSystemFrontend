@@ -4,6 +4,7 @@ import {onMounted, watch, ref} from 'vue';
 
 import TabSelector from "@/components/TabSelector.vue";
 import router from "@/router/index.js";
+import SideNavigationBar from "@/components/SideNavigationBar.vue";
 
 // App.vue组件全局变量定义
 const route = useRoute(); // 获取当前路由
@@ -31,11 +32,24 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="tab-selector" v-if="!isApprove">
-    <TabSelector />
-  </div>
-  <RouterView />
+  <el-row>
+    <!-- 左侧侧边导航栏 -->
+    <el-col :span="6">
+      <div class="side-navigation">
+        <SideNavigationBar />
+      </div>
+    </el-col>
+
+    <!-- 右侧内容区域 -->
+    <el-col :span="18">
+      <div class="tab-selector" v-if="!isApprove">
+        <TabSelector />
+      </div>
+      <RouterView />
+    </el-col>
+  </el-row>
 </template>
+
 
 <style scoped>
 

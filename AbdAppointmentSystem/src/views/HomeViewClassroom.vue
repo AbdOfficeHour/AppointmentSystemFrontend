@@ -119,7 +119,11 @@ const handleSelectedClassroom = (classroom) => {
 <template>
   <div class="app-container">
     <div class="functional-layer">
-      <FunctionalClassroom />
+      <FunctionalClassroom
+          :authority-table="authorityTable"
+          :backend-data="classroomTimeTableOrigin"
+          :classroom-id="getClassroomSelectionId"
+      />
     </div>
     <div class="picker-layer">
       <PickerClassroom :selectors="allowClassroomInfo" @update:selectedClassroom="handleSelectedClassroom"/>
@@ -139,14 +143,20 @@ const handleSelectedClassroom = (classroom) => {
 .table-component {
   display: flex;
   height: 100%;
+  width: 100%;
 }
+
 .app-container {
-  height: 100vh;
+  height: 1200px;
   background-color: #F7FAFF;
+  display: flex;
+  flex-direction: column;
 }
 
 .table-layer {
-  height: 60vh;
+  flex-grow: 1; /* Allow the table layer to expand */
+  display: flex;
+  flex-direction: column;
 }
 
 .picker-layer {

@@ -1,6 +1,24 @@
 <script setup>
 import router from "@/router/index.js";
-import {onMounted} from "vue";
+import axios from "axios";
+import { onMounted, ref, watch } from 'vue';
+
+import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
+
+
+// 接收父组件传递的props
+const props = defineProps({
+  authorityTable: Object, // 用户权限表
+  backendData: Object, // 后端返回时间表，用于限制禁用时段的选择范围
+  classroomId: String // 用户选中操作的教室ID
+})
+
+// FunctionalClassroom组件全局变量定义
+let local_authorityTable = ref(null); // 父组件传入的用户权限表，本地暂存
+let local_backendData = ref(null); // 父组件传入的后端返回时间表，本地暂存
+let isDialogVisible = ref(false); // 禁用时段弹框是否可见
+let local_classroomId = ref(null); // 被选中的教室对应的数据库ID
+
 
 /**
  * FunctionalClassroom组件初始化
@@ -8,6 +26,15 @@ import {onMounted} from "vue";
 onMounted(() => {
   console.log('FunctionalClassroom组件开始挂载');
 });
+
+/**
+ * 监听父组件传入参数变更
+ */
+watch(props, (newVal) => {
+  local_authorityTable.value = newVal.authorityTable;
+  local_backendData.value = newVal.backendData;
+  local_classroomId.value = newVal.classroomId;
+})
 
 /**
  * 当用户点击预约按钮时触发
@@ -20,6 +47,47 @@ const navigateToAppointment = () => {
       if_appointment: true
     }
   })
+};
+
+/**
+ * 当用户点击禁用时段按钮时触发
+ * 弹出禁用时段弹框表单
+ */
+const banTimeShow = () => {
+  isDialogVisible.value = true
+};
+
+/**
+ * 当用户点击禁用时段弹框表单的提交按钮时触发
+ * 关闭窗口，表单数据提交由子组件DisableTimeSlot处理
+ */
+const handleDisableTimeSlotSubmit = (timeForm) => {
+  axios({
+    method: 'post',
+    url: `/TableInfo/ban/${local_classroomId.value}`,
+    data: {
+      startDate: timeForm.startDate,
+      endDate: timeForm.endDate,
+      startTime: timeForm.startTime,
+      endTime: timeForm.endTime
+    }
+  }).then(res => {
+    if (res.data.code === 0) {
+      confirm('禁用时段成功')
+    } else {
+      alert('禁用时段失败，请检查禁用时段的合理性')
+      console.log(res.data.message)
+    }
+  })
+  isDialogVisible.value = false
+};
+
+/**
+ * 当用户点击禁用时段弹框表单的关闭按钮时触发
+ * 关闭窗口
+ */
+const handleDisableTimeSlotClose = () => {
+  isDialogVisible.value = false
 };
 </script>
 
@@ -37,6 +105,17 @@ const navigateToAppointment = () => {
     </div>
     <div class="appointment-button">
       <ElButton type="primary" round @click="navigateToAppointment">发起预约 Appointment</ElButton>
+    </div>
+    <div v-if="authorityTable['classroom:approve']" class="ban-button">
+      <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>
+    </div>
+    <div class="ban-layer">
+      <DisableTimeSlot
+          :isDialogVisible="isDialogVisible"
+          :backend-data="local_backendData"
+          @submit="handleDisableTimeSlotSubmit"
+          @close="handleDisableTimeSlotClose">
+      </DisableTimeSlot>
     </div>
   </div>
 </template>
