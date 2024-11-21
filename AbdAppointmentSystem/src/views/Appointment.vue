@@ -237,13 +237,17 @@ onMounted(()=>{
 </template>
 
 <style scoped>
-
 .main-container {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.main-title h1 {
+  font-size: 40px;
+  font-weight: 600;
 }
 
 .main-title {
@@ -255,5 +259,4 @@ onMounted(()=>{
   margin-top: 20px;
   margin-bottom: 20px;
 }
-
 </style>

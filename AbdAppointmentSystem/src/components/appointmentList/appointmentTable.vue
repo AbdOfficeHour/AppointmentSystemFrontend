@@ -245,8 +245,8 @@ const handleModeChange = () => {
       </div>
       <div class="button-field">
         <el-select class="mode-option" placeholder="请选择预约类型" v-model="mode" @change="handleModeChange">
-          <el-option v-if="ifOfficeHour" value="officeHour">officeHour</el-option>
-          <el-option v-if="ifClassroom" value="教室预约">教室预约</el-option>
+          <el-option v-if="ifOfficeHour" value="officeHour" label="教师预约 OfficeHour">教师预约 OfficeHour</el-option>
+          <el-option v-if="ifClassroom" value="教室预约" label="教室预约 Classrooms">教室预约 Classrooms</el-option>
         </el-select>
         <operate-button
             :operate-type="1"
@@ -254,7 +254,6 @@ const handleModeChange = () => {
             @addEventClicked="()=>{emit('addEventClicked')}"
             v-if="props.operationMode === 'view' "/>
       </div>
-
       <el-table
           :data="pageData"
           :row-class-name="tableRowClassName"

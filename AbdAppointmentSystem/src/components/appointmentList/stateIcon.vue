@@ -82,10 +82,10 @@ const stateTitle = computed(()=>{
 }
 .state-6{
   background-color: #fffaeb;
-  color: #b54708;
+  color: #292727;
 }
 .state-6 span{
-  background-color: #f79009;
+  background-color: #949191;
 }
 .state-7{
   background-color: #cac8c8;
