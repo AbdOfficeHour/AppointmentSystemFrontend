@@ -82,6 +82,7 @@ const theadOfClassroom = [
     width:120
   },
   {
+    fixed:'left',
     name:"申请人",
     prop:"applicant",
     width:120
@@ -127,11 +128,13 @@ const theadOfClassroom = [
     width:120
   },
   {
+    fixed:"right",
     name:"事件状态",
     prop:"state",
     width:120
   },
   {
+    fixed: "right",
     name:"操作",
     prop:"operation",
     width:180
@@ -231,6 +234,10 @@ const handleModeChange = () => {
         <input type="radio" name="selectDate" value="2" v-model="selectDate">
         <span class="option-box">一年内</span>
       </label>
+      <label class="date-picker-option">
+        <input type="radio" name="selectDate" value="3" v-model="selectDate">
+        <span class="option-box">已取消</span>
+      </label>
     </div>
     <div class="appointment-table">
       <div class="icon-field">
@@ -260,8 +267,9 @@ const handleModeChange = () => {
           @row-click="(row,col,event)=>{emit('rowClick',row,col,event)}"
       >
         <el-table-column type="selection"/>
-        <el-table-column type="index" label="序号" width="60"/>
+        <el-table-column type="index" label="序号" width="60" fixed/>
         <el-table-column
+            :fixed="item.fixed"
             v-for="item in thead"
             :prop="item.prop"
             :label="item.name"
@@ -321,7 +329,7 @@ const handleModeChange = () => {
   position: relative;
   cursor: pointer;
   user-select: none;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   column-gap: 10px;
 }
 
