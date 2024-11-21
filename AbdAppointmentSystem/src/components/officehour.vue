@@ -120,6 +120,7 @@ import axios from "axios";
 import { onMounted } from 'vue';
 import {TimeFormat} from '@/utils/index/format'
 import router from '@/router';
+import {ElMessage} from "element-plus";
 
 interface RuleForm {
     teacher: string
@@ -258,11 +259,14 @@ const post_it = () => {
     console.log("postData",postData);
     axios.post('/Appointment/list/officehour', postData)
         .then(response => {
-            console.log('Response:', response.data);
-            window.location.reload();
+            if (response.data.code === 0) {
+                console.log('成功:', response.data);
+                window.location.reload();
+            } else {
+                ElMessage.error("因未知原因预约失败");
+            }
         })
         .catch(error => {
-
             console.error('Error:', error);
         });
 };
