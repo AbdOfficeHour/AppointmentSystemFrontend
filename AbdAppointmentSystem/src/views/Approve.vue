@@ -332,10 +332,14 @@ onMounted(()=>{
   align-items: center;
 }
 
+.main-title h1 {
+  font-size: 40px;
+  font-weight: 600;
+}
+
 .main-title {
   display: grid;
   grid-template-columns: 0.4fr 1fr;
-
   height: 78px;
   font-size: 24px;
   margin-top: 20px;
