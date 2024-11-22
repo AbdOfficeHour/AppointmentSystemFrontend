@@ -237,7 +237,7 @@ const handleModeChange = () => {
       </label>
       <label class="date-picker-option">
         <input type="radio" name="selectDate" value="3" v-model="selectDate">
-        <span class="option-box">已取消</span>
+        <span class="option-box">已撤回</span>
       </label>
     </div>
     <div class="appointment-table">

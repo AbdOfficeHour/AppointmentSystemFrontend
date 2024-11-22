@@ -52,7 +52,7 @@ const navigateToLogin = (tab) => {
         <h3 class="menu-title-sub">Navigation Bar</h3>
       </div>
       <el-menu-item index="1" class="menu-item" :class="{ active : selectedItem === '1' }" @click="selectItem('1')">
-        <router-link to="/index/classroom" >
+        <router-link to="/index/classroom" class="router-link-part">
           <div class="menu-item-text">
             <span>发起预约</span>
             <span>Initiate Appointment</span>
@@ -60,7 +60,7 @@ const navigateToLogin = (tab) => {
         </router-link>
       </el-menu-item>
       <el-menu-item index="2" class="menu-item" :class="{ active: selectedItem === '2' }" @click="selectItem('2')" >
-        <router-link to="/approve" >
+        <router-link to="/approve" class="router-link-part">
           <div class="menu-item-text">
             <span>审核预约</span>
             <span>Audit Appointment</span>
@@ -181,5 +181,9 @@ const navigateToLogin = (tab) => {
 span.active {
   color: #1890ff;
   font-weight: bold;
+}
+
+.router-link-part {
+  width: 100%;
 }
 </style>

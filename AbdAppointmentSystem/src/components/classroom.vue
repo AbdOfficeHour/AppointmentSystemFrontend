@@ -258,7 +258,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 
 //检查人数够不够
 const post_it=()=>{
-    if(ruleForm.present.length<3){
+    if(ruleForm.present.length<2){
         ElMessage.error('至少需要3名成员');
     }
     else {

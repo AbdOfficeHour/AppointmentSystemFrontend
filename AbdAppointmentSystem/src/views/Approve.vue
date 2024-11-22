@@ -150,16 +150,17 @@ const handleWorkSummary = () => {
       }
   )
       .then(res=>{
-
         if(res.status===200&&res.data.code===0){
           ElMessage.success("请求成功")
           window.location.reload()
-        }else {
-
+        }
+        else if (res.status === 200 && res.data.code === 103) {
+          ElMessage.warning("请在预约事件结束后一天再填写工作总结")
+        }
+        else {
           ElMessage.error("请求失败")
         }
       })
-
 }
 
 /**
