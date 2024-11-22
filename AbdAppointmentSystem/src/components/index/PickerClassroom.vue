@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 
 // 接收父组件传递的props
 const props = defineProps({
-  selectors: Array // Classroom选择器列表信息
+  selectors: Array, // Classroom选择器列表信息
 });
 
 // 向父组件传递的事件

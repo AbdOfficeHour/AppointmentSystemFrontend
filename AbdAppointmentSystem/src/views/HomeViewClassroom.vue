@@ -29,6 +29,8 @@ let allowClassroomInfo = ref(null) // 用户权限允许的教室的id - name映
 let classroomTimeTableOrigin = ref(null) // 后端返回的教室时间表数据直接存储于此变量
 classroomTimeTableOrigin.value = null // 数据项初始化为null，供子组件判定时间表是否为空
 
+let componentKey = ref(0) // 用于强制刷新子组件
+
 function getUserInfo() {
   /**
    * 从后端获取用户信息和权限信息
@@ -100,6 +102,7 @@ onMounted( function(){
   getUserInfo()
   // 从后端获取Classroom选择器信息
   getClassroomPickerInfo()
+  componentKey.value += 1
 })
 
 const handleSelectedClassroom = (classroom) => {
@@ -126,7 +129,10 @@ const handleSelectedClassroom = (classroom) => {
       />
     </div>
     <div class="picker-layer">
-      <PickerClassroom :selectors="allowClassroomInfo" @update:selectedClassroom="handleSelectedClassroom"/>
+      <PickerClassroom
+          :selectors="allowClassroomInfo"
+          :key="componentKey"
+          @update:selectedClassroom="handleSelectedClassroom"/>
     </div>
     <div class="table-layer">
       <div class="table-component">

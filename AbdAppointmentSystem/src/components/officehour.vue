@@ -285,12 +285,16 @@ const post_it = () => {
   console.log("postData", postData);
   axios.post('/Appointment/list/officehour', postData)
       .then(response => {
-        if (response.data.code === 0) {
+        if (response.status === 200 && response.data.code === 0) {
           console.log('成功:', response.data);
           window.location.reload();
           emit('closeDialog');
           ElMessage.success("预约成功");
-        } else {
+        }
+        else if (response.status === 200 && response.data.code === 101) {
+          ElMessage.warning("预约失败，此时段老师已拒绝过您的预约");
+        }
+        else {
           ElMessage.error("因未知原因预约失败");
         }
       })

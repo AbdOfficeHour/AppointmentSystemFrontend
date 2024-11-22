@@ -307,7 +307,11 @@ const postIt = () => {
           window.location.reload();
           emit('closeDialog');
           ElMessage.success('提交成功');
-        } else {
+        }
+        else if (response.status === 200 && response.data.code === 101) {
+          ElMessage.warning("预约失败，此时段审核已拒绝过您的预约");
+        }
+        else {
           ElMessage.error('提交失败')
         }
       })
