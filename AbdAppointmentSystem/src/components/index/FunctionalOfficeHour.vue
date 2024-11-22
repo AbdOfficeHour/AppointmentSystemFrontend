@@ -81,10 +81,10 @@ const handleDisableTimeSlotSubmit = (timeForm) => {
     else if (res.data.code === 101) {
       is_conflict_info_visible.value = true
       conflict_info.value = res.data.data.conflict_period
-      console.log(res.data.message)
+      console.log(conflict_info.value)
     }
     else {
-      alert('禁用时段失败，请检查禁用时段的合理性')
+      alert('禁用时段失败')
       console.log(res.data.message)
     }
   })

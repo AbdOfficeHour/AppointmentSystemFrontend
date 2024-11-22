@@ -208,7 +208,7 @@ function renderTimeline() {
       const timeText = document.createElement("span");
       timeText.classList.add("time-text");
       timeText.textContent = `${slot.start} - ${slot.end}`;
-      if (duration >= 900000) {
+      if (duration >= 1200000) {
         busyElement.appendChild(timeText);
       }
     });
@@ -275,13 +275,16 @@ body {
 }
 
 .busy-time-slot {
-  background-color: #b7b4b4; /*淡灰色*/
+  background-color: #b7b4b4; /* 淡灰色 */
   position: absolute;
   width: 100%;
   z-index: 1;
   display: grid;
   place-items: center;
+  border-top: 1px solid #000; /* 黑色顶部边框 */
+  border-bottom: 1px solid #000; /* 黑色底部边框 */
 }
+
 
 .available-time-slot {
   background-color: #d4dffd; /*淡蓝色*/
