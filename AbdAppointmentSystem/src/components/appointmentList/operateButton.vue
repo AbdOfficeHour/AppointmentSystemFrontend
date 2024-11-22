@@ -1,7 +1,8 @@
 <script setup>
 import {defineProps,defineEmits} from 'vue';
+import eventUtil from "@/utils/MyAppointment/eventUtil.js";
 
-const props = defineProps(["operateType","state","operateMode","eventId","mode"])
+const props = defineProps(["operateType","state","operateMode","eventId","mode","datetime"])
 const emit = defineEmits(["addEventClicked","editEventClicked"])
 
 
@@ -19,6 +20,10 @@ const handleAddEvent = () => {
 const handleEventOp = (operate) => {
   emit("editEventClicked",props.eventId,operate)
 }
+
+// 检查一下当前时间是否在事件时间之后
+
+
 
 </script>
 
@@ -54,6 +59,7 @@ const handleEventOp = (operate) => {
       </div>
       <div class="button-group" v-else-if="state === 3">
         <button
+            v-if="eventUtil.compareDate(props.datetime)"
             class="approve-button"
             style="color:#1d39c4"
             @click="handleEventOp(1)"
