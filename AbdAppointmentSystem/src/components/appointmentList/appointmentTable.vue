@@ -284,6 +284,7 @@ const handleModeChange = () => {
                 :operateMode="props.operationMode"
                 :event-id="scope.row.id"
                 :mode="mode"
+                :datetime="scope.row.originalDate"
                 @edit-event-clicked="(eventId,operate)=>{emit('editEventClicked',eventId,operate)}"
             />
           </template>

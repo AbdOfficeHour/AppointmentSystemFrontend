@@ -35,10 +35,6 @@ const userInfo = reactive({
   "username":""
 })
 
-if(route.query.if_appointment === "true"){
-  if(mode.value === 'officeHour')showOfficeHourAppoint.value = true
-  else showClassroomAppoint.value = true
-}
 
 /*
 请求部分
@@ -194,6 +190,18 @@ const handleAddButtonClick = ()=>{
     console.log("点击")
     showClassroomAppoint.value = true
   }
+}
+
+
+if(route.query.type == "officeHour"){
+  handleModeChange("officeHour")
+}else if(route.query.type == "classroom"){
+  handleModeChange("教室预约")
+}
+
+if(route.query.if_appointment === "true"){
+  if(mode.value === 'officeHour')showOfficeHourAppoint.value = true
+  else showClassroomAppoint.value = true
 }
 
 

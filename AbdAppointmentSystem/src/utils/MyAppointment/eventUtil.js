@@ -46,7 +46,8 @@ const EventUtils = {
                 note: item.note,
                 question: item.question,
                 state: item.state,
-                operation: 2
+                operation: 2,
+                originalDate: item.time.date
             })
         })
 
@@ -72,7 +73,8 @@ const EventUtils = {
                 aim:item.aim,
                 state: item.state,
                 events: item.events,
-                operation: 2
+                operation: 2,
+                originalDate: item.time.date
             })
         })
         return dataAfterFormat
@@ -131,6 +133,20 @@ const EventUtils = {
         }
 
         return formatData;
+    },
+
+    /**
+     * 对比现在的日期和指定的日期
+     */
+    compareDate(targetDate){
+        let today = new Date()
+        today = new Date(today.getFullYear(),today.getMonth(),today.getDate())
+        targetDate = new Date(targetDate)
+        targetDate = new Date(targetDate.getFullYear(),targetDate.getMonth(),targetDate.getDate())
+        const diff = (targetDate - today) / (1000*60*60*24);
+
+        return diff >= 2
+
     }
 
 }
