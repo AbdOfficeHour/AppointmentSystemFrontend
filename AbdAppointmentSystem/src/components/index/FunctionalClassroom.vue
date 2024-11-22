@@ -48,7 +48,8 @@ const navigateToAppointment = () => {
   router.push({
     name: 'Appointment', // 跳转至预约列表页面
     query: {
-      if_appointment: true
+      if_appointment: true,
+      type: "officeHour"
     }
   })
 };
