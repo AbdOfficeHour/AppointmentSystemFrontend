@@ -64,11 +64,13 @@ const theadOfOfficeHour = [
     prop:"question"
   },
   {
+    fixed:"right",
     name:"状态",
     prop:"state",
     width:120
   },
   {
+    fixed: "right",
     name:"操作",
     prop:"operation",
     width:180
@@ -82,7 +84,6 @@ const theadOfClassroom = [
     width:120
   },
   {
-    fixed:'left',
     name:"申请人",
     prop:"applicant",
     width:120
