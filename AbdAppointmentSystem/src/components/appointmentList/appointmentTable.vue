@@ -125,7 +125,7 @@ const theadOfClassroom = [
   },
   {
     name:"活动内容",
-    prop:"event",
+    prop:"events",
     width:120
   },
   {
