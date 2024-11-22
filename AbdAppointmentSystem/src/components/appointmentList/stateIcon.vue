@@ -13,7 +13,7 @@ const stateTitle = computed(()=>{
   else if (props.state===5)
     return "已完成"
   else if (props.state===6)
-    return "已取消"
+    return "已撤回"
   else if (props.state===7)
     return "已超时"
 })
