@@ -18,7 +18,7 @@ const EventUtils = {
         isMedia:"是否使用投影仪",
         isComputer:"是否使用电脑",
         isSound:"是否使用音响",
-        event:"活动内容",
+        events:"活动内容",
         aim:"使用目的"
     },
 
@@ -71,7 +71,7 @@ const EventUtils = {
                 isSound:item.isSound?"是":"否",
                 aim:item.aim,
                 state: item.state,
-                event: item.event,
+                events: item.events,
                 operation: 2
             })
         })
