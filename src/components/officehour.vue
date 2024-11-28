@@ -172,17 +172,6 @@ const usefulTime = ref([]) //可用时间
 
 //初始化可选教师姓名
 onMounted(() => {
-  console.log("挂载中")
-  teachers.value = [{
-    "teacherName": "Anna",
-    "teacherID": "101"
-  }, {
-    "teacherName": "Bod",
-    "teacherID": "102"
-  }, {
-    "teacherName": "Car",
-    "teacherID": "103"
-  },]  //老师们的名字和id
 
   axios.get('/Appointment/list/officehour/pickerList')
       .then(response => {
@@ -282,7 +271,7 @@ const post_it = () => {
     "question": ruleForm.question,
     "present": ruleForm.present
   };
-  console.log("postData", postData);
+  // console.log("postData", postData);
   axios.post('/Appointment/list/officehour', postData)
       .then(response => {
         if (response.status === 200 && response.data.code === 0) {
@@ -386,8 +375,10 @@ const disabledDate = date => !allowedDates().includes(date.toDateString());
 
 //根据日期显示时间范围
 const selectedTimes = () => {
+
   const dateTimestamp = ruleForm.date.getTime();
   const timeEntry = usefulTime.value.find(entry => entry.date === dateTimestamp);
+  // console.log("office",timeEntry.times);
   if (timeEntry) {
     // console.log(timeEntry.times);
     return timeEntry.times;
@@ -400,10 +391,10 @@ const selectedTimes = () => {
 
 //合并所有时间范围并返回范围
 const disabledHours = () => {
+  // console.log("disabledHours office");
   const timeList = selectedTimes();
-  // console.log("disabledHours", timeList);
   if (!timeList) return allHours;
-
+  // console.log("disabledHours office", timeList);
   for (let i = 0; i < timeList.length; i++) {
     const st = timeList[i].startTime;
     const ed = timeList[i].endTime;
