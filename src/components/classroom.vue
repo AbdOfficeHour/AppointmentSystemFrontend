@@ -167,13 +167,13 @@ import {TimeFormat} from '@/utils/index/format'
 
 interface RuleForm {
   classroom: string
-  date: number
-  start_time: number
-  end_time: number
+  date:  Date
+  start_time: Date
+  end_time: Date
   isMedia: boolean// 是否使用投影仪
   isComputer: boolean // 是否使用电脑
   isSound: boolean // 是否使用音响
-  present: [string] // 参与成员数据库id主键对应值的字符串
+  present: string[] // 参与成员数据库id主键对应值的字符串
   aim: string // 使用目的（枚举类）
   events: string // 活动内容
   state: number // 事件状态
@@ -188,7 +188,6 @@ const usefulTime = ref([]) //可用时间
 
 //初始化可选教师姓名
 onMounted(() => {
-  console.log("挂载中")
   axios.get('/Appointment/list/classroom/pickerList')
       .then(response => {
         classrooms.value = response.data.data.classrooms;
@@ -196,7 +195,6 @@ onMounted(() => {
       .catch(error => {
         console.error('错误:', error);
       });
-
 });
 
 
@@ -210,9 +208,9 @@ const formSize = ref<ComponentSize>('default')
 const ruleFormRef = ref<FormInstance>()
 const ruleForm = reactive<RuleForm>({
   classroom: "",
-  date: 0,
-  start_time: 0,
-  end_time: 0,
+  date: new Date(),
+  start_time: new Date(),
+  end_time: new Date(),
   isMedia: false, // 是否使用投影仪
   isComputer: false, // 是否使用电脑
   isSound: false, // 是否使用音响
@@ -327,6 +325,7 @@ const getTime = () => {
   axios.get(`/Appointment/list/classroom/pickerTime/${ruleForm.classroom}`)
       .then(response => {
         usefulTime.value = response.data.data.dateTime;
+
       })
       .catch(error => {
         console.error('错误:', error);
@@ -401,8 +400,10 @@ const disabledDate = date => !allowedDates().includes(date.toDateString());
 
 //根据日期显示时间范围
 const selectedTimes = () => {
-  const dateTimestamp = ruleForm.date;
+
+  const dateTimestamp = ruleForm.date.getTime();
   const timeEntry = usefulTime.value.find(entry => entry.date === dateTimestamp);
+  // console.log("class",usefulTime.value);
   if (timeEntry) {
     // console.log(timeEntry.times);
     return timeEntry.times;
@@ -415,10 +416,10 @@ const selectedTimes = () => {
 
 //合并所有时间范围并返回范围
 const disabledHours = () => {
+  // console.log("disabledHours class");
   const timeList = selectedTimes();
-  // console.log("disabledHours", timeList);
+  // console.log("disabledHours class", timeList);
   if (!timeList) return allHours;
-
   for (let i = 0; i < timeList.length; i++) {
     const st = timeList[i].startTime;
     const ed = timeList[i].endTime;
@@ -552,7 +553,6 @@ const get_TimeRange = () => {
     ed = createDateFromTimeString(timestampToHourMinute(ed));
     if (st <= start_obj && start_obj <= ed) return [start_obj, ed];
   }
-  ;
   return false;
 };
 
