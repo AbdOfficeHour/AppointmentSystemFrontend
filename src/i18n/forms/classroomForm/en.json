@@ -1,0 +1,50 @@
+{
+  "form": {
+    "title": "Room Appointment",
+    "name": "Name",
+    "studentID": "Student ID",
+    "selectClassroom": "Select Classroom",
+    "selectDate": "Select Date",
+    "selectTime": "Select Time",
+    "nature": "Activity",
+    "selectNature": "Select Activity",
+    "purpose": "Purpose",
+    "events": "Event Details",
+    "equipment": "Equipment",
+    "projector": "Projector",
+    "computer": "Computer",
+    "sound": "Sound",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "searchMember": "Search Member",
+    "addMember": "Add",
+    "removeMember": "Remove",
+    "updateMember": "More",
+    "memberList": "Member List",
+    "AppointmentSuccess": "Submitted successfully",
+    "firstToDo": "Please select the space and date for your reservation first",
+    "secondToDo": "You can hover your mouse over the timeline to view the description",
+    "error": {
+      "selectClassroom": "Please select a classroom",
+      "selectDate": "Please select a date",
+      "selectTime": "Please select a start and end time",
+      "selectNature": "Please select the activity",
+      "enterPurpose": "Please enter a purpose",
+      "submitFailed": "Submission failed",
+      "minEventsLength": "Event details must be at least 5 characters",
+      "enterEvents": "Please enter event details",
+      "startTimeError": "Start time cannot be later than the end time",
+      "EndTimeError": "End time cannot be earlier than the start time",
+      "AppointmentFailed": "Submission failed, please try again",
+      "AppointmentTimeConflict": "Appointment time conflict, please choose a new time",
+      "MemberNumberError": "At least 3 members are required"
+    },
+    "purposeOptions": {
+      "meeting": "Meeting",
+      "seminar": "Seminar",
+      "team_building": "Team Building",
+      "lecture": "Lecture",
+      "other": "Other"
+    }
+  }
+}

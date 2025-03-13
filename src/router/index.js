@@ -1,19 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
 import HomeViewOfficeHour from "@/views/HomeViewOfficeHour.vue";
 import HomeViewClassroom from "@/views/HomeViewClassroom.vue";
 import Appointment from "@/views/Appointment.vue";
 import Approve from "@/views/Approve.vue";
-import login from "@/views/login.vue";
+import Setting from "@/views/Setting.vue";
+import Login from "@/views/LoginTest.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/login',
-      name: 'login',
-      component: login
-    },
     { // 教室预约首页 - 默认
       path: '/',
       name: 'HomeViewClassroomWithNone',
@@ -38,7 +33,17 @@ const router = createRouter({
       path: '/approve',
       name: 'approve',
       component: Approve
-    }
+    },
+    { // 设置页面
+      path: "/setting",
+      name: "setting",
+      component: Setting
+    },
+    { // 仅在开发环境下的登录界面
+      path: '/login',
+      name: 'login',
+      component: Login
+    },
   ]
 })
 

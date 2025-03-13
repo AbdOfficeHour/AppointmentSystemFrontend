@@ -1,0 +1,6 @@
+{
+  "unavailableTimeTip": "不可用时段",
+  "availableTimeTip": "可用时段",
+  "illegalTimeTip": "冲突时间段",
+  "selectedBarTip": "已选时段"
+}

@@ -1,10 +1,10 @@
 <script setup>
+import { ref, watch } from 'vue';
+import { useI18n } from "vue-i18n";
 import router from "@/router/index.js";
-import axios from "axios";
-import { onMounted, ref, watch } from 'vue';
-
-import DisableTimeSlot from "@/components/index/DisableTimeSlot.vue";
-
+import { axiosInsV1_1 as axios } from '/src/service/axiosServer.js'
+import DisableTimeSlot from "@/components/index/disableTimeSlot.vue";
+import ConflictInfo from "@/components/index/conflictInfo.vue";
 
 // 接收父组件传递的props
 const props = defineProps({
@@ -13,7 +13,7 @@ const props = defineProps({
   userId: String // 用户id
 })
 
-// FunctionalOfficeHour组件全局变量定义
+const { t } = useI18n(); // 国际化翻译函数
 let local_authorityTable = ref(null); // 父组件传入的用户权限表，本地暂存
 let local_backendData = ref(null); // 父组件传入的后端返回时间表，本地暂存
 let local_userId = ref(null); // 父组件传入用户id，本地暂存
@@ -22,24 +22,9 @@ let conflict_info = ref(null); // 冲突信息
 let is_conflict_info_visible = ref(false); // 冲突信息是否可见
 
 /**
- * FunctionalOfficeHour组件初始化
- */
-onMounted(() => {
-  console.log('FunctionalOfficeHour组件开始挂载');
-});
-
-/**
- * 监听父组件传入参数变更
- */
-watch(props, (newVal) => {
-  local_authorityTable.value = newVal.authorityTable;
-  local_backendData.value = newVal.backendData;
-  local_userId.value = newVal.userId;
-})
-
-/**
- * 当用户点击预约按钮时触发
+ * @description 当用户点击预约按钮时触发
  * 根据用户当前所在平台和选择的教师/教室跳转至对应的预约页面
+ * @returns {void}
  */
 const navigateToAppointment = () => {
   router.push({
@@ -52,16 +37,19 @@ const navigateToAppointment = () => {
 };
 
 /**
- * 当用户点击禁用时段按钮时触发
+ * @description 当用户点击禁用时段按钮时触发
  * 弹出禁用时段弹框表单
+ * @returns {void}
  */
 const banTimeShow = () => {
   isDialogVisible.value = true
 };
 
 /**
- * 当用户点击禁用时段弹框表单的提交按钮时触发
+ * @description 当用户点击禁用时段弹框表单的提交按钮时触发
  * 关闭窗口，表单数据提交由子组件DisableTimeSlot处理
+ * @param timeForm - 禁用时段表单数据
+ * @returns {void}
  */
 const handleDisableTimeSlotSubmit = (timeForm) => {
   axios({
@@ -75,7 +63,7 @@ const handleDisableTimeSlotSubmit = (timeForm) => {
     }
   }).then(res => {
     if (res.data.code === 0) {
-      confirm('禁用时段成功')
+      confirm(t('index.ban_time_success'))
       location.reload();
     }
     else if (res.data.code === 101) {
@@ -84,7 +72,7 @@ const handleDisableTimeSlotSubmit = (timeForm) => {
       console.log(conflict_info.value)
     }
     else {
-      alert('禁用时段失败')
+      alert(t('index.ban_time_fail'))
       console.log(res.data.message)
     }
   })
@@ -92,12 +80,20 @@ const handleDisableTimeSlotSubmit = (timeForm) => {
 };
 
 /**
- * 当用户点击禁用时段弹框表单的关闭按钮时触发
+ * @description 当用户点击禁用时段弹框表单的关闭按钮时触发
  * 关闭窗口
+ * @returns {void}
  */
 const handleDisableTimeSlotClose = () => {
   isDialogVisible.value = false
 };
+
+// 监听父组件传入的props
+watch(props, (newVal) => {
+  local_authorityTable.value = newVal.authorityTable;
+  local_backendData.value = newVal.backendData;
+  local_userId.value = newVal.userId;
+})
 </script>
 
 <template>
@@ -106,19 +102,27 @@ const handleDisableTimeSlotClose = () => {
       <div class="legend">
         <div class="legend-item">
           <span class="color-box free"></span>
-          <span>空闲，可以预约 Available by appointment</span>
+          <span>{{ t("index.available_to_appoint") }}</span>
         </div>
         <div class="legend-item">
           <span class="color-box busy"></span>
-          <span>繁忙，不可预约 Not Available by appointment</span>
+          <span>{{ t("index.not_available_to_appoint") }}</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-box waiting"></span>
+          <span>{{ t("index.waiting_to_appoint") }}</span>
+        </div>
+        <div class="legend-item">
+          <img src="/icon/hint_black.svg" alt="hint" class="color-box"/>
+          <span>{{ t("index.office_hour_hint") }}</span>
         </div>
       </div>
       <div class="button-layer">
         <div v-if="authorityTable['OfficeHour:appointment']" class="appointment-button">
-          <ElButton type="primary" round @click="navigateToAppointment">发起预约 Appointment</ElButton>
+          <ElButton type="primary" round @click="navigateToAppointment">{{ t("index.init_appointment") }}</ElButton>
         </div>
         <div v-if="authorityTable['OfficeHour:approve']" class="ban-button">
-          <ElButton type="danger" round @click="banTimeShow">禁用时段 Disable Time Slot</ElButton>
+          <ElButton type="danger" round @click="banTimeShow">{{ t("index.disable_time_slot") }}</ElButton>
         </div>
       </div>
     </div>
@@ -169,7 +173,7 @@ const handleDisableTimeSlotClose = () => {
 }
 
 .color-box.free {
-  background-color: #b7caea;
+  background-color: #71a66e;
   border-style: solid;
 }
 
@@ -178,10 +182,27 @@ const handleDisableTimeSlotClose = () => {
   border-style: solid;
 }
 
+.color-box.waiting {
+  background-color: #f3ce63;
+  border-style: solid;
+}
+
 .button-layer {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+@media (min-width: 960px) {
+  .button-layer {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 959px) {
+  .button-layer {
+    flex-direction: column;
+  }
 }
 
 .appointment-button,

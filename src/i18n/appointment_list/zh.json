@@ -1,0 +1,129 @@
+{
+    "title": {
+        "myappointment": "我的预约",
+        "myapprove": "预约审批"
+    },
+    "datePicker": {
+        "0": "三个月内",
+        "1": "半年内",
+        "2": "一年内",
+        "3": "已撤回"
+    },
+    "stateIcon": {
+        "2": "等待中",
+        "3": "已同意",
+        "4": "已拒绝",
+        "5": "已完成",
+        "6": "已撤回",
+        "7": "已超时"
+    },
+    "modeButton": {
+        "classroom": "空间预约",
+        "officehour": "Office Hour预约"
+    },
+    "no": "序号",
+    "officehourHead": {
+        "no": "序号",
+        "teacher_name": "预约教师",
+        "student_name": "预约学生",
+        "date": "日期",
+        "startTime": "开始时间",
+        "endTime": "结束时间",
+        "note": "备注",
+        "question": "要咨询的问题",
+        "state": "状态",
+        "operation": "操作"
+    },
+    "classroomHead": {
+        "no": "序号",
+        "classroom": "教室",
+        "applicant": "申请人",
+        "date": "日期",
+        "startTime": "开始时间",
+        "endTime": "结束时间",
+        "isMedia": "是否使用投影仪",
+        "isComputer": "是否使用电脑",
+        "isSound": "是否使用音响",
+        "aim": "使用目的",
+        "events": "活动内容",
+        "state": "事件状态",
+        "operation": "操作"
+    },
+    "detailMessage": {
+        "student_name": "学生姓名",
+        "teacher_name": "教师姓名",
+        "note": "备注",
+        "question": "要咨询的问题",
+        "present": "参与人员",
+        "state": "状态",
+        "refuse_result": "拒绝原因",
+        "work_summary": "工作总结",
+        "withdrawl_reason": "撤回原因",
+        "applicant": "申请人",
+        "approver": "审批人",
+        "classroom": "教室",
+        "isMedia": "是否使用投影仪",
+        "isComputer": "是否使用电脑",
+        "isSound": "是否使用音响",
+        "events": "活动内容",
+        "aim": "使用目的",
+        "date": "日期",
+        "startTime": "开始时间",
+        "endTime": "结束时间",
+        "data": "数据",
+        "true": "是",
+        "false": "否",
+        "null": "无",
+        "noPresent": "没有其他参与人员",
+        "teacher_course": "课程",
+        "teacher_room": "地点"
+    },
+    "buttons": {
+        "addAppointment": "添加预约",
+        "cancelAppointment": "取消预约",
+        "noOperate": "没有操作",
+        "accept": "同意",
+        "reject": "拒绝",
+        "withdraw": "撤回",
+        "complete": "完成",
+        "can_no_withdraw": "撤回需在活动开始前48小时之前完成"
+    },
+    "officehourCard": {
+        "teacher": "教师",
+        "time": "时间段"
+    },
+    "classroomCard": {
+        "classroom": "教室",
+        "time": "时间段",
+        "applicant": "申请人"
+    },
+    "moveHit": "向左滑动卡片以显示操作",
+    "dialog": {
+        "detailMessage": "详细信息",
+        "refuse_reason": "拒绝原因",
+        "work_summary": "工作总结",
+        "work_summary_message": "请输入你的工作总结",
+        "refuse_reason_message": "请输入你的拒绝原因",
+        "withdraw_reason": "撤回原因",
+        "withdraw_reason_message": "请输入你的撤回原因",
+        "confirm": "确认",
+        "cancel": "取消"
+    },
+    "hitDialog": {
+        "data_get_error": "获取数据失败",
+        "hit": "提示",
+        "no_appointment_auth": "您没有预约权限",
+        "no_approve_auth": "您没有审批权限",
+        "confirm": "确定",
+        "cancel": "取消",
+        "cancel_success": "取消成功",
+        "accept_success": "同意成功",
+        "request_fail": "请求失败",
+        "request_success": "请求成功",
+        "cannot_complete": "请在预约事件结束后一天再填写工作总结",
+        "confirm_accept": "确定要同意该预约吗",
+        "refuse_no_blank": "拒绝原因不能为空",
+        "withdrawl_no_blank": "撤回原因不能为空",
+        "work_summary_no_blank": "工作总结不能为空"
+    }
+}

@@ -1,19 +1,16 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
-
-import PickerOfficeHour from "@/components/index/PickerOfficeHour.vue";
-import TableComponent from "@/components/index/TableComponent.vue";
-import FunctionalOfficeHour from "@/components/index/FunctionalOfficeHour.vue";
-
-import { UserInfoFormat, PickerFormat } from "@/utils/index/format.js";
-
-// HomeViewOfficeHour组件全局变量定义
+import { axiosInsV1_1 as axios } from '/src/service/axiosServer.js'
+import { UserInfoFormat, PickerFormat } from "@/utils/dataFormat.js";
+import { useI18n } from "vue-i18n";
+import PickerOfficeHour from "@/components/index/pickerOfficeHour.vue";
+import FunctionalOfficeHour from "@/components/index/functionalOfficeHour.vue";
+import TimeTableBarOfficeHour from "@/components/index/timeTableBarOfficeHour.vue";
+import { ElMessage } from "element-plus";
 
 // 用户基本信息
 let username = ref(null) // 用户名
 let userID = ref(null) // 用户ID(与其他系统对齐为学生学号/教师工号)
-let email = ref(null) // 用户邮箱
 let role = ref([]) // 后端返回的权限信息
 let credits = ref([]) // 后端返回的用户权限
 let authorityTable = ref({}) // 经过格式化后的权限表
@@ -27,10 +24,17 @@ let getOfficeHourSelectionId = ref(null) // 被用户选中的教师 或 教师�
 
 // OfficeHour的基本变量 - Table Layer
 let officeHourTimeTableOrigin = ref(null) // 后端返回的教师时间表数据直接存储于此变量
-officeHourTimeTableOrigin.value = null // 数据项初始化为null，供子组件判定时间表是否为空来条件渲染
+
+// 渲染逻辑相关基本变量
+let pickerComponentKey = 0
+let tableComponentKey = 0
+let userInfoLoading = ref(true)
+let pickerLoading = ref(true)
+let tableChangeLoading = ref(false)
+let { t } = useI18n() // 国际化翻译函数
 
 /**
- * 当不具有OfficeHour:timeTable:all权限（通常为教师）的用户进入OfficeHour平台时触发，向后端请求自己的时间表数据
+ * @description 当不具有OfficeHour:timeTable:all权限（通常为教师）的用户进入OfficeHour平台时触发，向后端请求自己的时间表数据
  */
 function getTeacherTableInfoWithNoSelector(){
   axios({
@@ -41,14 +45,14 @@ function getTeacherTableInfoWithNoSelector(){
       officeHourTimeTableOrigin.value = res.data.data
     }
     else {
-      console.warn("请求失败，获取 教师 时间表内信息失败")
+      console.error("请求失败，获取教师时间表内信息失败")
       console.log(res.data.message)
     }
   })
 }
 
 /**
- * 从后端获取用户信息和权限信息
+ * @description 获取用户信息和权限信息
  */
 function getUserInfo() {
   axios({
@@ -61,21 +65,23 @@ function getUserInfo() {
       authorityTable.value = UserInfoFormat.credit_format(credits.value) // 格式化权限信息
       username.value = res.data.data.username // 用户姓名
       userID.value = res.data.data.userID // 用户学号/工号
-      email.value = res.data.data.email // 用户邮箱
+      // 从后端获取OfficeHour选择器内信息
+      getOfficeHourPickerInfo()
       if (authorityTable.value['OfficeHour:timeTable:all'] === false){
         // 当不具有OfficeHour:timeTable:all权限（通常为教师）的用户进入OfficeHour平台时触发，向后端请求自己的时间表数据
         getTeacherTableInfoWithNoSelector();
       }
     }
     else{
-      console.warn("请求失败，获取用户信息和权限信息失败")
+      console.error("请求失败，获取用户信息和权限信息失败")
       console.log(res.data.message)
     }
+    userInfoLoading.value = false
   })
 }
 
 /**
- * 从后端获取OfficeHour选择器内信息
+ * @description 获取OfficeHour选择器内选项信息
  */
 function getOfficeHourPickerInfo() {
   axios({
@@ -88,14 +94,15 @@ function getOfficeHourPickerInfo() {
       allTeacherInfo.value = PickerFormat.all_teacher_info(teacherList.value) // 格式化教师列表信息，用于id - name映射表
     }
     else{
-      console.warn("请求失败，获取教室选择器内选项信息失败")
+      console.error("请求失败，获取教室选择器内选项信息失败")
       console.log(res.data.message)
     }
   })
+  pickerComponentKey += 1
 }
 
 /**
- * 通过选中的教师的ID向后端动态路由请求数据
+ * @description 依据选中的教师，获取教师时间表内信息
  */
 function getOfficeHourTableInfo() {
   axios({
@@ -106,27 +113,33 @@ function getOfficeHourTableInfo() {
       officeHourTimeTableOrigin.value = res.data.data
     }
     else {
-      console.warn("请求失败，获取 教师 时间表内信息失败")
+      console.error("请求失败，获取 教师 时间表内信息失败")
       console.log(res.data.message)
+      tableChangeLoading.value = false
+      ElMessage.error(t("index.fail_to_load_table_info"))
     }
   })
+  tableComponentKey += 1
 }
 
 /**
- * HomeViewOfficeHour组件初始化
- * 向后端请求数据，获取用户信息、权限信息、选择器内信息
+ * @description 时间表加载完毕
  */
-onMounted( function(){
-  console.log("HomeViewOfficeHour组件开始挂载")
-  // 从后端获取用户信息和权限信息
-  getUserInfo()
-  // 从后端获取OfficeHour选择器内信息
-  getOfficeHourPickerInfo()
-})
+const tableLoadingDone = () => {
+  tableChangeLoading.value = false
+}
 
 /**
- * 当接收到来自PickerOfficeHour组件传递的选中教师发生变更时触发
+ * @description 选择器加载完毕
+ */
+const pickerLoadingDone =() => {
+  pickerLoading.value = false
+}
+
+/**
+ * @description 当接收到来自PickerOfficeHour组件传递的选中教师发生变更时触发
  * 保存用户的变更，用于后续向后端请求时间表数据进行渲染
+ * @param teacher - 选中的教师信息
  */
 const handleSelectedTeacher = (teacher) => {
   if (teacher === "no teachers available") {
@@ -142,27 +155,46 @@ const handleSelectedTeacher = (teacher) => {
     getOfficeHourSelectionId.value = PickerFormat.get_id_by_teacher_name(teacher, allTeacherInfo.value)
 
     // 通过选中的教师的ID向后端动态路由请求数据
+    tableChangeLoading.value = true
     getOfficeHourTableInfo()
   }
 };
-</script >
+
+// Mounted生命周期钩子，用于初始化页面，获取用户信息和权限信息
+onMounted( function(){
+  userInfoLoading.value = true
+  pickerLoading.value = true
+  tableChangeLoading.value = false
+  // 从后端获取用户信息和权限信息
+  getUserInfo()
+})
+</script>
 
 <template>
   <div class="app-container">
     <div class="functional-layer">
-      <FunctionalOfficeHour :authority-table="authorityTable" :backend-data="officeHourTimeTableOrigin" :user-id="userID"/>
+      <FunctionalOfficeHour
+        :authority-table="authorityTable"
+        :backend-data="officeHourTimeTableOrigin"
+        :user-id="userID"
+      />
     </div>
     <div class="picker-layer">
-      <div v-if="authorityTable['OfficeHour:timeTable:all']" class="picker-tutor-stu">
-        <PickerOfficeHour :selectors="pickerTeacherListFormat" @update:selectedTeacher="handleSelectedTeacher" />
+      <div v-if="authorityTable['OfficeHour:timeTable:all']" class="picker-tutor-stu"  v-loading="pickerLoading">
+        <PickerOfficeHour
+          :selectors="pickerTeacherListFormat"
+          @update:selectedTeacher="handleSelectedTeacher"
+          @loading-done="pickerLoadingDone"
+          :key="pickerComponentKey"
+        />
       </div>
     </div>
-    <div class="table-layer">
+    <div class="table-layer" v-loading="tableChangeLoading">
       <div class="table-component">
-        <TableComponent
-            :backend-data="officeHourTimeTableOrigin"
-            :authority-table="authorityTable"
-            :is-office-hour="true"
+        <TimeTableBarOfficeHour
+          :backend-data="officeHourTimeTableOrigin"
+          :authority-table="authorityTable"
+          @loading-done="tableLoadingDone"
         />
       </div>
     </div>
@@ -170,21 +202,15 @@ const handleSelectedTeacher = (teacher) => {
 </template>
 
 <style scoped>
-.table-component {
-  display: flex;
-  height: 100%;
-  width: 100%;
-}
-
 .app-container {
-  height: 1200px;
+  min-height: 1200px;
   background-color: #F7FAFF;
   display: flex;
   flex-direction: column;
 }
 
 .table-layer {
-  flex-grow: 1; /* Allow the table layer to expand */
+  height: auto;
   display: flex;
   flex-direction: column;
 }

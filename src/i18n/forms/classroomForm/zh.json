@@ -1,0 +1,50 @@
+{
+  "form": {
+    "title": "空间预约",
+    "name": "姓名",
+    "studentID": "学号",
+    "selectClassroom": "选择教室",
+    "selectDate": "选择日期",
+    "selectTime": "选择时间",
+    "nature": "活动性质",
+    "selectNature": "选择性质",
+    "purpose": "使用目的",
+    "events": "活动内容",
+    "equipment": "仪器设备",
+    "projector": "投影仪",
+    "computer": "电脑",
+    "sound": "音响",
+    "cancel": "取消",
+    "confirm": "确认",
+    "searchMember": "搜索成员",
+    "addMember": "加入",
+    "removeMember": "删除",
+    "updateMember": "更多",
+    "memberList": "人员名单",
+    "AppointmentSuccess": "提交成功",
+    "firstToDo": "请先选择预约空间和日期",
+    "secondToDo": "可用鼠标靠近时间条查看说明",
+    "error": {
+      "selectClassroom": "请选择教室",
+      "selectDate": "请选择日期",
+      "selectTime": "请选择开始和结束时间",
+      "selectNature": "请选择活动性质",
+      "enterPurpose": "请填写使用目的",
+      "submitFailed": "提交失败",
+      "minEventsLength": "活动内容至少需要 5 个字符",
+      "enterEvents": "请填写活动内容",
+      "startTimeError": "开始时间不能晚于结束时间",
+      "EndTimeError": "结束时间不能早于开始时间",
+      "AppointmentFailed": "提交失败,请重试",
+      "AppointmentTimeConflict": "预约时间冲突,请重新选择时间",
+      "MemberNumberError": "至少需要3名成员"
+    },
+    "purposeOptions": {
+      "meeting": "会议",
+      "seminar": "研讨",
+      "team_building": "团建",
+      "lecture": "讲座",
+      "other": "其他"
+    }
+  }
+}

@@ -1,8 +1,10 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+/**
+ * 当前组件已弃用，以类似课程表的表格形式渲染时间表。
+ */
 
-import { TableFormat } from "@/utils/index/format.js";
-/* 注: 由于时间粒度为1分钟的需求，难以复用现有的开源框架内组件，本组件从DOM树开始实现 */
+import { ref, onMounted, watch } from 'vue';
+import { TableFormat } from "@/utils/dataFormat.js";
 
 // 接收父组件传递的props
 const props = defineProps(
@@ -13,51 +15,9 @@ const props = defineProps(
     ]
 );
 
-// TableComponent组件全局变量定义
 const totalMinutes = 12 * 60 * 60 * 1000; // 12小时对应的毫秒数（8：00-20：00）
 let timeSlots = ref([]); // 用于渲染的时间表信息
 let local_authorityTable = ref({}); // 本地权限表
-
-/**
- * 监听父组件传入参数的变更
- */
-watch(props, (newVal) => {
-  if (newVal.backendData === null) {
-    // 父组件传入后端时间表数据为空，则渲染空时间表提示
-    renderNoTable()
-  }
-  else {
-    let backendDataTemp = newVal.backendData;
-    if (props.authorityTable) {
-      // 父组件传入了权限表数据，按照权限表数据渲染
-      local_authorityTable.value = newVal.authorityTable;
-    }
-    else {
-      // 父组件传入权限表为空，为学生选中了"no teachers available"，按照默认权限表数据渲染
-      local_authorityTable.value = {
-        'OfficeHour:approve': false,
-      }
-    }
-    let timeTableTemp = backendDataTemp.timeTable;
-    timeSlots.value = TableFormat.timetable_format(timeTableTemp); // 格式化传入数据为渲染用数据
-    renderTimeline(); // 执行时间表渲染，修改DOM树
-  }
-});
-
-/**
- * TableComponent组件初始化
- * 依据父组件传入的数据决定渲染逻辑
- */
-onMounted(() => {
-  console.log('TableComponent组件开始挂载');
-  clearTimeTable();
-  if (props.backendData === null){
-    renderNoTable(); // 父组件传入空数据，代表不具备可渲染数据，修改DOM树为空时间表提示
-  }
-  else{
-    renderTimeline(); // 父组件传入时间表数据，执行时间表渲染，修改DOM树为时间表结构
-  }
-});
 
 /**
  * 在DOM树中查询到时间表对应的标签
@@ -231,6 +191,42 @@ function renderTimeline() {
     appTable.appendChild(timeline); // 挂载至 #app .page-container .table-layer下
   });
 }
+
+// 监听父组件传入的数据，当数据发生变化时执行回调函数
+watch(props, (newVal) => {
+  if (newVal.backendData === null) {
+    // 父组件传入后端时间表数据为空，则渲染空时间表提示
+    renderNoTable()
+  }
+  else {
+    let backendDataTemp = newVal.backendData;
+    if (props.authorityTable) {
+      // 父组件传入了权限表数据，按照权限表数据渲染
+      local_authorityTable.value = newVal.authorityTable;
+    }
+    else {
+      // 父组件传入权限表为空，为学生选中了"no teachers available"，按照默认权限表数据渲染
+      local_authorityTable.value = {
+        'OfficeHour:approve': false,
+      }
+    }
+    let timeTableTemp = backendDataTemp.timeTable;
+    timeSlots.value = TableFormat.timetable_format(timeTableTemp); // 格式化传入数据为渲染用数据
+    renderTimeline(); // 执行时间表渲染，修改DOM树
+  }
+});
+
+// Mounted生命周期钩子函数，组件挂载时执行，用于初始化渲染时间表
+onMounted(() => {
+  console.log('TableComponent组件开始挂载');
+  clearTimeTable();
+  if (props.backendData === null){
+    renderNoTable(); // 父组件传入空数据，代表不具备可渲染数据，修改DOM树为空时间表提示
+  }
+  else{
+    renderTimeline(); // 父组件传入时间表数据，执行时间表渲染，修改DOM树为时间表结构
+  }
+});
 </script>
 
 <template>

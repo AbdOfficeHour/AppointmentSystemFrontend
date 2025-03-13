@@ -1,0 +1,34 @@
+{
+  "form": {
+    "title": "OfficeHour",
+    "name": "Name",
+    "studentID": "Student ID",
+    "selectTeacher": "Select Teacher",
+    "selectDate": "Select Date",
+    "selectTime": "Select Time",
+    "question": "Enter your question",
+    "note": "Note (Optional)",
+    "searchMember": "Search Member",
+    "addMember": "Add",
+    "removeMember": "Remove",
+    "updateMember": "More",
+    "memberList": "Member List",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "AppointmentSuccess": "Appointment successful",
+    "office": "Office",
+    "course": "Course",
+    "firstToDo": "Please select the teacher and date for your reservation first",
+    "secondToDo": "You can hover your mouse over the timeline to view the description",
+    "error": {
+      "selectTeacher": "Please select a teacher",
+      "selectDate": "Please select a date",
+      "selectTime": "Please select a time",
+      "enterQuestion": "Please enter a question",
+      "startTimeError": "Start time cannot be later than the end time",
+      "EndTimeError": "End time cannot be earlier than the start time",
+      "AppointmentFailed": "Appointment failed, please try again",
+      "AppointmentTimeConflict": "Appointment time conflict, please choose a new time"
+    }
+  }
+}

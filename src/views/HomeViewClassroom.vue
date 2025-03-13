@@ -1,19 +1,16 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
-
-import PickerClassroom from "@/components/index/PickerClassroom.vue";
-import TableComponent from "@/components/index/TableComponent.vue";
-import FunctionalClassroom from "@/components/index/FunctionalClassroom.vue";
-
-import { UserInfoFormat, PickerFormat } from "@/utils/index/format.js";
-
-// HomeViewClassroom组件全局变量定义
+import { ref, onMounted, onUpdated } from 'vue';
+import { axiosInsV1_1 as axios } from '/src/service/axiosServer.js'
+import { UserInfoFormat, PickerFormat } from "@/utils/dataFormat.js";
+import { useI18n } from "vue-i18n";
+import PickerClassroom from "@/components/index/pickerClassroom.vue";
+import FunctionalClassroom from "@/components/index/functionalClassroom.vue";
+import TimeTableBarClassroom from "@/components/index/timeTableBarClassroom.vue";
+import { ElMessage } from "element-plus";
 
 // 用户基本信息
 let username = ref(null) // 用户名
 let userID = ref(null) // 用户ID(与其他系统对齐为学生学号/教师工号)
-let email = ref(null) // 用户邮箱
 let role = ref([]) // 后端返回的权限信息
 let credits = ref([]) // 后端返回的用户权限
 let authorityTable = ref({}) // 经过格式化后的权限表
@@ -23,18 +20,24 @@ let classroomList = ref([]) // 后端返回的教室列表
 let allClassroomInfo = ref(null) // 所有教室的id - name映射信息表
 let getClassroomSelection = ref(null) // 被用户选中的教室
 let getClassroomSelectionId = ref(null) // 被用户选中的教室
-let allowClassroomInfo = ref(null) // 用户权限允许的教室的id - name映射信息表
+let allowClassroomInfo = ref([]) // 用户权限允许的教室的id - name映射信息表
 
 // Classroom的基本变量 - Table Layer
 let classroomTimeTableOrigin = ref(null) // 后端返回的教室时间表数据直接存储于此变量
-classroomTimeTableOrigin.value = null // 数据项初始化为null，供子组件判定时间表是否为空
 
-let componentKey = ref(0) // 用于强制刷新子组件
+// 渲染逻辑相关基本变量
+let pickerComponentKey = 0 // 用于强制刷新子组件
+let tableComponentKey = 0 // 用于强制刷新子组件
+let userInfoLoading = ref(true) // 用户信息加载状态
+let pickerLoading = ref(true) // 选择器加载状态
+let tableChangeLoading = ref(false) // 时间表加载状态
+let { t } = useI18n() // 国际化翻译函数
+let hasChosenClassroomFlag = ref(false) // 是否已经选择了教室
 
+/**
+ * @description 获取用户信息和权限信息
+ */
 function getUserInfo() {
-  /**
-   * 从后端获取用户信息和权限信息
-   */
   axios({
     method: 'get',
     url: '/User/info',
@@ -45,19 +48,19 @@ function getUserInfo() {
       authorityTable.value = UserInfoFormat.credit_format(credits.value) // 格式化权限信息
       username.value = res.data.data.username // 用户姓名
       userID.value = res.data.data.userID // 用户学号/工号
-      email.value = res.data.data.email // 用户邮箱
+      getClassroomPickerInfo() // 从后端获取Classroom选择器信息
     }
     else{
-      console.warn("请求失败，获取用户信息和权限信息失败")
+      console.error("请求失败，获取用户信息和权限信息失败")
       console.log(res.data.message)
     }
   })
 }
 
+/**
+ * @description 获取教室选择器内选项信息
+ */
 function getClassroomPickerInfo(){
-  /**
-   * 从后端获取Classroom选择器信息
-   */
   axios({
     method:'get',
     url:'/TableInfo/picker/classroom',
@@ -68,16 +71,17 @@ function getClassroomPickerInfo(){
       allowClassroomInfo.value = PickerFormat.allow_classroom_info(authorityTable.value, allClassroomInfo.value)
     }
     else {
-      console.warn("请求失败，获取教师选择器内选项信息失败")
+      console.error("请求失败，获取教师选择器内选项信息失败")
       console.log(res.data.message)
     }
+    pickerComponentKey += 1
   })
 }
 
+/**
+ * @description 依据选中的教室，获取教室时间表内信息
+ */
 function getClassroomTableInfo(){
-  /**
-   * 通过选中的教室的ID向后端动态路由请求数据
-   */
   axios({
     method:"get",
     url:`/TableInfo/classroom/${getClassroomSelectionId.value}`
@@ -86,38 +90,61 @@ function getClassroomTableInfo(){
       classroomTimeTableOrigin.value = res.data.data
     }
     else {
-      console.warn("请求失败，获取 教室 时间表内信息失败")
+      console.error("请求失败，获取 教室 时间表内信息失败")
       console.log(res.data.message)
+      tableChangeLoading.value = false
+      ElMessage.error(t("index.fail_to_load_table_info"))
     }
   })
+  tableComponentKey += 1
 }
 
-onMounted( function(){
-  /**
-   * HomeViewClassroom组件挂载时执行
-   * 向后端请求数据，获取用户信息、权限信息、选择器内信息
-   */
-  console.log("HomeViewClassroom组件开始挂载")
-  // 从后端获取用户信息和权限信息
-  getUserInfo()
-  // 从后端获取Classroom选择器信息
-  getClassroomPickerInfo()
-  componentKey.value += 1
-})
-
+/**
+ * @description 当接收到来自PickerClassroom组件传递的选中教师发生变更时触发
+ * 保存用户的变更，用于后续向后端请求时间表数据进行渲染
+ * @param classroom - 选中的教室信息
+ */
 const handleSelectedClassroom = (classroom) => {
-  /**
-   * 当接收到来自PickerClassroom组件传递的选中教师发生变更时触发
-   * 保存用户的变更，用于后续向后端请求时间表数据进行渲染
-   */
   // 暂存子组件传来的选择
   getClassroomSelectionId.value = classroom.classroomId
   getClassroomSelection.value = classroom.classroom
+  hasChosenClassroomFlag.value = true
 
   // 通过选中的教室的ID向后端动态路由请求数据
+  tableChangeLoading.value = true
+  console.log(tableChangeLoading.value)
   getClassroomTableInfo()
 };
-</script >
+
+/**
+ * @description 时间表加载完成
+ */
+const tableLoadingDone = () => {
+  tableChangeLoading.value = false
+}
+
+/**
+ * @description 选择器加载完成
+ */
+const pickerLoadingDone = () => {
+  pickerLoading.value = false
+}
+
+// Mounted生命周期钩子，用于初始化页面，获取用户信息和权限信息
+onMounted( function(){
+  userInfoLoading.value = true
+  pickerLoading.value = true
+  tableChangeLoading.value = false
+
+  hasChosenClassroomFlag.value = false
+  // 从后端获取用户信息和权限信息
+  getUserInfo()
+})
+
+onUpdated(() => {
+  hasChosenClassroomFlag.value = false
+})
+</script>
 
 <template>
   <div class="app-container">
@@ -128,18 +155,22 @@ const handleSelectedClassroom = (classroom) => {
           :classroom-id="getClassroomSelectionId"
       />
     </div>
-    <div class="picker-layer">
+    <div class="picker-layer" v-loading="pickerLoading">
       <PickerClassroom
-          :selectors="allowClassroomInfo"
-          :key="componentKey"
-          @update:selectedClassroom="handleSelectedClassroom"/>
+        :selectors="allowClassroomInfo"
+        :key="pickerComponentKey"
+        @update:selectedClassroom="handleSelectedClassroom"
+        @loading-done="pickerLoadingDone"
+      />
     </div>
-    <div class="table-layer">
+    <div class="table-layer" v-loading="tableChangeLoading">
       <div class="table-component">
-        <TableComponent
-            :backend-data="classroomTimeTableOrigin"
-            :authority-table="authorityTable"
-            :is-office-hour="false"/>
+        <TimeTableBarClassroom
+          :backend-data="classroomTimeTableOrigin"
+          :authority-table="authorityTable"
+          :has-chosen-classroom-flag="hasChosenClassroomFlag"
+          @loading-done="tableLoadingDone"
+        />
       </div>
     </div>
   </div>
@@ -148,31 +179,31 @@ const handleSelectedClassroom = (classroom) => {
 <style scoped>
 .table-component {
   display: flex;
-  height: 100%;
+  height: auto;
   width: 100%;
 }
 
 .app-container {
-  height: 1200px;
+  min-height: 1200px;
   background-color: #F7FAFF;
   display: flex;
   flex-direction: column;
 }
 
 .table-layer {
-  flex-grow: 1; /* Allow the table layer to expand */
+  height: auto;
   display: flex;
   flex-direction: column;
-}
-
-.picker-layer {
-  margin-left: 10px;
-  margin-right: 10px;
 }
 
 .functional-layer {
   padding-top: 10px;
   padding-left: 10px;
   padding-right: 10px;
+}
+
+.picker-layer {
+  margin-left: 10px;
+  margin-right: 10px;
 }
 </style>

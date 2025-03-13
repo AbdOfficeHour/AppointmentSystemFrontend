@@ -1,0 +1,6 @@
+{
+  "unavailableTimeTip": "Unavailable Time Slot",
+  "availableTimeTip": "Available Time Slot",
+  "illegalTimeTip": "Conflicting Time Slot",
+  "selectedBarTip": "Selected Time Slot"
+}

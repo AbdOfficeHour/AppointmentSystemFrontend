@@ -1,0 +1,127 @@
+{
+    "title": {
+        "myappointment": "My Appointment",
+        "myapprove": "My Approval"
+    },
+    "datePicker": {
+        "0": "Three month",
+        "1": "Six month",
+        "2": "One year",
+        "3": "Cancel"
+    },
+    "stateIcon": {
+        "2": "waiting",
+        "3": "pass",
+        "4": "reject",
+        "5": "complete",
+        "6": "cancel",
+        "7": "overtime"
+    },
+    "modeButton": {
+        "classroom": "Room Appointment",
+        "officehour": "Office Hour Appointment"
+    },
+    "no": "no.",
+    "officehourHead": {
+        "teacher_name": "teacher name",
+        "student_name": "student name",
+        "date": "date",
+        "startTime": "start time",
+        "endTime": "end time",
+        "note": "note",
+        "question": "questions to consult",
+        "state": "state",
+        "operation": "operation"
+    },
+    "classroomHead": {
+        "classroom": "room",
+        "applicant": "applicant",
+        "date": "date",
+        "startTime": "start time",
+        "endTime": "end time",
+        "isMedia": "whether to use the projector",
+        "isComputer": "whether to use the computer",
+        "isSound": "whether to use the loudspeaker",
+        "aim": "aim",
+        "events": "activity content",
+        "state": "state",
+        "operation": "operation"
+    },
+    "detailMessage": {
+        "student_name": "student name",
+        "teacher_name": "teacher name",
+        "note": "note",
+        "question": "questions to consult",
+        "present": "participant",
+        "state": "state",
+        "refuse_result": "refuse reason",
+        "work_summary": "work summary",
+        "withdrawl_reason": "withdrawl reason",
+        "applicant": "applicant",
+        "approver": "applicant",
+        "classroom": "classroom",
+        "isMedia": "whether to use the projector",
+        "isComputer": "whether to use the computer",
+        "isSound": "whether to use the loudspeaker",
+        "events": "activity content",
+        "aim": "aim",
+        "date": "date",
+        "startTime": "start time",
+        "endTime": "end time",
+        "data": "data",
+        "true": "yes",
+        "false": "no",
+        "null": "empty",
+        "noPresent": "No participant",
+        "teacher_course": "course",
+        "teacher_room": "place"
+    },
+    "buttons": {
+        "addAppointment": "Book Now",
+        "cancelAppointment": "cancel",
+        "noOperate": "no operation",
+        "accept": "accept",
+        "reject": "reject",
+        "withdraw": "withdraw",
+        "complete": "complete",
+        "can_no_withdraw": "Withdrawals must be made no later than 48 hours before the event begins"
+    },
+    "officehourCard": {
+        "teacher": "teacher",
+        "time": "time period"
+    },
+    "classroomCard": {
+        "classroom": "classroom",
+        "time": "time period",
+        "applicant": "applicant"
+    },
+    "moveHit": "Swipe the card to the left to show the action",
+    "dialog": {
+        "detailMessage": "Detail",
+        "refuse_reason": "Refuse Reason",
+        "work_summary": "Work Summary",
+        "work_summary_message": "Please enter your work summary",
+        "refuse_reason_message": "Please enter your reason for denial ",
+        "withdraw_reason": "Withdrawal reason",
+        "withdraw_reason_message": "Please enter your reason for withdrawal ",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
+    },
+    "hitDialog": {
+        "data_get_error": "Failed to retrieve data ",
+        "hit": "Tip",
+        "no_appointment_auth": "You do not have appointment permission ",
+        "no_approve_auth": "You do not have permission to approve",
+        "confirm": "confirm",
+        "cancel": "cancel",
+        "cancel_success": "Cancel success",
+        "accept_success": "Confirm success",
+        "request_fail": "The request failed",
+        "request_success": "The request was successful",
+        "cannot_complete": "Please do not complete the work summary until one day after the appointment event",
+        "confirm_accept": "Are you sure you want to approve this appointment?",
+        "refuse_no_blank": "The reason for rejection cannot be null",
+        "withdrawl_no_blank": "The revocation reason cannot be null",
+        "work_summary_no_blank": "The work summary cannot be empty"
+    }
+}

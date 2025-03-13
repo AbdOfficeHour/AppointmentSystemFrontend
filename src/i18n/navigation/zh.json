@@ -1,0 +1,12 @@
+{
+  "Appointment": "发起预约",
+  "Approve": "审核预约",
+  "Home": "回到SSO系统",
+  "Version": "版本：",
+  "Logout": "退出登录",
+  "ChangeLanguage": "切换语言",
+  "ClassroomTab": "学院空间时间表",
+  "OfficeHourTab": "OfficeHour时间表",
+  "AppointmentTab": "我的预约",
+  "Setting": "设置"
+}
